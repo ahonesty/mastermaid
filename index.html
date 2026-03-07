@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -10,8 +9,8 @@
     
     <style>
         :root { 
-            --primary: #001F3F; 
-            --gold: #D4AF37; 
+            --primary: #001F3F; /* สีกรมท่า */
+            --gold: #D4AF37;   /* สีทอง */
             --white: #ffffff;
             --bg: #F8F9FA;
             --line-green: #06C755;
@@ -19,9 +18,9 @@
 
         body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; scroll-behavior: smooth; }
 
-        /* Navigation */
+        /* Navigation: สีขาว, ลดพื้นที่ว่าง, โลโก้คมชัด (ตาม image_14.png) */
         nav { 
-            background: var(--white); 
+            background: #ffffff; 
             padding: 5px 8%; 
             display: flex; 
             justify-content: center; 
@@ -31,46 +30,45 @@
             top: 0; 
             z-index: 1000; 
         }
-        .logo-img { height: 150px; width: auto; transition: 0.3s; }
+        .logo-img { height: 90px; width: auto; display: block; } /* ปรับขนาดให้พอดี (ตาม image_13.png) */
 
-        /* Hero Section */
+        /* Hero Section: เปลี่ยนเป็นรูปคนทำความสะอาดจริง */
         .hero { 
-            background: linear-gradient(rgba(0,31,63,0.75), rgba(0,31,63,0.75)), url('https://images.unsplash.com/photo-1581578731548-c64695cc6954?auto=format&fit=crop&w=1350&q=80'); 
-            background-size: cover; background-position: center; height: 500px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 0 20px;
+            /* ลิงก์รูปภาพแม่บ้านมืออาชีพกำลังทำงาน */
+            background: linear-gradient(rgba(0,31,63,0.7), rgba(0,31,63,0.7)), url('https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?q=80&w=1920&auto=format&fit=crop'); 
+            background-size: cover; background-position: center 30%; height: 550px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 0 20px;
         }
-        .hero h1 { font-size: clamp(28px, 5vw, 42px); margin-bottom: 15px; font-weight: 700; }
-        .hero-btn { background: var(--gold); color: var(--primary); padding: 18px 45px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 18px; transition: 0.4s; box-shadow: 0 8px 25px rgba(212,175,55,0.3); }
+        .hero h1 { font-size: clamp(32px, 6vw, 48px); margin-bottom: 10px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .hero p { font-size: clamp(16px, 3vw, 20px); opacity: 0.9; max-width: 600px; margin-bottom: 30px; }
+        
+        /* ปุ่มจอง: สีทอง, มีเงาแสง (ตาม image_14.png) */
+        .hero-btn { 
+            background: var(--gold); color: var(--primary); padding: 18px 45px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 18px; transition: 0.4s; 
+            box-shadow: 0 8px 25px rgba(212,175,55,0.3); /* เงาแสงตาม image_14.png */
+        }
+        .hero-btn:hover { background: #b8922f; transform: translateY(-3px); box-shadow: 0 10px 30px rgba(212,175,55,0.4); }
 
-        /* Package Section */
+        /* Package Section: สมมาตร (ตาม image_9.png) */
         .container { max-width: 1100px; margin: 0 auto; padding: 60px 20px; text-align: center; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
         .card { background: var(--white); padding: 40px 30px; border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.08); transition: 0.4s; border: 2px solid var(--gold); }
         .card i { font-size: 50px; color: var(--gold); margin-bottom: 25px; }
-        .price { font-size: 26px; font-weight: 700; color: var(--primary); margin-top: auto; padding-top: 10px; }
+        .price { font-size: 32px; font-weight: 700; color: var(--primary); margin-top: auto; padding-top: 10px; } /* ปรับราคาให้ใหญ่ตาม image_9.png */
 
-        /* Booking Form */
+        /* Booking Section */
         .booking-wrap { background: var(--primary); padding: 80px 20px; }
         .booking-container { background: var(--white); border-radius: 30px; padding: 40px; max-width: 700px; margin: 0 auto; }
-        .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
-        label { font-weight: 600; display: block; margin-top: 20px; font-size: 14px; color: #666; }
-        input, select { width: 100%; padding: 15px; margin-top: 8px; border: 1px solid #ddd; border-radius: 12px; font-family: 'Sarabun'; box-sizing: border-box; }
-
-        .summary-box { background: #F0F4F8; border-radius: 15px; padding: 25px; margin-top: 30px; border: 1px dashed var(--gold); text-align: center; }
         
-        /* Deposit Section - Line Style */
-        .deposit-notice { background: #F2FFF7; border: 1px solid #B7EBC8; padding: 25px; border-radius: 15px; margin-top: 30px; text-align: center; }
-        .line-btn { display: inline-flex; align-items: center; justify-content: center; background: var(--line-green); color: white !important; text-decoration: none; padding: 12px 25px; border-radius: 10px; font-weight: 700; margin-top: 15px; transition: 0.3s; }
-        .line-btn i { margin-right: 10px; font-size: 20px; }
-
-        .submit-btn { width: 100%; background: var(--gold); color: var(--primary); padding: 20px; border: none; border-radius: 15px; font-size: 20px; font-weight: 700; cursor: pointer; margin-top: 30px; transition: 0.3s; }
-
-        /* Modal */
-        .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 9999; backdrop-filter: blur(5px); }
-        #thanks { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width: 90%; max-width: 450px; background: white; padding: 45px; border-radius: 35px; text-align: center; z-index: 10000; border-top: 15px solid var(--gold); }
+        /* สไตล์ฟอร์มเพิ่มเติม (ตาม image_10.png) */
+        input, select { width: 100%; padding: 15px; margin-top: 8px; border: 1px solid #ddd; border-radius: 12px; font-family: 'Sarabun'; }
         
+        /* ปุ่มส่ง LINE (ตาม image_10.png) */
+        .deposit-notice { background: #F2FFF7; border: 1px solid #B7EBC8; padding: 25px; border-radius: 15px; text-align: center; margin-top: 30px;}
+        .line-btn { display: inline-flex; align-items: center; justify-content: center; background: var(--line-green); color: white; text-decoration: none; padding: 12px 25px; border-radius: 10px; font-weight: 700; margin-top: 15px; }
+
         @media (max-width: 600px) {
-            .logo-img { height: 45px; }
-            .time-grid { grid-template-columns: 1fr; }
+            .logo-img { height: 70px; }
+            .hero { height: 450px; }
         }
     </style>
 </head>
@@ -222,5 +220,6 @@
     </script>
 </body>
 </html>
+
 
 
