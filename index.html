@@ -10,7 +10,7 @@
         :root { --primary: #001F3F; --gold: #D4AF37; --white: #ffffff; --bg: #F8F9FA; --line-green: #06C755; }
         body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; scroll-behavior: smooth; }
         
-        /* Navigation - White & Minimal */
+        /* Navigation */
         nav { background: #ffffff; padding: 5px 8%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
         .logo-img { height: 100px; width: auto; display: block; }
 
@@ -33,13 +33,9 @@
         input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Sarabun'; box-sizing: border-box; font-size: 15px; }
         textarea { height: 80px; resize: vertical; }
 
+        /* Summary Box */
         .summary-box { background: #F0F4F8; border-radius: 15px; padding: 20px; margin-top: 25px; border: 1px dashed var(--gold); text-align: center; }
         .submit-btn { width: 100%; background: var(--gold); color: var(--primary); padding: 18px; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 25px; }
-
-        /* Review Section */
-        .review-card { text-align: center; border: 1px solid #eee; padding: 25px; border-radius: 20px; background: white; }
-        .review-card img { width: 70px; height: 70px; border-radius: 50%; margin-bottom: 10px; object-fit: cover; border: 2px solid var(--gold); }
-        .stars { color: var(--gold); font-size: 14px; margin-bottom: 8px; }
 
         /* Modal Payment */
         .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 9999; backdrop-filter: blur(5px); }
@@ -84,7 +80,7 @@
                 <div class="time-grid">
                     <div>
                         <label>เลือกประเภทบริการ:</label>
-                        <select name="service_type">
+                        <select name="service_type" onchange="calculateTime()">
                             <option value="ทำความสะอาดทั่วไป">ทำความสะอาดทั่วไป</option>
                             <option value="Big Cleaning">Big Cleaning</option>
                         </select>
@@ -100,7 +96,7 @@
                     </div>
                 </div>
 
-                <label>รายละเอียดบ้าน / จุดที่เน้นเป็นพิเศษ:</label>
+                <label>รายละเอียดเพิ่มเติม / จุดที่เน้นเป็นพิเศษ:</label>
                 <textarea name="home_details" placeholder="เช่น บ้าน 2 ชั้น เน้นขัดห้องน้ำและกระจก"></textarea>
 
                 <div><label>วันที่เข้าทำ:</label><input type="date" name="date" id="book_date" required></div>
@@ -120,6 +116,7 @@
                                 <option value="2">2 ชม.</option>
                                 <option value="3">3 ชม.</option>
                                 <option value="4">4 ชม.</option>
+                                <option value="5">5 ชม.</option>
                             </select>
                             <input type="hidden" name="work_hours" id="work_hours_input" value="2 ชั่วโมง">
                         </div>
@@ -128,10 +125,15 @@
                         <strong>เลิกงานประมาณ: <span id="display_end">11:00</span> น.</strong>
                         <input type="hidden" name="end_time" id="end_time_input" value="11:00">
                         <input type="hidden" name="total_price" id="total_price_hidden" value="550">
+                        
                         <br><span style="color: var(--gold); font-size: 20px; font-weight: 700;">ค่าบริการ: <span id="total_price_display">550</span>.-</span>
+                        
+                        <div id="price_note" style="color: #d9534f; font-size: 13px; margin-top: 5px; font-weight: 600; display: none;">
+                            *ตรวจสอบค่าบริการจริงที่ Line*
+                        </div>
                     </div>
                 </div>
-                <button type="submit" class="submit-btn">ยืนยันการจอง</button>
+                <button type="submit" class="submit-btn">ยืนยันข้อมูลการจอง</button>
             </form>
         </div>
     </section>
@@ -158,22 +160,28 @@
     <script>
         function calculateTime() {
             const startVal = document.getElementById('start_time').value;
+            const serviceType = document.getElementsByName('service_type')[0].value;
             const duration = parseInt(document.getElementById('duration').value);
+            const priceNote = document.getElementById('price_note');
             
-            // เก็บค่าระยะเวลาเป็นตัวหนังสือ
             document.getElementById('work_hours_input').value = duration + " ชั่วโมง";
 
-            // คำนวณเวลาสิ้นสุด
             let [hours, minutes] = startVal.split(':').map(Number);
             let endHours = hours + duration;
             const formattedEnd = (endHours < 10 ? '0' + endHours : endHours) + ':' + (minutes < 10 ? '0' + minutes : minutes);
             document.getElementById('display_end').innerText = formattedEnd;
             document.getElementById('end_time_input').value = formattedEnd;
 
-            // คำนวณราคา
-            let price = 550;
-            if (duration === 3) price = 800;
-            else if (duration > 3) price = 800 + ((duration - 3) * 200);
+            let price = 0;
+            if (serviceType === "Big Cleaning") {
+                price = 2000;
+                priceNote.style.display = 'block';
+            } else {
+                price = 550;
+                if (duration === 3) price = 800;
+                else if (duration > 3) price = 800 + ((duration - 3) * 200);
+                priceNote.style.display = 'none';
+            }
             
             document.getElementById('total_price_display').innerText = price.toLocaleString();
             document.getElementById('total_price_hidden').value = price;
