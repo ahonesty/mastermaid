@@ -22,12 +22,10 @@
         .booking-container { background: var(--white); border-radius: 30px; padding: 40px; max-width: 700px; margin: 0 auto; }
         .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
         label { font-weight: 600; display: block; margin-top: 20px; font-size: 14px; color: #666; }
-        input, select { width: 100%; padding: 15px; margin-top: 8px; border: 1px solid #ddd; border-radius: 12px; font-family: 'Sarabun'; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 15px; margin-top: 8px; border: 1px solid #ddd; border-radius: 12px; font-family: 'Sarabun'; box-sizing: border-box; }
+        textarea { height: 100px; resize: vertical; }
         .summary-box { background: #F0F4F8; border-radius: 15px; padding: 25px; margin-top: 30px; border: 1px dashed var(--gold); text-align: center; }
         .submit-btn { width: 100%; background: var(--gold); color: var(--primary); padding: 20px; border: none; border-radius: 15px; font-size: 20px; font-weight: 700; cursor: pointer; margin-top: 30px; }
-        .review-card { text-align: center; border: 1px solid #eee; padding: 30px; border-radius: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); background: white; }
-        .review-card img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 15px; border: 3px solid var(--gold); object-fit: cover; }
-        .stars { color: var(--gold); margin-bottom: 10px; }
         .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 9999; backdrop-filter: blur(5px); }
         #payment-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width: 90%; max-width: 450px; background: white; padding: 30px 20px; border-radius: 35px; text-align: center; z-index: 10000; border-top: 15px solid var(--gold); }
         .bank-box { background: #F2FFF7; border: 1px solid #B7EBC8; padding: 20px; border-radius: 20px; margin: 15px 0; }
@@ -56,32 +54,52 @@
             <h2 style="text-align: center; color: var(--primary); margin-top: 0;">จองคิวแม่บ้าน</h2>
             <form id="maidForm" action="https://hook.us2.make.com/u4ddkucyj2gbd9gj14om5cdtu3qjnzxx" method="POST">
                 <div class="time-grid">
-                    <div><label>ชื่อ-นามสกุล:</label><input type="text" name="name" required></div>
-                    <div><label>เบอร์โทรศัพท์:</label><input type="tel" name="phone" required></div>
+                    <div><label>ชื่อ-นามสกุล:</label><input type="text" name="name" required placeholder="ระบุชื่อ"></div>
+                    <div><label>เบอร์โทรศัพท์:</label><input type="tel" name="phone" required placeholder="06x-xxx-xxxx"></div>
                 </div>
-                <label>ที่อยู่ / พิกัด:</label><input type="text" name="location" required>
                 
-                <label>เลือกประเภทบริการ:</label>
-                <select name="service_type" id="service_type">
-                    <option value="ทำความสะอาดทั่วไป">ทำความสะอาดทั่วไป</option>
-                    <option value="Big Cleaning">Big Cleaning</option>
-                </select>
-
+                <label>ที่อยู่ / พิกัดที่ชัดเจน:</label>
+                <input type="text" name="location" required placeholder="หมู่บ้าน / ตำบล / อำเภอ">
+                
                 <div class="time-grid">
-                    <div><label>ประเภทที่พัก:</label><select name="home_type"><option value="House">บ้านเดี่ยว</option><option value="Condo">คอนโด</option></select></div>
-                    <div><label>วันที่เข้าทำ:</label><input type="date" name="date" id="book_date" required></div>
+                    <div>
+                        <label>เลือกประเภทบริการ:</label>
+                        <select name="service_type">
+                            <option value="ทำความสะอาดทั่วไป">ทำความสะอาดทั่วไป</option>
+                            <option value="Big Cleaning">Big Cleaning</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>ประเภทที่พัก:</label>
+                        <select name="home_type">
+                            <option value="บ้านเดี่ยว">บ้านเดี่ยว</option>
+                            <option value="ทาวน์โฮม">ทาวน์โฮม</option>
+                            <option value="คอนโด/หอพัก">คอนโด/หอพัก</option>
+                            <option value="ออฟฟิศ">ออฟฟิศ</option>
+                        </select>
+                    </div>
                 </div>
+
+                <label>รายละเอียดเพิ่มเติม / จุดที่เน้นเป็นพิเศษ:</label>
+                <textarea name="home_details" placeholder="เช่น บ้าน 2 ชั้น 3 ห้องนอน 2 ห้องน้ำ หรือเน้นทำความสะอาดกระจกเป็นพิเศษ"></textarea>
+
+                <div><label>วันที่เข้าทำ:</label><input type="date" name="date" id="book_date" required></div>
 
                 <div class="summary-box">
                     <div class="time-grid">
                         <div><label>เวลาเริ่ม:</label>
                             <select name="start_time" id="start_time" onchange="calculateTime()">
-                                <option value="09:00">09:00</option><option value="13:00">13:00</option>
+                                <option value="09:00">09:00 น.</option>
+                                <option value="10:00">10:00 น.</option>
+                                <option value="11:00">11:00 น.</option>
+                                <option value="13:00">13:00 น.</option>
+                                <option value="14:00">14:00 น.</option>
                             </select>
                         </div>
                         <div><label>จำนวนชั่วโมง:</label>
                             <select id="duration" onchange="calculateTime()">
                                 <option value="2">2 ชม.</option><option value="3">3 ชม.</option>
+                                <option value="4">4 ชม.</option><option value="5">5 ชม.</option>
                             </select>
                             <input type="hidden" name="work_hours" id="work_hours_input" value="2 ชั่วโมง">
                         </div>
@@ -92,25 +110,25 @@
                         <br><span style="color: var(--gold); font-size: 20px; font-weight: 700;">ค่าบริการ: <span id="total_price">550</span>.-</span>
                     </div>
                 </div>
-                <button type="submit" class="submit-btn">ยืนยันการจอง</button>
+                <button type="submit" class="submit-btn">ยืนยันข้อมูลการจอง</button>
             </form>
         </div>
     </section>
 
     <section class="container">
-        <h2 style="color: var(--primary); font-size: 32px; margin-bottom: 50px;">รีวิวจากลูกค้า</h2>
+        <h2 style="color: var(--primary); font-size: 32px; margin-bottom: 50px;">รีวิวจากลูกค้าอุบลฯ</h2>
         <div class="grid">
-            <div class="review-card"><img src="https://i.pravatar.cc/100?u=1" alt="Reviewer"><h4>คุณไหม</h4><p>"สะอาดมากค่ะ"</p></div>
-            <div class="review-card"><img src="https://i.pravatar.cc/100?u=2" alt="Reviewer"><h4>คุณบอย</h4><p>"แม่บ้านสุภาพครับ"</p></div>
+            <div class="review-card"><img src="https://i.pravatar.cc/100?u=1" alt="Reviewer"><h4>คุณไหม</h4><p>"สะอาดมาก ตรงเวลาค่ะ"</p></div>
+            <div class="review-card"><img src="https://i.pravatar.cc/100?u=2" alt="Reviewer"><h4>คุณบอย</h4><p>"แม่บ้านสุภาพ อุปกรณ์ครบ"</p></div>
         </div>
     </section>
 
     <div class="overlay" id="overlay"></div>
     <div id="payment-modal">
-        <h3>บันทึกข้อมูลสำเร็จ!</h3>
+        <h3 style="color: var(--primary);">บันทึกข้อมูลสำเร็จ!</h3>
         <div class="bank-box">
             <img src="payment-qr.png" alt="QR Code" style="width: 150px; margin-bottom: 10px;">
-            <p>มัดจำ 200.- (กสิกรไทย: 123-x-xxxxx-x)</p>
+            <p><strong>มัดจำ 200.-</strong><br>กสิกรไทย: 123-x-xxxxx-x<br>(บจก. มาสเตอร์เมด อุบล)</p>
         </div>
         <a href="https://line.me/ti/p/@your_id" target="_blank" class="line-btn"><i class="fab fa-line"></i> ทัก LINE ส่งสลิป</a>
         <button onclick="location.reload()" style="margin-top:15px; background:none; border:none; text-decoration:underline; cursor:pointer;">กลับหน้าหลัก</button>
@@ -123,10 +141,11 @@
             document.getElementById('work_hours_input').value = duration + " ชั่วโมง";
             let [hours, minutes] = startVal.split(':').map(Number);
             let endHours = hours + duration;
-            const formattedEnd = (endHours < 10 ? '0' + endHours : endHours) + ':00';
+            const formattedEnd = (endHours < 10 ? '0' + endHours : endHours) + ':' + (minutes < 10 ? '0' : '0') + '0';
             document.getElementById('display_end').innerText = formattedEnd;
             document.getElementById('end_time_input').value = formattedEnd;
-            let price = (duration === 2) ? 550 : 800;
+            let price = 550;
+            if (duration === 3) price = 800; else if (duration > 3) price = 800 + ((duration - 3) * 200);
             document.getElementById('total_price').innerText = price.toLocaleString();
         }
         const form = document.getElementById('maidForm');
