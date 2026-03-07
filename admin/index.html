@@ -1,55 +1,24 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid Thailand</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Master Maid Admin Panel</title>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
-<body class="bg-gray-50 text-gray-800">
-
-    <header class="bg-blue-600 text-white py-16 text-center shadow-md">
-        <h1 class="text-5xl font-bold mb-2">Master Maid</h1>
-        <p class="text-xl opacity-90">สะอาด มั่นใจ วางใจเรา ในพื้นที่อุบลราชธานี</p>
-    </header>
-
-    <section class="max-w-5xl mx-auto px-4 py-16">
-        <div class="grid md:grid-cols-2 gap-8 text-center">
-            <div class="bg-white p-8 rounded-3xl shadow-xl border-2 border-blue-400">
-                <h3 class="text-2xl font-bold mb-4">ทำความสะอาดทั่วไป</h3>
-                <p class="text-5xl font-black text-blue-600">650.-</p>
-                <p class="text-gray-400 mt-2">ราคาเริ่มต้น</p>
-            </div>
-            <div class="bg-white p-8 rounded-3xl shadow-xl border-2 border-blue-400">
-                <h3 class="text-2xl font-bold mb-4">Big Cleaning</h3>
-                <p class="text-5xl font-black text-blue-600">2,000.-</p>
-                <p class="text-gray-400 mt-2">ราคาเริ่มต้น</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="max-w-3xl mx-auto px-4 py-12 bg-white rounded-2xl shadow-sm mb-16">
-        <h2 class="text-3xl font-bold mb-6 text-blue-800 text-center border-b pb-4">ทำไมต้องเลือกเรา</h2>
-        <div class="prose prose-blue lg:prose-xl mx-auto">
-            <p>เราคือทีมงานมืออาชีพ พร้อมให้บริการในอุบลราชธานี...</p>
-        </div>
-    </section>
-
-    <footer class="bg-gray-800 text-white py-8 text-center">
-        <p>© 2026 Master Maid Thailand - Ubon Ratchathani</p>
-    </footer>
-
-    <script>
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on("init", user => {
-          if (!user) {
-            window.netlifyIdentity.on("login", () => {
-              document.location.href = "/admin/";
-            });
-          }
-        });
-      }
-    </script>
+<body>
+  <script src="https://unpkg.com/netlify-cms@^2.10.19/dist/netlify-cms.js"></script>
+  <script>
+    // ตรวจสอบการล็อกอิน
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", user => {
+        if (!user) {
+          window.netlifyIdentity.on("login", () => {
+            document.location.href = "/admin/";
+          });
+        }
+      });
+    }
+  </script>
 </body>
 </html>
