@@ -5,19 +5,10 @@ media_folder: "images"
 public_folder: "/images"
 collections:
   - name: "pages"
-    label: "จัดการเนื้อหาเว็บไซต์"
+    label: "จัดการหน้าเว็บ"
     files:
       - file: "index.html"
-        label: "หน้าหลัก (Master Maid)"
+        label: "หน้าหลัก"
         name: "home"
         fields:
-          - {label: "ราคาเริ่มต้น (ทั่วไป)", name: "price_basic", widget: "string", default: "650.-"}
-          - {label: "ราคาเริ่มต้น (Big Cleaning)", name: "price_big", widget: "string", default: "2,000.-"}
-          - {label: "เบอร์โทรศัพท์", name: "phone", widget: "string", default: "0xx-xxx-xxxx"}
-          - {label: "Line ID", name: "line_id", widget: "string", default: "@mastermaid"}
-          - label: "รีวิวลูกค้า"
-            name: "reviews"
-            widget: "list"
-            fields:
-              - {label: "ชื่อลูกค้า", name: "name", widget: "string"}
-              - {label: "ข้อความรีวิว", name: "comment", widget: "text"}
+          - {label: "ราคาเริ่มต้น", name: "price", widget: "string"}
