@@ -11,25 +11,13 @@ collections:
         label: "หน้าหลัก (Master Maid)"
         name: "home"
         fields:
-          - label: "ข้อมูลติดต่อ"
-            name: "contact"
-            widget: "object"
-            fields:
-              - {label: "เบอร์โทรศัพท์", name: "phone", widget: "string"}
-              - {label: "Line ID", name: "line_id", widget: "string"}
-          
-          - label: "แพ็กเกจบริการ (ดีไซน์สมมาตร)"
-            name: "packages"
-            widget: "object"
-            fields:
-              - {label: "ราคาเริ่มต้น (ทั่วไป)", name: "price_basic", widget: "string"}
-              - {label: "ราคาเริ่มต้น (Big Cleaning)", name: "price_big", widget: "string"}
-          
-          - label: "รีวิวจากลูกค้า (6 ท่าน)"
+          - {label: "ราคาเริ่มต้น (ทั่วไป)", name: "price_basic", widget: "string", default: "650.-"}
+          - {label: "ราคาเริ่มต้น (Big Cleaning)", name: "price_big", widget: "string", default: "2,000.-"}
+          - {label: "เบอร์โทรศัพท์", name: "phone", widget: "string", default: "0xx-xxx-xxxx"}
+          - {label: "Line ID", name: "line_id", widget: "string", default: "@mastermaid"}
+          - label: "รีวิวลูกค้า"
             name: "reviews"
             widget: "list"
-            allow_add: true
             fields:
-              - {label: "ชื่อลูกค้า", name: "customer_name", widget: "string"}
+              - {label: "ชื่อลูกค้า", name: "name", widget: "string"}
               - {label: "ข้อความรีวิว", name: "comment", widget: "text"}
-              - {label: "คะแนน (1-5 ดาว)", name: "rating", widget: "number"}
