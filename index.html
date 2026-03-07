@@ -19,7 +19,7 @@
 
         body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; scroll-behavior: smooth; }
 
-        /* Navigation: สีขาวและลดพื้นที่ว่างตามรูป */
+        /* Navigation */
         nav { 
             background: #ffffff; 
             padding: 5px 8%; 
@@ -41,12 +41,11 @@
         .hero h1 { font-size: clamp(28px, 5vw, 42px); margin-bottom: 15px; font-weight: 700; }
         .hero-btn { background: var(--gold); color: var(--primary); padding: 18px 45px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 18px; transition: 0.4s; box-shadow: 0 8px 25px rgba(212,175,55,0.3); }
 
-        /* Packages Section */
+        /* Container & Grid */
         .container { max-width: 1100px; margin: 0 auto; padding: 60px 20px; text-align: center; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
         .card { background: var(--white); padding: 40px 30px; border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 2px solid var(--gold); }
         .card i { font-size: 50px; color: var(--gold); margin-bottom: 25px; }
-        .price { font-size: 32px; font-weight: 700; color: var(--primary); margin-top: auto; padding-top: 20px; }
 
         /* Booking Form */
         .booking-wrap { background: var(--primary); padding: 80px 20px; }
@@ -56,24 +55,22 @@
         input, select { width: 100%; padding: 15px; margin-top: 8px; border: 1px solid #ddd; border-radius: 12px; font-family: 'Sarabun'; box-sizing: border-box; }
 
         .summary-box { background: #F0F4F8; border-radius: 15px; padding: 25px; margin-top: 30px; border: 1px dashed var(--gold); text-align: center; }
-        .submit-btn { width: 100%; background: var(--gold); color: var(--primary); padding: 20px; border: none; border-radius: 15px; font-size: 20px; font-weight: 700; cursor: pointer; margin-top: 30px; transition: 0.3s; }
+        .submit-btn { width: 100%; background: var(--gold); color: var(--primary); padding: 20px; border: none; border-radius: 15px; font-size: 20px; font-weight: 700; cursor: pointer; margin-top: 30px; }
 
-        /* Review Section */
+        /* Review Card */
         .review-card { text-align: center; border: 1px solid #eee; padding: 30px; border-radius: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); background: white; }
         .review-card img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 15px; border: 3px solid var(--gold); object-fit: cover; }
         .stars { color: var(--gold); margin-bottom: 10px; }
 
-        /* Modal Payment */
+        /* Modal */
         .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 9999; backdrop-filter: blur(5px); }
         #payment-modal { 
             display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); 
             width: 90%; max-width: 450px; background: white; padding: 30px 20px; 
             border-radius: 35px; text-align: center; z-index: 10000; border-top: 15px solid var(--gold);
-            max-height: 90vh; overflow-y: auto;
         }
         .bank-box { background: #F2FFF7; border: 1px solid #B7EBC8; padding: 20px; border-radius: 20px; margin: 15px 0; }
         .line-btn { display: inline-flex; align-items: center; justify-content: center; background: var(--line-green); color: white !important; text-decoration: none; padding: 15px 30px; border-radius: 12px; font-weight: 700; width: 100%; box-sizing: border-box; }
-        .line-btn i { margin-right: 10px; font-size: 24px; }
 
         @media (max-width: 600px) {
             .logo-img { height: 75px; }
@@ -98,20 +95,20 @@
                 <i class="fas fa-broom"></i>
                 <h3 style="font-weight: 700;">ทำความสะอาดทั่วไป</h3>
                 <p style="color: #666;">กวาด ถู ล้างห้องน้ำ<br>เหมาะสำหรับที่พักอาศัยประจำ</p>
-                <div class="price">550.- / 2 ชม.</div>
+                <div style="font-size: 28px; font-weight: 700; color: var(--primary);">550.- / 2 ชม.</div>
             </div>
             <div class="card">
                 <i class="fas fa-sparkles"></i>
                 <h3 style="font-weight: 700;">Big Cleaning</h3>
                 <p style="color: #666;">ขัดล้างคราบฝังลึกทุกจุด<br>เหมาะสำหรับย้ายเข้า-ออก</p>
-                <div class="price">เริ่มต้น 2,000.-</div>
+                <div style="font-size: 28px; font-weight: 700; color: var(--primary);">เริ่มต้น 2,000.-</div>
             </div>
         </div>
     </section>
 
     <section class="booking-wrap" id="booking">
         <div class="booking-container">
-            <h2 style="text-align: center; color: var(--primary); margin-top: 0;">กรอกรายละเอียดการจอง</h2>
+            <h2 style="text-align: center; color: var(--primary); margin-top: 0;">จองคิวแม่บ้าน</h2>
             <form id="maidForm" action="https://hook.us2.make.com/u4ddkucyj2gbd9gj14om5cdtu3qjnzxx" method="POST">
                 
                 <div class="time-grid">
@@ -119,8 +116,15 @@
                     <div><label>เบอร์โทรศัพท์:</label><input type="tel" name="phone" required placeholder="06x-xxx-xxxx"></div>
                 </div>
 
-                <label>ที่อยู่ / โลเคชั่น (ในอุบลฯ):</label>
+                <label>ที่อยู่ / พิกัด (ในอุบลฯ):</label>
                 <input type="text" name="location" required placeholder="หมู่บ้าน / ตำบล / อำเภอ">
+
+                <label>เลือกประเภทบริการ:</label>
+                <select name="service_type">
+                    <option value="ทำความสะอาดทั่วไป">ทำความสะอาดทั่วไป (เริ่ม 550.-)</option>
+                    <option value="Big Cleaning">Big Cleaning (เริ่ม 2,000.-)</option>
+                    <option value="ทำความสะอาดกระจก">ทำความสะอาดกระจก / มุ้งลวด</option>
+                </select>
 
                 <div class="time-grid">
                     <div>
@@ -154,17 +158,17 @@
                         <div>
                             <label style="margin-top:0;">จำนวนชั่วโมง:</label>
                             <select id="duration" onchange="calculateTime()">
-                                <option value="2">2 ชั่วโมง (550.-)</option>
-                                <option value="3">3 ชั่วโมง (800.-)</option>
-                                <option value="4">4 ชั่วโมง (1,000.-)</option>
-                                <option value="5">5 ชั่วโมง (1,200.-)</option>
-                                <option value="6">6 ชั่วโมง (1,400.-)</option>
+                                <option value="2">2 ชั่วโมง</option>
+                                <option value="3">3 ชั่วโมง</option>
+                                <option value="4">4 ชั่วโมง</option>
+                                <option value="5">5 ชั่วโมง</option>
+                                <option value="6">6 ชั่วโมง</option>
                             </select>
                             <input type="hidden" name="work_hours" id="work_hours_input" value="2 ชั่วโมง">
                         </div>
                     </div>
                     <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
-                        <strong>เลิกงานโดยประมาณ: <span id="display_end">11:00</span> น.</strong><br>
+                        <strong>เลิกงานประมาณ: <span id="display_end">11:00</span> น.</strong><br>
                         <input type="hidden" name="end_time" id="end_time_input" value="11:00">
                         <span style="color: var(--gold); font-size: 20px; font-weight: 700;">ค่าบริการ: <span id="total_price">550</span>.-</span>
                     </div>
@@ -175,7 +179,7 @@
         </div>
     </section>
 
-    <section class="container" id="reviews">
+    <section class="container">
         <h2 style="color: var(--primary); font-size: 32px; margin-bottom: 50px;">รีวิวจากลูกค้าอุบลฯ</h2>
         <div class="grid">
             <div class="review-card">
@@ -195,73 +199,39 @@
 
     <div class="overlay" id="overlay"></div>
     <div id="payment-modal">
-        <i class="fas fa-check-circle" style="font-size: 50px; color: #28a745; margin-bottom: 15px;"></i>
-        <h3 style="margin: 0; color: var(--primary);">บันทึกข้อมูลสำเร็จ!</h3>
-        <p style="color: #666; font-size: 14px; margin: 5px 0;">กรุณาชำระมัดจำเพื่อยืนยันคิวงาน</p>
-        
+        <h3 style="color: var(--primary);">บันทึกข้อมูลสำเร็จ!</h3>
+        <p style="color: #666; font-size: 14px;">กรุณาชำระมัดจำเพื่อยืนยันคิวงาน</p>
         <div class="bank-box">
-            <strong><i class="fas fa-university"></i> ชำระมัดจำ 200.-</strong><br>
-            <p style="font-size: 15px; margin: 10px 0;">กสิกรไทย: 123-x-xxxxx-x<br>(บจก. มาสเตอร์เมด อุบล)</p>
-            <p style="font-size: 13px; color: #555;">โอนเงินแล้วแจ้งสลิปที่ LINE แอดมิน</p>
+            <img src="payment-qr.png" alt="QR Code" style="width: 180px; margin-bottom: 10px;">
+            <p><strong>มัดจำ 200.-</strong><br>กสิกรไทย: 123-x-xxxxx-x<br>(บจก. มาสเตอร์เมด อุบล)</p>
         </div>
-
-        <a href="https://line.me/ti/p/@your_id" target="_blank" class="line-btn">
-            <i class="fab fa-line"></i> ทัก LINE ส่งสลิป
-        </a>
-        
-        <button onclick="location.reload()" style="margin-top: 15px; background: none; border: none; color: #999; text-decoration: underline; cursor: pointer;">กลับหน้าหลัก</button>
+        <a href="https://line.me/ti/p/@your_id" target="_blank" class="line-btn"><i class="fab fa-line"></i> ทัก LINE ส่งสลิป</a>
+        <button onclick="location.reload()" style="margin-top:15px; background:none; border:none; text-decoration:underline; cursor:pointer;">กลับหน้าหลัก</button>
     </div>
 
     <script>
-        // จำลองคิวงานเพื่อป้องกันจองซ้อน
-        const bookingsDB = { "2026-03-10|09:00": 2 };
-
         function calculateTime() {
             const startVal = document.getElementById('start_time').value;
             const duration = parseInt(document.getElementById('duration').value);
-            
-            // ตั้งค่าข้อความระยะเวลา
             document.getElementById('work_hours_input').value = duration + " ชั่วโมง";
-
-            // คำนวณเวลาเลิกงาน
             let [hours, minutes] = startVal.split(':').map(Number);
             let endHours = hours + duration;
             const formattedEnd = (endHours < 10 ? '0' + endHours : endHours) + ':' + (minutes < 10 ? '0' + minutes : minutes);
-            
             document.getElementById('display_end').innerText = formattedEnd;
             document.getElementById('end_time_input').value = formattedEnd;
-
-            // คำนวณราคา
             let price = 550;
-            if (duration === 3) price = 800;
-            else if (duration > 3) price = 800 + ((duration - 3) * 200);
+            if (duration === 3) price = 800; else if (duration > 3) price = 800 + ((duration - 3) * 200);
             document.getElementById('total_price').innerText = price.toLocaleString();
         }
 
         const form = document.getElementById('maidForm');
         form.onsubmit = async (e) => {
             e.preventDefault();
-
-            const dateVal = document.getElementById('book_date').value;
-            const timeVal = document.getElementById('start_time').value;
-            const checkKey = `${dateVal}|${timeVal}`;
-
-            if (bookingsDB[checkKey] >= 2) {
-                alert("ขออภัยครับ! ช่วงเวลา " + timeVal + " น. ของวันที่เลือก เต็มแล้วครับ");
-                return;
-            }
-
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('payment-modal').style.display = 'block';
-            
             const formData = new FormData(form);
-            try {
-                await fetch(form.action, { method: 'POST', body: formData, mode: 'no-cors' });
-            } catch (error) {
-                console.error("Error", error);
-            }
+            await fetch(form.action, { method: 'POST', body: formData, mode: 'no-cors' });
         };
-
         window.onload = calculateTime;
     </script>
 </body>
