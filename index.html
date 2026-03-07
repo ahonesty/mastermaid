@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -9,8 +10,8 @@
     
     <style>
         :root { 
-            --primary: #001F3F; /* สีกรมท่า */
-            --gold: #D4AF37;   /* สีทอง */
+            --primary: #001F3F; 
+            --gold: #D4AF37; 
             --white: #ffffff;
             --bg: #F8F9FA;
             --line-green: #06C755;
@@ -18,7 +19,7 @@
 
         body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; scroll-behavior: smooth; }
 
-        /* Navigation: สีขาว, ลดพื้นที่ว่าง, โลโก้คมชัด (ตาม image_14.png) */
+        /* Header & Navigation - สีขาว ลดพื้นที่ว่าง */
         nav { 
             background: #ffffff; 
             padding: 5px 8%; 
@@ -30,55 +31,49 @@
             top: 0; 
             z-index: 1000; 
         }
-        .logo-img { height: 90px; width: auto; display: block; } /* ปรับขนาดให้พอดี (ตาม image_13.png) */
+        .logo-img { height: 100px; width: auto; display: block; }
 
-        /* Hero Section: เปลี่ยนเป็นรูปคนทำความสะอาดจริง */
+        /* Hero Section - รูปคนทำความสะอาดจริง */
         .hero { 
-            /* ลิงก์รูปภาพแม่บ้านมืออาชีพกำลังทำงาน */
             background: linear-gradient(rgba(0,31,63,0.7), rgba(0,31,63,0.7)), url('https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?q=80&w=1920&auto=format&fit=crop'); 
-            background-size: cover; background-position: center 30%; height: 550px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 0 20px;
+            background-size: cover; background-position: center; height: 500px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 0 20px;
         }
-        .hero h1 { font-size: clamp(32px, 6vw, 48px); margin-bottom: 10px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        .hero p { font-size: clamp(16px, 3vw, 20px); opacity: 0.9; max-width: 600px; margin-bottom: 30px; }
-        
-        /* ปุ่มจอง: สีทอง, มีเงาแสง (ตาม image_14.png) */
-        .hero-btn { 
-            background: var(--gold); color: var(--primary); padding: 18px 45px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 18px; transition: 0.4s; 
-            box-shadow: 0 8px 25px rgba(212,175,55,0.3); /* เงาแสงตาม image_14.png */
-        }
-        .hero-btn:hover { background: #b8922f; transform: translateY(-3px); box-shadow: 0 10px 30px rgba(212,175,55,0.4); }
+        .hero h1 { font-size: clamp(28px, 5vw, 42px); margin-bottom: 15px; font-weight: 700; }
+        .hero-btn { background: var(--gold); color: var(--primary); padding: 18px 45px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 18px; transition: 0.4s; box-shadow: 0 8px 25px rgba(212,175,55,0.3); }
 
-        /* Package Section: สมมาตร (ตาม image_9.png) */
-        .container { max-width: 1100px; margin: 0 auto; padding: 60px 20px; text-align: center; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
-        .card { background: var(--white); padding: 40px 30px; border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.08); transition: 0.4s; border: 2px solid var(--gold); }
-        .card i { font-size: 50px; color: var(--gold); margin-bottom: 25px; }
-        .price { font-size: 32px; font-weight: 700; color: var(--primary); margin-top: auto; padding-top: 10px; } /* ปรับราคาให้ใหญ่ตาม image_9.png */
-
-        /* Booking Section */
+        /* Booking Form Section */
         .booking-wrap { background: var(--primary); padding: 80px 20px; }
         .booking-container { background: var(--white); border-radius: 30px; padding: 40px; max-width: 700px; margin: 0 auto; }
-        
-        /* สไตล์ฟอร์มเพิ่มเติม (ตาม image_10.png) */
-        input, select { width: 100%; padding: 15px; margin-top: 8px; border: 1px solid #ddd; border-radius: 12px; font-family: 'Sarabun'; }
-        
-        /* ปุ่มส่ง LINE (ตาม image_10.png) */
-        .deposit-notice { background: #F2FFF7; border: 1px solid #B7EBC8; padding: 25px; border-radius: 15px; text-align: center; margin-top: 30px;}
-        .line-btn { display: inline-flex; align-items: center; justify-content: center; background: var(--line-green); color: white; text-decoration: none; padding: 12px 25px; border-radius: 10px; font-weight: 700; margin-top: 15px; }
+        .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
+        label { font-weight: 600; display: block; margin-top: 20px; font-size: 14px; color: #666; }
+        input, select { width: 100%; padding: 15px; margin-top: 8px; border: 1px solid #ddd; border-radius: 12px; font-family: 'Sarabun'; box-sizing: border-box; }
+
+        .summary-box { background: #F0F4F8; border-radius: 15px; padding: 25px; margin-top: 30px; border: 1px dashed var(--gold); text-align: center; }
+        .submit-btn { width: 100%; background: var(--gold); color: var(--primary); padding: 20px; border: none; border-radius: 15px; font-size: 20px; font-weight: 700; cursor: pointer; margin-top: 30px; transition: 0.3s; }
+
+        /* Modal แจ้งชำระเงิน */
+        .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 9999; backdrop-filter: blur(5px); }
+        #payment-modal { 
+            display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); 
+            width: 90%; max-width: 450px; background: white; padding: 30px 20px; 
+            border-radius: 35px; text-align: center; z-index: 10000; border-top: 15px solid var(--gold);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .bank-box { background: #F8F9FA; border: 1px solid #ddd; padding: 15px; border-radius: 20px; margin: 15px 0; }
+        .qr-image { width: 200px; height: auto; margin: 10px auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .line-btn { display: inline-flex; align-items: center; justify-content: center; background: var(--line-green); color: white !important; text-decoration: none; padding: 15px 30px; border-radius: 12px; font-weight: 700; font-size: 18px; width: 100%; box-sizing: border-box; transition: 0.3s; }
+        .line-btn i { margin-right: 10px; font-size: 24px; }
 
         @media (max-width: 600px) {
-            .logo-img { height: 70px; }
-            .hero { height: 450px; }
+            .logo-img { height: 75px; }
+            .time-grid { grid-template-columns: 1fr; }
+            .qr-image { width: 160px; }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <a href="#">
-            <img src="logo.png" alt="Master Maid Thailand" class="logo-img">
-        </a>
-    </nav>
+    <nav><a href="#"><img src="logo.png" alt="Master Maid Thailand" class="logo-img"></a></nav>
 
     <section class="hero">
         <h1>คืนความสวยงามให้บ้านคุณ</h1>
@@ -86,27 +81,9 @@
         <a href="#booking" class="hero-btn">จองคิวออนไลน์ทันที</a>
     </section>
 
-    <section class="container" id="packages">
-        <h2 style="color: var(--primary); font-size: 32px; margin-bottom: 50px;">บริการของเรา</h2>
-        <div class="grid">
-            <div class="card">
-                <i class="fas fa-broom"></i>
-                <h3 style="margin-bottom: 10px;">ทำความสะอาดทั่วไป</h3>
-                <p style="color: #666;">เริ่มต้น 550.- / 2 ชม.<br>(ชม. ถัดไป +200.-)</p>
-                <div class="price">550.-</div>
-            </div>
-            <div class="card">
-                <i class="fas fa-sparkles"></i>
-                <h3 style="margin-bottom: 10px;">Big Cleaning</h3>
-                <p style="color: #666;">ขัดล้างคราบฝังลึกทุกจุด<br>เหมาะสำหรับย้ายเข้า-ออก</p>
-                <div class="price">เริ่มต้น 2,000.-</div>
-            </div>
-        </div>
-    </section>
-
     <section class="booking-wrap" id="booking">
         <div class="booking-container">
-            <h2 style="text-align: center; color: var(--primary); margin-top: 0;">รายละเอียดการจองคิว</h2>
+            <h2 style="text-align: center; color: var(--primary); margin-top: 0;">กรอกรายละเอียดการจอง</h2>
             <form id="maidForm" action="https://hook.us2.make.com/u4ddkucyj2gbd9gj14om5cdtu3qjnzxx" method="POST">
                 
                 <div class="time-grid">
@@ -134,7 +111,7 @@
                     </div>
                     <div>
                         <label>วันที่เข้าทำ:</label>
-                        <input type="date" name="date" required>
+                        <input type="date" name="date" id="book_date" required>
                     </div>
                 </div>
 
@@ -164,34 +141,44 @@
                         </div>
                     </div>
                     <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
-                        <strong>เวลาเลิกงานโดยประมาณ: <span id="display_end">11:00</span> น.</strong><br>
+                        <strong>เลิกงานโดยประมาณ: <span id="display_end">11:00</span> น.</strong><br>
                         <span style="color: var(--gold); font-size: 20px; font-weight: 700;">ค่าบริการ: <span id="total_price">550</span>.-</span>
                     </div>
                 </div>
 
-                <div class="deposit-notice">
-                    <strong><i class="fas fa-university"></i> ชำระมัดจำ 200.- เพื่อยืนยันคิว</strong><br>
-                    <p style="font-size: 14px; margin: 5px 0;">กสิกรไทย: 123-x-xxxxx-x (บจก. มาสเตอร์เมด อุบล)</p>
-                    <p style="font-size: 13px; color: #555; margin-top: 10px;">โอนเงินแล้วแจ้งสลิปที่ LINE แอดมิน</p>
-                    <a href="https://line.me/ti/p/@your_id" target="_blank" class="line-btn">
-                        <i class="fab fa-line"></i> ทัก LINE ส่งสลิป
-                    </a>
-                </div>
-
-                <button type="submit" class="submit-btn">ยืนยันการจองคิว</button>
+                <button type="submit" class="submit-btn">ยืนยันข้อมูลการจอง</button>
             </form>
         </div>
     </section>
 
     <div class="overlay" id="overlay"></div>
-    <div id="thanks">
-        <i class="fas fa-check-circle" style="font-size: 60px; color: #28a745; margin-bottom: 20px;"></i>
-        <h3>บันทึกข้อมูลสำเร็จ!</h3>
-        <p>กรุณาส่งสลิปใน LINE เพื่อให้แอดมินโทรยืนยันคิวครับ</p>
-        <button onclick="location.reload()" style="margin-top: 20px; background: var(--primary); color: var(--gold); padding: 10px 30px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700;">ตกลง</button>
+    <div id="payment-modal">
+        <h3 style="margin: 0; color: var(--primary); font-size: 22px;">จองคิวสำเร็จ!</h3>
+        <p style="color: #666; font-size: 14px; margin: 5px 0;">กรุณาชำระมัดจำเพื่อล็อคคิวงาน</p>
+        
+        <div class="bank-box">
+            <p style="font-weight: 700; color: var(--primary); margin-bottom: 5px;">สแกนชำระเงิน</p>
+            <img src="payment-qr.png" alt="QR Code" class="qr-image">
+            <div style="text-align: left; font-size: 14px; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;">
+                <strong>มัดจำ 200.-</strong><br>
+                <span>ธ.กสิกรไทย: 123-x-xxxxx-x</span><br>
+                <span>บจก. มาสเตอร์เมด อุบล</span>
+            </div>
+        </div>
+
+        <a href="https://line.me/ti/p/@your_id" target="_blank" class="line-btn">
+            <i class="fab fa-line"></i> ส่งสลิปแจ้งแอดมินใน LINE
+        </a>
+        
+        <button onclick="location.reload()" style="margin-top: 15px; background: none; border: none; color: #999; text-decoration: underline; cursor: pointer; font-size: 13px;">กลับหน้าหลัก</button>
     </div>
 
     <script>
+        // ข้อมูลจำลองวันที่เต็ม (ตัวอย่าง: วันที่|เวลา : จำนวนคนจอง)
+        const bookingsDB = {
+            "2026-03-10|09:00": 2, // สมมติว่า 10 มีนา 9 โมง เต็มแล้ว 2 คน
+        };
+
         function calculateTime() {
             const startVal = document.getElementById('start_time').value;
             const duration = parseInt(document.getElementById('duration').value);
@@ -199,7 +186,6 @@
             let endHours = hours + duration;
             const formattedEnd = (endHours < 10 ? '0' + endHours : endHours) + ':' + (minutes < 10 ? '0' + minutes : minutes);
             
-            // คำนวณราคา: 2ชม.=550, 3ชม.=800, ชม.ถัดไป +200
             let price = 550;
             if (duration === 3) price = 800;
             else if (duration > 3) price = 800 + ((duration - 3) * 200);
@@ -211,15 +197,30 @@
         const form = document.getElementById('maidForm');
         form.onsubmit = async (e) => {
             e.preventDefault();
+
+            // เช็กการจองซ้อน
+            const dateVal = document.getElementById('book_date').value;
+            const timeVal = document.getElementById('start_time').value;
+            const checkKey = `${dateVal}|${timeVal}`;
+
+            if (bookingsDB[checkKey] >= 2) {
+                alert("ขออภัยครับ! ช่วงเวลา " + timeVal + " น. ของวันที่เลือก มีคิวจองครบ 2 ท่านแล้ว กรุณาเลือกเวลาหรือวันอื่นนะครับ");
+                return;
+            }
+
+            // แสดงหน้าจ่ายเงิน
             document.getElementById('overlay').style.display = 'block';
-            document.getElementById('thanks').style.display = 'block';
+            document.getElementById('payment-modal').style.display = 'block';
+            
             const formData = new FormData(form);
-            await fetch(form.action, { method: 'POST', body: formData, mode: 'no-cors' });
+            try {
+                await fetch(form.action, { method: 'POST', body: formData, mode: 'no-cors' });
+            } catch (error) {
+                console.error("Error", error);
+            }
         };
+
         window.onload = calculateTime;
     </script>
 </body>
 </html>
-
-
-
