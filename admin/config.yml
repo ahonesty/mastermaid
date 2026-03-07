@@ -13,3 +13,9 @@ collections:
         fields:
           - {label: "ราคาเริ่มต้น (ทั่วไป)", name: "price_basic", widget: "string"}
           - {label: "ราคาเริ่มต้น (Big Cleaning)", name: "price_big", widget: "string"}
+          - label: "รีวิวลูกค้า (6 ท่าน)"
+            name: "reviews"
+            widget: "list"
+            fields:
+              - {label: "ชื่อลูกค้า", name: "name", widget: "string"}
+              - {label: "ข้อความรีวิว", name: "comment", widget: "text"}
