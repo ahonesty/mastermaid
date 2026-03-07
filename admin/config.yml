@@ -1,35 +1,17 @@
 backend:
   name: git-gateway
   branch: main
-
 media_folder: "images"
 public_folder: "/images"
-
 collections:
-  - name: "pages"
-    label: "จัดการเนื้อหาเว็บไซต์"
+  - name: "content"
+    label: "แก้ไขเนื้อหาหน้าเว็บ"
     files:
       - file: "index.html"
-        label: "หน้าหลัก (Master Maid)"
+        label: "หน้าหลัก"
         name: "home"
         fields:
-          - label: "ส่วนบนของเว็บไซต์ (Header)"
-            name: "header"
-            widget: "object"
-            fields:
-              - {label: "ชื่อโลโก้ (ตัวหนังสือ)", name: "logo_text", widget: "string", default: "Master Maid"}
-              - {label: "สโลแกน", name: "slogan", widget: "string", default: "สะอาด มั่นใจ วางใจเรา"}
-          
-          - label: "จัดการราคา (Packages)"
-            name: "packages"
-            widget: "object"
-            fields:
-              - {label: "ราคาเริ่มต้นทั่วไป", name: "price_basic", widget: "string", default: "650.-"}
-              - {label: "ราคาเริ่มต้น Big Cleaning", name: "price_big", widget: "string", default: "2,000.-"}
-
-          - label: "บทความ/เนื้อหาบริการ"
-            name: "content"
-            widget: "object"
-            fields:
-              - {label: "หัวข้อบทความ", name: "title", widget: "string", default: "ทำไมต้องเลือกเรา"}
-              - {label: "เนื้อหาบทความ", name: "body", widget: "markdown", default: "รายละเอียดบริการของเรา..."}
+          - {label: "สโลแกนใต้ชื่อร้าน", name: "slogan", widget: "string"}
+          - {label: "ราคาแพ็กเกจทั่วไป", name: "price_1", widget: "string"}
+          - {label: "ราคาแพ็กเกจ Big Clean", name: "price_2", widget: "string"}
+          - {label: "เนื้อหาบทความ", name: "body", widget: "markdown"}
