@@ -1,0 +1,27 @@
+backend:
+  name: git-gateway
+  branch: main # ถ้าชื่อกิ่งใน GitHub เป็น master ให้เปลี่ยนเป็น master
+
+media_folder: "assets/images" # โฟลเดอร์เก็บรูปที่อัปโหลด
+public_folder: "/assets/images"
+
+collections:
+  - name: "homepage"
+    label: "หน้าแรก"
+    files:
+      - file: "content/home.json"
+        label: "ตกแต่งหน้าเว็บ"
+        name: "home_data"
+        fields:
+          - {label: "รูปหน้าปก (Hero)", name: "hero_image", widget: "image", description: "ขนาดแนะนำ: 1920x800px"}
+          - {label: "หัวข้อหลัก", name: "hero_title", widget: "string"}
+          - {label: "ข้อความต้อนรับ", name: "hero_desc", widget: "string"}
+
+  - name: "reviews"
+    label: "จัดการรีวิว (6 คน)"
+    folder: "content/reviews"
+    create: true
+    fields:
+      - {label: "ชื่อลูกค้า", name: "title", widget: "string"}
+      - {label: "รูปโปรไฟล์", name: "photo", widget: "image", description: "ขนาดแนะนำ: 200x200px"}
+      - {label: "รีวิวลูกค้า", name: "body", widget: "text"}
