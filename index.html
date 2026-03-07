@@ -7,7 +7,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     
     <style>
         :root { 
@@ -15,14 +14,24 @@
             --gold: #D4AF37; 
             --white: #ffffff;
             --bg: #F8F9FA;
+            --line-green: #06C755;
         }
 
         body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; scroll-behavior: smooth; }
 
         /* Navigation */
-        nav { background: var(--white); padding: 15px 8%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
-        .logo { font-weight: 700; color: var(--primary); font-size: 22px; text-decoration: none; letter-spacing: 2px; }
-        .logo span { color: var(--gold); }
+        nav { 
+            background: var(--white); 
+            padding: 10px 8%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+        .logo-img { height: 60px; width: auto; transition: 0.3s; }
 
         /* Hero Section */
         .hero { 
@@ -35,35 +44,43 @@
         /* Package Section */
         .container { max-width: 1100px; margin: 0 auto; padding: 60px 20px; text-align: center; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
-        .card { background: var(--white); padding: 40px 30px; border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.08); transition: 0.4s; }
+        .card { background: var(--white); padding: 40px 30px; border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.08); transition: 0.4s; border: 2px solid var(--gold); }
         .card i { font-size: 50px; color: var(--gold); margin-bottom: 25px; }
-        .price { font-size: 26px; font-weight: 700; color: var(--primary); margin-top: auto; padding-top: 20px; }
+        .price { font-size: 26px; font-weight: 700; color: var(--primary); margin-top: auto; padding-top: 10px; }
 
         /* Booking Form */
         .booking-wrap { background: var(--primary); padding: 80px 20px; }
         .booking-container { background: var(--white); border-radius: 30px; padding: 40px; max-width: 700px; margin: 0 auto; }
         .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
         label { font-weight: 600; display: block; margin-top: 20px; font-size: 14px; color: #666; }
-        input, select { width: 100%; padding: 15px; margin-top: 8px; border: 1px solid #ddd; border-radius: 12px; font-family: 'Sarabun'; }
+        input, select { width: 100%; padding: 15px; margin-top: 8px; border: 1px solid #ddd; border-radius: 12px; font-family: 'Sarabun'; box-sizing: border-box; }
 
         .summary-box { background: #F0F4F8; border-radius: 15px; padding: 25px; margin-top: 30px; border: 1px dashed var(--gold); text-align: center; }
-        .deposit-notice { background: #FFF9E6; border: 1px solid #FFE58F; padding: 25px; border-radius: 15px; margin-top: 30px; text-align: center; }
-        .submit-btn { width: 100%; background: var(--primary); color: var(--gold); padding: 20px; border: none; border-radius: 15px; font-size: 20px; font-weight: 700; cursor: pointer; margin-top: 30px; transition: 0.3s; }
-        .submit-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        
+        /* Deposit Section - Line Style */
+        .deposit-notice { background: #F2FFF7; border: 1px solid #B7EBC8; padding: 25px; border-radius: 15px; margin-top: 30px; text-align: center; }
+        .line-btn { display: inline-flex; align-items: center; justify-content: center; background: var(--line-green); color: white !important; text-decoration: none; padding: 12px 25px; border-radius: 10px; font-weight: 700; margin-top: 15px; transition: 0.3s; }
+        .line-btn i { margin-right: 10px; font-size: 20px; }
 
-        /* Review Section (Added) */
-        .review-card { text-align: center; border: 1px solid #eee; padding: 30px; border-radius: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); background: white; }
-        .review-card img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 15px; border: 3px solid var(--gold); object-fit: cover; }
-        .stars { color: var(--gold); margin-bottom: 10px; }
+        .submit-btn { width: 100%; background: var(--gold); color: var(--primary); padding: 20px; border: none; border-radius: 15px; font-size: 20px; font-weight: 700; cursor: pointer; margin-top: 30px; transition: 0.3s; }
 
         /* Modal */
         .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 9999; backdrop-filter: blur(5px); }
         #thanks { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width: 90%; max-width: 450px; background: white; padding: 45px; border-radius: 35px; text-align: center; z-index: 10000; border-top: 15px solid var(--gold); }
+        
+        @media (max-width: 600px) {
+            .logo-img { height: 45px; }
+            .time-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <nav><a href="#" class="logo">MASTER<span>MAID</span></a></nav>
+    <nav>
+        <a href="#">
+            <img src="logo.png" alt="Master Maid Thailand" class="logo-img">
+        </a>
+    </nav>
 
     <section class="hero">
         <h1>คืนความสวยงามให้บ้านคุณ</h1>
@@ -72,27 +89,18 @@
     </section>
 
     <section class="container" id="packages">
-        <div class="section-header" style="margin-bottom: 50px;">
-            <h2 style="color: var(--primary); font-size: 32px;">เลือกบริการที่ใช่สำหรับคุณ</h2>
-        </div>
+        <h2 style="color: var(--primary); font-size: 32px; margin-bottom: 50px;">บริการของเรา</h2>
         <div class="grid">
-            <div class="card" style="border: 2px solid var(--gold);">
+            <div class="card">
                 <i class="fas fa-broom"></i>
-                <h3 style="font-weight: 700; margin-bottom: 20px;">ทำความสะอาดทั่วไป</h3>
-                <p style="color: #666; font-size: 15px; margin-bottom: 25px;">
-                    กวาด ถู ดูดฝุ่น ล้างห้องน้ำ และจัดระเบียบของทั่วไป<br>
-                    เหมาะสำหรับที่พักอาศัยประจำ
-                </p>
-                <div class="price">550.- / 2 ชม.</div>
+                <h3 style="margin-bottom: 10px;">ทำความสะอาดทั่วไป</h3>
+                <p style="color: #666;">เริ่มต้น 550.- / 2 ชม.<br>(ชม. ถัดไป +200.-)</p>
+                <div class="price">550.-</div>
             </div>
-
-            <div class="card" style="border: 2px solid var(--gold);">
+            <div class="card">
                 <i class="fas fa-sparkles"></i>
-                <h3 style="font-weight: 700; margin-bottom: 20px;">Big Cleaning</h3>
-                <p style="color: #666; font-size: 15px; margin-bottom: 25px;">
-                    ขัดล้างคราบฝังลึกทุกจุด เช็ดมุ้งลวด กระจก<br>
-                    และเพดานสูง เหมาะสำหรับย้ายเข้า-ออก
-                </p>
+                <h3 style="margin-bottom: 10px;">Big Cleaning</h3>
+                <p style="color: #666;">ขัดล้างคราบฝังลึกทุกจุด<br>เหมาะสำหรับย้ายเข้า-ออก</p>
                 <div class="price">เริ่มต้น 2,000.-</div>
             </div>
         </div>
@@ -101,7 +109,7 @@
     <section class="booking-wrap" id="booking">
         <div class="booking-container">
             <h2 style="text-align: center; color: var(--primary); margin-top: 0;">รายละเอียดการจองคิว</h2>
-            <form id="maidForm" action="https://hook.us2.make.com/u4ddkucyj2gbd9gj14om5cdtu3qjnzxx" method="POST" enctype="multipart/form-data">
+            <form id="maidForm" action="https://hook.us2.make.com/u4ddkucyj2gbd9gj14om5cdtu3qjnzxx" method="POST">
                 
                 <div class="time-grid">
                     <div>
@@ -121,8 +129,8 @@
                     <div>
                         <label>ประเภทที่พัก:</label>
                         <select name="home_type">
-                            <option value="Condo">คอนโด / หอพัก</option>
                             <option value="House">บ้านเดี่ยว</option>
+                            <option value="Condo">คอนโด / หอพัก</option>
                             <option value="Office">ออฟฟิศ</option>
                         </select>
                     </div>
@@ -138,102 +146,51 @@
                             <label style="margin-top:0;">เวลาเริ่มงาน:</label>
                             <select name="start_time" id="start_time" onchange="calculateTime()">
                                 <option value="09:00">09:00 น.</option>
+                                <option value="10:00">10:00 น.</option>
+                                <option value="11:00">11:00 น.</option>
+                                <option value="12:00">12:00 น.</option>
                                 <option value="13:00">13:00 น.</option>
+                                <option value="14:00">14:00 น.</option>
+                                <option value="15:00">15:00 น.</option>
                             </select>
                         </div>
                         <div>
                             <label style="margin-top:0;">จำนวนชั่วโมง:</label>
                             <select name="duration" id="duration" onchange="calculateTime()">
-                                <option value="2">2 ชั่วโมง</option>
-                                <option value="3">3 ชั่วโมง</option>
-                                <option value="4">4 ชั่วโมง</option>
+                                <option value="2">2 ชั่วโมง (550.-)</option>
+                                <option value="3">3 ชั่วโมง (800.-)</option>
+                                <option value="4">4 ชั่วโมง (1,000.-)</option>
+                                <option value="5">5 ชั่วโมง (1,200.-)</option>
+                                <option value="6">6 ชั่วโมง (1,400.-)</option>
                             </select>
                         </div>
                     </div>
-                    <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
-                        <span style="font-size: 13px; color: #777;">เวลาให้บริการทั้งหมด:</span><br>
-                        <strong style="font-size: 22px; color: var(--primary);">
-                            <span id="display_start">09:00</span> - <span id="display_end">11:00</span> น.
-                        </strong>
-                        <input type="hidden" name="end_time" id="end_time" value="11:00">
+                    <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <strong>เวลาเลิกงานโดยประมาณ: <span id="display_end">11:00</span> น.</strong><br>
+                        <span style="color: var(--gold); font-size: 20px; font-weight: 700;">ค่าบริการ: <span id="total_price">550</span>.-</span>
                     </div>
                 </div>
 
                 <div class="deposit-notice">
-                    <strong><i class="fas fa-university"></i> มัดจำ 200.- ยืนยันคิว</strong><br>
-                    <p style="font-size: 14px; margin: 10px 0;">กสิกรไทย: 123-x-xxxxx-x (บจก. มาสเตอร์เมด อุบล)</p>
-                    <label style="text-align:center;">แนบสลิปโอนเงิน:</label>
-                    <input type="file" name="slip" accept="image/*" required style="border: none; background: white; padding: 10px;">
+                    <strong><i class="fas fa-university"></i> ชำระมัดจำ 200.- เพื่อยืนยันคิว</strong><br>
+                    <p style="font-size: 14px; margin: 5px 0;">กสิกรไทย: 123-x-xxxxx-x (บจก. มาสเตอร์เมด อุบล)</p>
+                    <p style="font-size: 13px; color: #555; margin-top: 10px;">โอนเงินแล้วแจ้งสลิปที่ LINE แอดมิน</p>
+                    <a href="https://line.me/ti/p/@your_id" target="_blank" class="line-btn">
+                        <i class="fab fa-line"></i> ทัก LINE ส่งสลิป
+                    </a>
                 </div>
 
-                <button type="submit" class="submit-btn">ยืนยันการจองคิวออนไลน์</button>
+                <button type="submit" class="submit-btn">ยืนยันการจองคิว</button>
             </form>
         </div>
     </section>
 
-    <section class="container" id="reviews">
-        <div class="section-header" style="margin-bottom: 50px;">
-            <h2 style="color: var(--primary); font-size: 32px;">รีวิวความประทับใจจากลูกค้า</h2>
-            <p style="color: #888;">ความพึงพอใจจากลูกค้าจริงในพื้นที่อุบลราชธานี</p>
-        </div>
-        
-        <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
-            
-            <div class="review-card">
-                <img src="https://i.pravatar.cc/100?u=1" alt="Reviewer">
-                <h4 style="margin: 0;">คุณไหม (วารินชำราบ)</h4>
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                <p style="color: #666; font-style: italic;">"ประทับใจมากค่ะ แม่บ้านมาตรงเวลา ทำงานละเอียดทุกจุด ห้องหอมสะอาดมาก แนะนำเลยค่ะ"</p>
-            </div>
-
-            <div class="review-card">
-                <img src="https://i.pravatar.cc/100?u=2" alt="Reviewer">
-                <h4 style="margin: 0;">คุณบอย (เมืองอุบล)</h4>
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                <p style="color: #666; font-style: italic;">"ทีม Big Cleaning อุปกรณ์ครบมากครับ ขัดคราบฝังลึกที่ห้องครัวหายเกลี้ยง ประหยัดเวลาไปเยอะเลย"</p>
-            </div>
-
-            <div class="review-card">
-                <img src="https://i.pravatar.cc/100?u=3" alt="Reviewer">
-                <h4 style="margin: 0;">คุณนก (ห้วยวังนอง)</h4>
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                <p style="color: #666; font-style: italic;">"จองง่ายผ่านเว็บ มัดจำเสร็จเจ้าหน้าที่โทรมายืนยันไวมาก แม่บ้านสุภาพ งานเรียบร้อยดีค่ะ"</p>
-            </div>
-
-            <div class="review-card">
-                <img src="https://i.pravatar.cc/100?u=4" alt="Reviewer">
-                <h4 style="margin: 0;">คุณเก่ง (ชยางกูร)</h4>
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                <p style="color: #666; font-style: italic;">"เรียกใช้บริการออฟฟิศครับ ทำงานเร็วแต่สะอาดมาก พนักงานทุกคนแฮปปี้กับความสะอาดครับ"</p>
-            </div>
-
-            <div class="review-card">
-                <img src="https://i.pravatar.cc/100?u=5" alt="Reviewer">
-                <h4 style="margin: 0;">คุณฝน (ขามใหญ่)</h4>
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                <p style="color: #666; font-style: italic;">"เป็นลูกค้าประจำแล้วค่ะ ไว้ใจได้เรื่องความปลอดภัย และไม่เคยต้องตามงานซ้ำเลย มาตรฐานดีมาก"</p>
-            </div>
-
-            <div class="review-card">
-                <img src="https://i.pravatar.cc/100?u=6" alt="Reviewer">
-                <h4 style="margin: 0;">คุณอาร์ต (แจระแม)</h4>
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                <p style="color: #666; font-style: italic;">"ย้ายคอนโดใหม่ใช้บริการที่นี่คุ้มสุดครับ ห้องกลับมาใหม่เหมือนมือหนึ่งเลย ทีมงานสุภาพมาก"</p>
-            </div>
-
-        </div>
-    </section>
-    
-    <footer style="padding: 40px 0; text-align: center; color: #999; font-size: 13px;">
-        &copy; 2026 Master Maid Thailand (Ubon Branch). All Rights Reserved.
-    </footer>
-
     <div class="overlay" id="overlay"></div>
     <div id="thanks">
         <i class="fas fa-check-circle" style="font-size: 60px; color: #28a745; margin-bottom: 20px;"></i>
-        <h3>ส่งข้อมูลเรียบร้อย!</h3>
-        <p>เจ้าหน้าที่จะตรวจสอบสลิปและโทรยืนยันคิวภายใน 15 นาที</p>
-        <button onclick="location.reload()" style="margin-top: 20px; background: var(--primary); color: var(--gold); border: none; padding: 12px 30px; border-radius: 10px; cursor: pointer; font-weight: 700;">ตกลง</button>
+        <h3>บันทึกข้อมูลสำเร็จ!</h3>
+        <p>กรุณาส่งสลิปใน LINE เพื่อให้แอดมินโทรยืนยันคิวครับ</p>
+        <button onclick="location.reload()" style="margin-top: 20px; background: var(--primary); color: var(--gold); padding: 10px 30px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700;">ตกลง</button>
     </div>
 
     <script>
@@ -243,9 +200,14 @@
             let [hours, minutes] = startVal.split(':').map(Number);
             let endHours = hours + duration;
             const formattedEnd = (endHours < 10 ? '0' + endHours : endHours) + ':' + (minutes < 10 ? '0' + minutes : minutes);
-            document.getElementById('display_start').innerText = startVal;
+            
+            // คำนวณราคา: 2ชม.=550, 3ชม.=800, ชม.ถัดไป +200
+            let price = 550;
+            if (duration === 3) price = 800;
+            else if (duration > 3) price = 800 + ((duration - 3) * 200);
+
             document.getElementById('display_end').innerText = formattedEnd;
-            document.getElementById('end_time').value = formattedEnd;
+            document.getElementById('total_price').innerText = price.toLocaleString();
         }
 
         const form = document.getElementById('maidForm');
@@ -254,16 +216,9 @@
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('thanks').style.display = 'block';
             const formData = new FormData(form);
-            try {
-                await fetch(form.action, { method: 'POST', body: formData, mode: 'no-cors' });
-            } catch (error) {
-                console.error("Error submitting form", error);
-            }
+            await fetch(form.action, { method: 'POST', body: formData, mode: 'no-cors' });
         };
         window.onload = calculateTime;
     </script>
 </body>
-
 </html>
-
-
