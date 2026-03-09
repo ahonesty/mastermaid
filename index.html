@@ -38,7 +38,7 @@
         .booking-wrap { background: var(--primary); padding: 60px 20px; }
         .booking-container { background: var(--white); border-radius: 30px; padding: 35px; max-width: 800px; margin: 0 auto; box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
         
-        /* แก้ปัญหาแผนที่บังตัวเลือก */
+        /* ตั้งค่า z-index เพื่อแก้ปัญหาแผนที่บังตัวเลือก */
         #geocoder { margin-bottom: 10px; width: 100%; position: relative; z-index: 10; }
         .mapboxgl-ctrl-geocoder { width: 100% !important; max-width: none !important; z-index: 20 !important; }
         .mapboxgl-ctrl-geocoder--suggestions { z-index: 30 !important; position: absolute; background: white; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
@@ -77,7 +77,7 @@
                     <div><label>เบอร์โทรศัพท์:</label><input type="tel" name="phone" required></div>
                 </div>
 
-                <label>ค้นหาตำแหน่งบ้าน (พิมพ์ชื่อโรงแรม, หมู่บ้าน หรือซอย):</label>
+                <label>ค้นหาตำแหน่งบ้าน (พิมพ์ชื่อสถานที่ หรือคลิกบนแผนที่):</label>
                 <div id="geocoder"></div>
                 <div id="map"></div>
                 <p style="font-size: 12px; color: #888; margin-top: -10px;">*หากค้นหาไม่เจอ สามารถคลิกที่แผนที่เพื่อปักหมุดเองได้เลยครับ</p>
@@ -139,25 +139,32 @@
 
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiYXdhbmNoYW5hIiwiYSI6ImNtbWl4NjJxYTE3NDEycXB2NndkZHFxNDAifQ.oAA8Vp4AD4UdjjDuPLsgnw';
-        const ubonBounds = [104.3411, 14.3975, 105.6358, 16.0274]; 
 
         const map = new mapboxgl.Map({ 
-            container: 'map', style: 'mapbox://styles/mapbox/streets-v12', 
-            center: [104.8564, 15.2294], zoom: 14 
+            container: 'map', 
+            style: 'mapbox://styles/mapbox/streets-v12', 
+            center: [104.8564, 15.2294], 
+            zoom: 13 
         });
 
+        // คืนค่าระบบค้นหาแบบมาตรฐาน (Default)
         const geocoder = new MapboxGeocoder({ 
-            accessToken: mapboxgl.accessToken, mapboxgl: mapboxgl, 
-            placeholder: 'พิมพ์ชื่อโรงแรม, หมู่บ้าน หรือซอย...', countries: 'th', language: 'th',
-            types: 'poi,address,neighborhood', bbox: ubonBounds, 
-            proximity: { longitude: 104.8564, latitude: 15.2294 } 
+            accessToken: mapboxgl.accessToken, 
+            mapboxgl: mapboxgl, 
+            placeholder: 'ค้นหาตำแหน่งบ้าน...', 
+            countries: 'th', 
+            language: 'th'
         });
 
         document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
         let marker = new mapboxgl.Marker({ color: "#D4AF37", draggable: true });
 
-        geocoder.on('result', (e) => { updateMarker(e.result.geometry.coordinates[1], e.result.geometry.coordinates[0]); });
-        map.on('click', (e) => { updateMarker(e.lngLat.lat, e.lngLat.lng); });
+        geocoder.on('result', (e) => { 
+            updateMarker(e.result.geometry.coordinates[1], e.result.geometry.coordinates[0]); 
+        });
+        map.on('click', (e) => { 
+            updateMarker(e.lngLat.lat, e.lngLat.lng); 
+        });
 
         function updateMarker(lat, lng) {
             marker.setLngLat([lng, lat]).addTo(map);
