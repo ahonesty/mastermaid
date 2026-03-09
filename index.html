@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid Thailand | บริการแม่บ้านมืออาชีพ อุบลราชธานี</title>
+    <title>Master Maid Thailand | จองแม่บ้านอุบลฯ</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -19,13 +19,10 @@
 
         .hero { 
             background: linear-gradient(rgba(0,31,63,0.7), rgba(0,31,63,0.7)), url('https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?q=80&w=1920&auto=format&fit=crop'); 
-            background-size: cover; background-position: center; height: 450px; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            text-align: center; color: var(--white); padding: 0 20px; 
+            background-size: cover; background-position: center; height: 400px; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 0 20px; 
         }
-        .hero h1 { font-size: clamp(28px, 5vw, 42px); margin: 0; font-weight: 700; }
-        
-        /* ปุ่มจองตำแหน่งตามรูป */
+        /* ปุ่มจองตำแหน่งกลางหน้าจอตามรูป */
         .hero-btn { 
             background: var(--gold); color: var(--primary); padding: 18px 45px; border-radius: 50px; 
             text-decoration: none; font-weight: 800; font-size: 20px; transition: 0.3s; 
@@ -75,8 +72,8 @@
                     <div><label>เบอร์โทรศัพท์:</label><input type="tel" name="phone" required placeholder="06x-xxx-xxxx"></div>
                 </div>
 
-                <label><i class="fas fa-search-location"></i> ค้นหาตำแหน่งบ้าน (Google Maps แม่นยำสูงสุด):</label>
-                <input id="pac-input" type="text" placeholder="พิมพ์ชื่อโรงแรม, หมู่บ้าน หรือซอยในอุบลฯ...">
+                <label><i class="fas fa-map-marker-alt"></i> ค้นหาตำแหน่งบ้าน หรือ <b>คลิกบนแผนที่เพื่อปักหมุด</b>:</label>
+                <input id="pac-input" type="text" placeholder="พิมพ์ชื่อโรงแรม, หมู่บ้าน หรือจิ้มแผนที่ได้เลย...">
                 <div id="map"></div>
                 <input type="hidden" name="lat_long" id="lat_long" required>
                 
@@ -128,7 +125,7 @@
     <div id="payment-modal">
         <i class="fas fa-check-circle" style="font-size: 50px; color: #28a745; margin-bottom: 10px;"></i>
         <h3>ส่งข้อมูลเรียบร้อย!</h3>
-        <p style="font-size: 14px;">แจ้งสลิปมัดจำได้เลยค่ะ เจ้าหน้าที่จะติดต่อยืนยันโดยเร็ว</p>
+        <p style="font-size: 14px; color: #333; font-weight: 600;">แจ้งสลิปมัดจำได้เลยค่ะ เจ้าหน้าที่จะติดต่อยืนยันโดยเร็ว</p>
         <div class="bank-box"><p><strong>มัดจำ: 200.-</strong><br>ธ.กสิกรไทย: 123-x-xxxxx-x<br>บจก. มาสเตอร์เมด อุบล</p></div>
         
         <a id="lineLink" href="#" class="line-btn">
@@ -149,21 +146,32 @@
                 streetViewControl: false
             });
 
-            // ตั้งค่า Autocomplete ให้แม่นยำที่สุดในอุบลฯ
-            const input = document.getElementById("pac-input");
-            autocomplete = new google.maps.places.Autocomplete(input, {
-                componentRestrictions: { country: "th" },
-                fields: ["geometry", "name", "formatted_address"]
-            });
-
             marker = new google.maps.Marker({
                 map: map,
                 draggable: true,
                 position: ubonCenter,
-                icon: "https://maps.google.com/mapfiles/ms/icons/gold-dot.png"
+                animation: google.maps.Animation.DROP
             });
 
-            // เมื่อลูกค้าเลือกสถานที่
+            // 📍 ฟีเจอร์จิ้มบนแผนที่เพื่อปักหมุด
+            map.addListener("click", (e) => {
+                marker.setPosition(e.latLng);
+                updateLatLng(e.latLng.lat(), e.latLng.lng());
+            });
+
+            // 🖱️ ฟีเจอร์ลากหมุด
+            marker.addListener("dragend", () => {
+                const pos = marker.getPosition();
+                updateLatLng(pos.lat(), pos.lng());
+            });
+
+            // 🔍 ระบบพิมพ์ค้นหา (Google Autocomplete)
+            const input = document.getElementById("pac-input");
+            autocomplete = new google.maps.places.Autocomplete(input, {
+                componentRestrictions: { country: "th" },
+                fields: ["geometry", "name"]
+            });
+
             autocomplete.addListener("place_changed", () => {
                 const place = autocomplete.getPlace();
                 if (!place.geometry) return;
@@ -172,26 +180,11 @@
                 marker.setPosition(place.geometry.location);
                 updateLatLng(place.geometry.location.lat(), place.geometry.location.lng());
             });
-
-            // เมื่อคลิกบนแผนที่
-            map.addListener("click", (e) => {
-                marker.setPosition(e.latLng);
-                updateLatLng(e.latLng.lat(), e.latLng.lng());
-            });
-
-            // เมื่อลากหมุด
-            marker.addListener("dragend", () => {
-                const pos = marker.getPosition();
-                updateLatLng(pos.lat(), pos.lng());
-            });
         }
 
         function updateLatLng(lat, lng) {
             document.getElementById("lat_long").value = lat.toFixed(6) + "," + lng.toFixed(6);
         }
-
-        const rawMsg = "แจ้งสลิปการมัดจำทำความสะอาดของ Master Maid Thailand";
-        document.getElementById('lineLink').href = `line://oaMessage/@301xqlpj/?${encodeURIComponent(rawMsg)}`;
 
         function calculateTime() {
             const startVal = document.getElementById('start_time').value;
@@ -210,11 +203,14 @@
 
         document.getElementById('maidForm').onsubmit = async (e) => {
             e.preventDefault();
-            if(!document.getElementById('lat_long').value) return alert("❌ กรุณาปักหมุดตำแหน่งบ้านในแผนที่ก่อนครับ");
+            if(!document.getElementById('lat_long').value) return alert("❌ กรุณาปักหมุดตำแหน่งในแผนที่ก่อนครับ");
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('payment-modal').style.display = 'block';
             await fetch(e.target.action, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
         };
+
+        const rawMsg = "แจ้งสลิปการมัดจำทำความสะอาดของ Master Maid Thailand";
+        document.getElementById('lineLink').href = `line://oaMessage/@301xqlpj/?${encodeURIComponent(rawMsg)}`;
 
         google.maps.event.addDomListener(window, 'load', initMap);
         window.onload = () => { calculateTime(); document.getElementById('book_date').min = new Date().toISOString().split("T")[0]; };
