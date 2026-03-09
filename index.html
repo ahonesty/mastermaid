@@ -45,9 +45,10 @@
         .booking-container { background: var(--white); border-radius: 30px; padding: 35px; max-width: 800px; margin: 0 auto; box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
         .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
         label { font-weight: 600; display: block; margin-top: 15px; font-size: 14px; color: #666; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Sarabun'; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Sarabun'; box-sizing: border-box; font-size: 15px; }
 
         .mapboxgl-ctrl-geocoder { width: 100% !important; max-width: none !important; border-radius: 12px !important; position: relative !important; z-index: 10 !important; }
+        .mapboxgl-ctrl-geocoder--suggestions { z-index: 9999 !important; }
         #map { height: 350px; border-radius: 20px; border: 2px solid var(--gold); margin: 15px 0; z-index: 1 !important; }
 
         .summary-box { background: #F0F4F8; border-radius: 15px; padding: 25px; margin-top: 25px; border: 1px dashed var(--gold); text-align: center; }
@@ -76,7 +77,6 @@
         <h2 style="color: var(--primary); margin-bottom: 30px;">แพ็กเกจการบริการ</h2>
         <div class="grid">
             <div class="card">
-                <div style="text-align: center;"><i class="fas fa-broom" style="font-size: 40px; color: var(--gold);"></i></div>
                 <h3>ทำความสะอาดทั่วไป</h3>
                 <ul style="font-size: 14px; color: #555; line-height: 1.8; text-align: left;">
                     <li>กวาดพื้น ถูพื้น ฆ่าเชื้อ</li>
@@ -86,12 +86,11 @@
                 <div class="price-tag">550.- / 2 ชม.</div>
             </div>
             <div class="card">
-                <div style="text-align: center;"><i class="fas fa-sparkles" style="font-size: 40px; color: var(--gold);"></i></div>
                 <h3>Big Cleaning</h3>
                 <ul style="font-size: 14px; color: #555; line-height: 1.8; text-align: left;">
                     <li>ขจัดคราบฝังลึกรอบบ้าน</li>
                     <li>เช็ดมุ้งลวด ขอบหน้าต่าง</li>
-                    <li>เหมาะสำหรับบ้านใหม่/ย้ายเข้า</li>
+                    <li>สำหรับบ้านใหม่/ย้ายเข้า</li>
                 </ul>
                 <div class="price-tag">เริ่มต้น 2,000.-</div>
             </div>
@@ -118,48 +117,41 @@
 
                 <div class="time-grid">
                     <div>
-                        <label>ประเภทบริการ:</label>
+                        <label>บริการ:</label>
                         <select name="service_type" id="service_type" onchange="calculateTime()">
                             <option value="ทำความสะอาดทั่วไป">ทำความสะอาดทั่วไป</option>
                             <option value="Big Cleaning">Big Cleaning</option>
                         </select>
                     </div>
-                    <div><label>วันที่เข้าทำ:</label><input type="date" name="date" id="book_date" required></div>
+                    <div><label>วันที่:</label><input type="date" name="date" id="book_date" required></div>
                 </div>
 
                 <div class="time-grid">
                     <div>
                         <label>เวลาเริ่มงาน:</label>
                         <select name="start_time" id="start_time" onchange="calculateTime()">
-                            <option value="09:00">09:00 น.</option>
-                            <option value="10:00">10:00 น.</option>
-                            <option value="11:00">11:00 น.</option>
-                            <option value="12:00">12:00 น.</option>
-                            <option value="13:00">13:00 น.</option>
-                            <option value="14:00">14:00 น.</option>
-                            <option value="15:00">15:00 น.</option>
-                            <option value="16:00">16:00 น.</option>
+                            <option value="09:00">09:00 น.</option><option value="10:00">10:00 น.</option>
+                            <option value="11:00">11:00 น.</option><option value="12:00">12:00 น.</option>
+                            <option value="13:00">13:00 น.</option><option value="14:00">14:00 น.</option>
+                            <option value="15:00">15:00 น.</option><option value="16:00">16:00 น.</option>
                         </select>
                     </div>
                     <div>
-                        <label>จำนวนชั่วโมงงาน:</label>
+                        <label>จำนวนชั่วโมง:</label>
                         <select id="duration" onchange="calculateTime()">
-                            <option value="2">2 ชม.</option>
-                            <option value="3">3 ชม.</option>
-                            <option value="4">4 ชม.</option>
-                            <option value="5">5 ชม.</option>
-                            <option value="6">6 ชม.</option>
-                            <option value="8">เหมา 8 ชม.</option>
+                            <option value="2">2 ชม.</option><option value="3">3 ชม.</option>
+                            <option value="4">4 ชม.</option><option value="5">5 ชม.</option>
+                            <option value="6">6 ชม.</option><option value="8">เหมา 8 ชม.</option>
                         </select>
-                        <input type="hidden" name="work_hours" id="work_hours_input" value="2 ชั่วโมง">
                     </div>
                 </div>
 
                 <div class="summary-box">
-                    <strong>ประเมินเลิกงาน: <span id="display_end">11:00</span> น.</strong>
-                    <input type="hidden" name="end_time" id="end_time_input" value="11:00">
-                    <br><span style="color: var(--gold); font-size: 24px; font-weight: 700;">ยอดจอง: <span id="total_price_display">550</span>.-</span>
+                    <strong>เลิกงานประมาณ: <span id="display_end">11:00</span> น.</strong>
+                    <br><span style="color: var(--gold); font-size: 24px; font-weight: 700;">ยอดรวม: <span id="total_price_display">550</span>.-</span>
                     <input type="hidden" name="total_price" id="total_price_hidden" value="550">
+                    <input type="hidden" name="work_hours" id="work_hours_input" value="2 ชั่วโมง">
+                    <input type="hidden" name="end_time" id="end_time_input" value="11:00">
                 </div>
 
                 <button type="submit" class="submit-btn">ยืนยันข้อมูลและจองคิว</button>
@@ -176,7 +168,7 @@
             <p><strong>มัดจำ: 200.-</strong><br>ธ.กสิกรไทย: 123-x-xxxxx-x<br>บจก. มาสเตอร์เมด อุบล</p>
         </div>
         
-        <a href="line://oaMessage/@301xqlpj/?ส่งสลิปมัดจำ" class="line-btn">
+        <a href="line://oaMessage/@301xqlpj/?แจ้งสลิปการมัดจำทำความสะอาดของ MasterMiad Thailand" class="line-btn">
             <i class="fab fa-line"></i> ส่งสลิปแจ้งโอน (เปิดแอปทันที)
         </a>
         
@@ -185,20 +177,10 @@
 
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiYXdhbmNoYW5hIiwiYSI6ImNtbWl4NjJxYTE3NDEycXB2NndkZHFxNDAifQ.oAA8Vp4AD4UdjjDuPLsgnw';
-
-        const map = new mapboxgl.Map({
-            container: 'map', style: 'mapbox://styles/mapbox/streets-v12',
-            center: [104.8564, 15.2294], zoom: 13, pitch: 45
-        });
-
-        const geocoder = new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken, mapboxgl: mapboxgl,
-            placeholder: 'ค้นพิกัดบ้านเลขที่...', countries: 'th'
-        });
+        const map = new mapboxgl.Map({ container: 'map', style: 'mapbox://styles/mapbox/streets-v12', center: [104.8564, 15.2294], zoom: 13, pitch: 45 });
+        const geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken, mapboxgl: mapboxgl, placeholder: 'ค้นพิกัดบ้านเลขที่...', countries: 'th' });
         document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
-
         let marker = new mapboxgl.Marker({ color: "#D4AF37", draggable: true });
-
         geocoder.on('result', (e) => { updateMarker(e.result.geometry.coordinates[1], e.result.geometry.coordinates[0]); });
         map.on('click', (e) => { updateMarker(e.lngLat.lat, e.lngLat.lng); });
 
@@ -211,22 +193,13 @@
             const startVal = document.getElementById('start_time').value;
             const service = document.getElementById('service_type').value;
             const duration = parseInt(document.getElementById('duration').value);
-            
             document.getElementById('work_hours_input').value = (duration === 8) ? "เหมา 8 ชั่วโมง" : duration + " ชั่วโมง";
             let [h, m] = startVal.split(':').map(Number);
             let endH = (h + duration) % 24;
             const formattedEnd = endH.toString().padStart(2, '0') + ":00";
             document.getElementById('display_end').innerText = formattedEnd;
             document.getElementById('end_time_input').value = formattedEnd;
-
-            let price = 0;
-            if (service === "Big Cleaning") price = 2000;
-            else {
-                if (duration === 2) price = 550;
-                else if (duration === 3) price = 800;
-                else if (duration === 8) price = 1500;
-                else price = 800 + (duration - 3) * 200;
-            }
+            let price = (service === "Big Cleaning") ? 2000 : (duration === 2 ? 550 : (duration === 3 ? 800 : (duration === 8 ? 1500 : 800 + (duration-3)*200)));
             document.getElementById('total_price_display').innerText = price.toLocaleString();
             document.getElementById('total_price_hidden').value = price;
         }
@@ -238,7 +211,6 @@
             document.getElementById('payment-modal').style.display = 'block';
             await fetch(e.target.action, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
         };
-
         window.onload = () => { calculateTime(); document.getElementById('book_date').min = new Date().toISOString().split("T")[0]; };
     </script>
 </body>
