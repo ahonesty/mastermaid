@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Maid | สำหรับแม่บ้าน</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; text-align: center; padding-top: 50px; background: #0A1931; color: white; }
+        .btn { background: #D4AF37; color: #0A1931; padding: 20px 40px; border: none; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; }
+        .status { margin-top: 20px; font-size: 18px; color: #06C755; }
+    </style>
+</head>
+<body>
+    <h2>ระบบส่งพิกัดแม่บ้าน (Master Maid)</h2>
+    <p>กดปุ่มเมื่อเริ่มเดินทางไปหาลูกค้า</p>
+    <button class="btn" onclick="startTracking()">🚀 เริ่มเดินทาง</button>
+    <div id="status" class="status"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
+            databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "mastermaid-ubon",
+            appId: "1:272279135131:web:18a1d12073e601688c773e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function startTracking() {
+            if (navigator.geolocation) {
+                document.getElementById('status').innerText = "📍 กำลังแชร์ตำแหน่งเรียลไทม์...";
+                navigator.geolocation.watchPosition((pos) => {
+                    db.ref('tracking/maid_01').set({
+                        lat: pos.coords.latitude,
+                        lng: pos.coords.longitude
+                    });
+                }, (err) => alert("กรุณาเปิด GPS บนมือถือ"), { enableHighAccuracy: true });
+            }
+        }
+    </script>
+</body>
+</html>
