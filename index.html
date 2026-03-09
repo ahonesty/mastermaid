@@ -7,7 +7,11 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
 
     <style>
         :root { --primary: #001F3F; --gold: #D4AF37; --gold-dark: #B8962D; --white: #ffffff; --bg: #F8F9FA; --line-green: #06C755; }
@@ -19,72 +23,37 @@
         .hero { background: linear-gradient(rgba(0,31,63,0.7), rgba(0,31,63,0.7)), url('https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?q=80&w=1920&auto=format&fit=crop'); background-size: cover; background-position: center; height: 350px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 0 20px; }
         .hero h1 { font-size: clamp(26px, 5vw, 38px); margin-bottom: 10px; font-weight: 700; }
 
-        /* Packages */
         .container { max-width: 1100px; margin: 0 auto; padding: 50px 20px; text-align: center; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
-        .card { background: var(--white); padding: 35px; border-radius: 20px; border: 2px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: left; transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); }
-        .card h3 { color: var(--primary); text-align: center; font-size: 24px; margin-top: 10px; }
-        .card ul { padding-left: 20px; font-size: 14px; color: #555; line-height: 1.8; }
+        .card { background: var(--white); padding: 35px; border-radius: 20px; border: 2px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: left; }
+        .card h3 { color: var(--primary); text-align: center; }
         .price-tag { text-align: center; font-size: 26px; font-weight: 700; color: var(--primary); margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
 
-        /* Booking Form */
         .booking-wrap { background: var(--primary); padding: 60px 20px; }
         .booking-container { background: var(--white); border-radius: 30px; padding: 35px; max-width: 800px; margin: 0 auto; box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
         .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
         label { font-weight: 600; display: block; margin-top: 15px; font-size: 14px; color: #666; }
         input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Sarabun'; box-sizing: border-box; font-size: 15px; }
-        
-        /* Map Tools */
-        .search-box { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-search { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-family: 'Sarabun'; }
-        #map { height: 320px; border-radius: 15px; margin: 15px 0; border: 2px solid var(--gold); z-index: 1; }
 
-        /* Summary */
+        /* Mapbox Styles */
+        .mapboxgl-ctrl-geocoder { width: 100%; max-width: none; box-shadow: none; border: 1px solid #ddd; border-radius: 12px; font-family: 'Sarabun'; }
+        #map { height: 400px; border-radius: 20px; border: 2px solid var(--gold); margin: 15px 0; z-index: 1; }
+
         .summary-box { background: #F0F4F8; border-radius: 15px; padding: 25px; margin-top: 25px; border: 1px dashed var(--gold); text-align: center; }
-        
-        /* Premium Submit Button */
-        .submit-btn { 
-            width: 100%; 
-            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-            color: var(--primary); 
-            padding: 22px; 
-            border: none; 
-            border-radius: 15px; 
-            font-size: 20px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            margin-top: 25px; 
-            transition: all 0.4s;
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-        .submit-btn:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 12px 30px rgba(212, 175, 55, 0.6);
-            filter: brightness(1.1);
-        }
-        .submit-btn:active { transform: translateY(1px); }
+        .submit-btn { width: 100%; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--primary); padding: 22px; border: none; border-radius: 15px; font-size: 20px; font-weight: 800; cursor: pointer; margin-top: 25px; transition: 0.4s; box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4); text-transform: uppercase; }
+        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212, 175, 55, 0.6); }
 
-        /* Reviews Section */
         .review-section { padding: 80px 20px; background: #fff; }
         .review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
-        .review-card { background: var(--bg); padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .review-card { background: var(--bg); padding: 30px; border-radius: 20px; text-align: center; }
         .review-card img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid var(--gold); }
-        .stars { color: var(--gold); margin-bottom: 10px; font-size: 18px; }
 
-        /* Modal */
         .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 9999; backdrop-filter: blur(5px); }
         #payment-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width: 90%; max-width: 420px; background: white; padding: 30px 20px; border-radius: 30px; text-align: center; z-index: 10000; border-top: 10px solid var(--gold); }
         .bank-box { background: #F2FFF7; border: 1px solid #B7EBC8; padding: 20px; border-radius: 15px; margin: 15px 0; }
         .line-btn { display: inline-flex; align-items: center; justify-content: center; background: var(--line-green); color: white !important; text-decoration: none; padding: 15px; border-radius: 10px; font-weight: 700; width: 100%; }
 
-        @media (max-width: 600px) { .time-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 28px; } }
+        @media (max-width: 600px) { .time-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -92,8 +61,8 @@
     <nav><a href="#"><img src="logo.png" alt="Master Maid" class="logo-img"></a></nav>
 
     <section class="hero">
-        <h1>บริการแม่บ้าน Master Maid อุบลฯ</h1>
-        <p>สะอาด มั่นใจ ทุกตารางนิ้ว ปรับโฉมบ้านให้เหมือนใหม่</p>
+        <h1>บริการแม่บ้านระดับพรีเมียม</h1>
+        <p>ยกระดับความสะอาด ปักหมุดที่บ้านคุณด้วยเทคโนโลยีล่าสุด</p>
     </section>
 
     <section class="container" id="services">
@@ -102,26 +71,22 @@
             <div class="card">
                 <div style="text-align: center;"><i class="fas fa-broom" style="font-size: 40px; color: var(--gold);"></i></div>
                 <h3>ทำความสะอาดทั่วไป</h3>
-                <ul>
-                    <li><i class="fas fa-check"></i> กวาดพื้น ถูพื้น ลงน้ำยาฆ่าเชื้อ</li>
-                    <li><i class="fas fa-check"></i> เช็ดฝุ่นตามเฟอร์นิเจอร์และขอบหน้าต่าง</li>
-                    <li><i class="fas fa-check"></i> ล้างห้องน้ำ ขัดพื้นและสุขภัณฑ์</li>
-                    <li><i class="fas fa-check"></i> จัดระเบียบของใช้ภายในบ้าน</li>
-                    <li><i class="fas fa-check"></i> เช็ดกระจกภายในและระเบียง</li>
-                    <li><i class="fas fa-check"></i> เปลี่ยนผ้าปูที่นอน (ถ้าลูกค้าจัดไว้)</li>
+                <ul style="font-size: 14px; color: #555; line-height: 1.8;">
+                    <li>กวาดพื้น ถูพื้น ลงน้ำยาฆ่าเชื้อ</li>
+                    <li>เช็ดฝุ่นเฟอร์นิเจอร์และขอบหน้าต่าง</li>
+                    <li>ล้างห้องน้ำ ขัดสุขภัณฑ์</li>
+                    <li>จัดระเบียบของใช้ภายในบ้าน</li>
                 </ul>
                 <div class="price-tag">550.- / 2 ชม.</div>
             </div>
-
             <div class="card">
                 <div style="text-align: center;"><i class="fas fa-sparkles" style="font-size: 40px; color: var(--gold);"></i></div>
                 <h3>Big Cleaning</h3>
-                <ul>
-                    <li><i class="fas fa-check"></i> เน้นขจัดคราบฝังลึกทุกจุด</li>
-                    <li><i class="fas fa-check"></i> เช็ดมุ้งลวด ขอบหน้าต่างรอบบ้าน</li>
-                    <li><i class="fas fa-check"></i> ทำความสะอาดตู้เย็น/เตาแก๊ส</li>
-                    <li><i class="fas fa-check"></i> ปัดหยากไย่เพดานและจุดอับ</li>
-                    <li><i class="fas fa-check"></i> เหมาะสำหรับย้ายเข้า หรือทำความสะอาดประจำปี</li>
+                <ul style="font-size: 14px; color: #555; line-height: 1.8;">
+                    <li>ขจัดคราบฝังลึกทุกจุดรอบบ้าน</li>
+                    <li>เช็ดมุ้งลวด ขอบหน้าต่างรอบบ้าน</li>
+                    <li>ปัดหยากไย่เพดานและจุดอับ</li>
+                    <li>เหมาะสำหรับย้ายเข้า หรือทำประจำปี</li>
                 </ul>
                 <div class="price-tag">เริ่มต้น 2,000.-</div>
             </div>
@@ -138,17 +103,14 @@
                     <div><label>เบอร์โทรศัพท์:</label><input type="tel" name="phone" required placeholder="06x-xxx-xxxx"></div>
                 </div>
 
-                <label><i class="fas fa-search"></i> ค้นหาพิกัดบ้าน (พิมพ์เลขที่บ้าน หรือชื่อหมู่บ้าน):</label>
-                <div class="search-box">
-                    <input type="text" id="address_search" placeholder="เช่น หมู่บ้านสุขสบาย อุบล" style="margin-top:0;">
-                    <button type="button" class="btn-search" onclick="searchLocation()">ค้นหา</button>
-                </div>
+                <label><i class="fas fa-map-marker-alt" style="color:red;"></i> ค้นหาพิกัดบ้าน (พิมพ์เพื่อช่วยค้นหา):</label>
+                <div id="geocoder"></div>
                 
                 <div id="map"></div>
                 <input type="hidden" name="lat_long" id="lat_long" required>
                 
-                <label>ที่อยู่เพิ่มเติม (หมู่บ้าน/ซอย/เลขที่บ้าน):</label>
-                <input type="text" name="location" required placeholder="กรอกที่อยู่เพื่อให้แม่บ้านไปถูกจุด">
+                <label>เลขที่บ้าน / รายละเอียดที่อยู่เพิ่มเติม:</label>
+                <input type="text" name="location" required placeholder="เช่น เลขที่ 123 ม.5 หมู่บ้าน...">
 
                 <div class="time-grid">
                     <div>
@@ -168,123 +130,107 @@
                     </div>
                 </div>
 
-                <label>รายละเอียดบ้าน / จุดที่เน้นเป็นพิเศษ:</label>
-                <textarea name="home_details" placeholder="เช่น เน้นห้องน้ำ, บ้าน 2 ชั้น 3 ห้องนอน"></textarea>
+                <label>จุดที่เน้นเป็นพิเศษ / รายละเอียดบ้าน:</label>
+                <textarea name="home_details" placeholder="เช่น เน้นห้องน้ำ, บ้าน 2 ชั้น"></textarea>
 
                 <div class="time-grid">
                     <div><label>วันที่เข้าทำ:</label><input type="date" name="date" id="book_date" required></div>
                     <div><label>เวลาเริ่มงาน:</label>
                         <select name="start_time" id="start_time" onchange="calculateTime()">
                             <option value="09:00">09:00 น.</option>
-                            <option value="10:00">10:00 น.</option>
                             <option value="13:00">13:00 น.</option>
-                            <option value="14:00">14:00 น.</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="summary-box">
-                    <div class="time-grid">
-                        <div>
-                            <label style="margin-top:0;">จำนวนชั่วโมง:</label>
-                            <select id="duration" onchange="calculateTime()">
-                                <option value="2">2 ชม.</option><option value="3">3 ชม.</option><option value="4">4 ชม.</option><option value="5">5 ชม.</option>
-                            </select>
-                            <input type="hidden" name="work_hours" id="work_hours_input" value="2 ชั่วโมง">
-                        </div>
-                        <div style="text-align:center;">
-                            <strong>เลิกงานประมาณ: <span id="display_end">11:00</span> น.</strong>
-                            <input type="hidden" name="end_time" id="end_time_input" value="11:00">
-                        </div>
-                    </div>
+                    <label style="margin-top:0;">จำนวนชั่วโมง:</label>
+                    <select id="duration" onchange="calculateTime()" style="width: auto; display: inline-block;">
+                        <option value="2">2 ชม.</option><option value="3">3 ชม.</option><option value="4">4 ชม.</option>
+                    </select>
+                    <input type="hidden" name="work_hours" id="work_hours_input" value="2 ชั่วโมง">
+                    
                     <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <strong>เลิกงานประมาณ: <span id="display_end">11:00</span> น.</strong>
+                        <input type="hidden" name="end_time" id="end_time_input" value="11:00">
                         <input type="hidden" name="total_price" id="total_price_hidden" value="550">
-                        <span style="color: var(--gold); font-size: 24px; font-weight: 700;">ยอดชำระประเมิน: <span id="total_price_display">550</span>.-</span>
-                        <div id="price_note" style="color: red; font-size: 13px; font-weight: 600; display: none; margin-top:5px;">*โปรดตรวจสอบราคาจริงผ่านทาง Line*</div>
+                        <br><span style="color: var(--gold); font-size: 24px; font-weight: 700;">ยอดประเมิน: <span id="total_price_display">550</span>.-</span>
                     </div>
                 </div>
 
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-calendar-check"></i> ยืนยันการจองคิว
-                </button>
+                <button type="submit" class="submit-btn"><i class="fas fa-calendar-check"></i> ยืนยันการจองคิว</button>
             </form>
         </div>
     </section>
 
     <section class="review-section">
-        <h2 style="text-align: center; color: var(--primary); margin-bottom: 50px;">รีวิวจากลูกค้าตัวจริง</h2>
+        <h2 style="text-align: center; color: var(--primary); margin-bottom: 50px;">ความประทับใจจากลูกค้า</h2>
         <div class="review-grid">
             <div class="review-card">
                 <img src="https://i.pravatar.cc/150?u=11" alt="Reviewer">
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <div style="color:var(--gold);"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                 <h4>คุณไหม (อุบลฯ)</h4>
-                <p>"แม่บ้านมาตรงเวลา ทำงานเรียบร้อยมากค่ะ โดยเฉพาะห้องน้ำ ขัดจนขาวสะอาดเหมือนใหม่เลย"</p>
+                <p>"แม่บ้านทำงานละเอียดมาก แผนที่ปักหมุดใช้ง่ายมากค่ะ"</p>
             </div>
             <div class="review-card">
                 <img src="https://i.pravatar.cc/150?u=12" alt="Reviewer">
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <div style="color:var(--gold);"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                 <h4>คุณบอย</h4>
-                <p>"จอง Big Cleaning ไว้ก่อนเข้าอยู่บ้านใหม่ ประทับใจมากครับ แผนที่ปักหมุดใช้ง่าย แม่บ้านมาถูกที่เป๊ะ"</p>
-            </div>
-            <div class="review-card">
-                <img src="https://i.pravatar.cc/150?u=13" alt="Reviewer">
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-                <h4>คุณแอน</h4>
-                <p>"ชอบระบบจองผ่านหน้าเว็บมาก สะดวกดีค่ะ ไม่ต้องนั่งอธิบายพิกัดบ้านยาวๆ"</p>
+                <p>"ระบบจองพรีเมียมมากครับ แจ้งเตือนเข้าไลน์รวดเร็วดี"</p>
             </div>
         </div>
     </section>
 
     <div class="overlay" id="overlay"></div>
     <div id="payment-modal">
-        <i class="fas fa-check-circle" style="font-size: 45px; color: #28a745; margin-bottom: 10px;"></i>
+        <i class="fas fa-check-circle" style="font-size: 45px; color: #28a745;"></i>
         <h3>รับข้อมูลเรียบร้อย!</h3>
         <div class="bank-box">
             <p><strong>มัดจำเพื่อยืนยันคิว: 200.-</strong><br>ธ.กสิกรไทย: 123-x-xxxxx-x<br>บจก. มาสเตอร์เมด อุบล</p>
         </div>
         <a href="https://line.me/ti/p/@your_id" target="_blank" class="line-btn"><i class="fab fa-line"></i> ทักไลน์ส่งสลิป คลิกที่นี่</a>
-        <button onclick="location.reload()" style="margin-top:15px; background:none; border:none; text-decoration:underline; cursor:pointer; color:#999;">กลับหน้าหลัก</button>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- 1. แผนที่และค้นหาที่อยู่ ---
-        var map = L.map('map').setView([15.2294, 104.8564], 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© Master Maid' }).addTo(map);
-        var marker;
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYXdhbmNoYW5hIiwiYSI6ImNtbWl4NjJxYTE3NDEycXB2NndkZHFxNDAifQ.oAA8Vp4AD4UdjjDuPLsgnw';
 
-        map.on('click', function(e) { updateMarker(e.latlng.lat, e.latlng.lng); });
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [104.8564, 15.2294],
+            zoom: 14,
+            pitch: 45
+        });
 
-        async function searchLocation() {
-            const query = document.getElementById('address_search').value;
-            if (!query) return alert("กรุณาพิมพ์เลขที่บ้าน หรือชื่อหมู่บ้านครับ");
-            const fullQuery = query + " อุบลราชธานี";
-            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}`;
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                if (data.length > 0) {
-                    const lat = parseFloat(data[0].lat);
-                    const lon = parseFloat(data[0].lon);
-                    map.setView([lat, lon], 17);
-                    updateMarker(lat, lon);
-                } else {
-                    alert("❌ ไม่พบตำแหน่งที่ระบุ กรุณาปักหมุดเองบนแผนที่ครับ");
-                }
-            } catch (err) { alert("เกิดข้อผิดพลาดในการค้นหา"); }
-        }
+        const geocoder = new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl,
+            placeholder: 'ค้นหาเลขที่บ้าน หรือสถานที่...',
+            countries: 'th'
+        });
+        document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+
+        let marker = new mapboxgl.Marker({ color: "#D4AF37", draggable: true });
+
+        geocoder.on('result', (e) => {
+            const coords = e.result.geometry.coordinates;
+            updateMarker(coords[1], coords[0]);
+        });
+
+        map.on('click', (e) => {
+            updateMarker(e.lngLat.lat, e.lngLat.lng);
+        });
 
         function updateMarker(lat, lng) {
-            if (marker) marker.setLatLng([lat, lng]); else marker = L.marker([lat, lng]).addTo(map);
+            marker.setLngLat([lng, lat]).addTo(map);
             document.getElementById('lat_long').value = lat.toFixed(6) + "," + lng.toFixed(6);
         }
 
-        // --- 2. คำนวณราคาและเวลา ---
+        // --- Logic คำนวณราคา ---
         function calculateTime() {
             const startVal = document.getElementById('start_time').value;
             const service = document.getElementById('service_type').value;
             const duration = parseInt(document.getElementById('duration').value);
-            const priceNote = document.getElementById('price_note');
             
             document.getElementById('work_hours_input').value = duration + " ชั่วโมง";
             let [h, m] = startVal.split(':').map(Number);
@@ -293,26 +239,22 @@
             document.getElementById('end_time_input').value = formattedEnd;
 
             let price = (service === "Big Cleaning") ? 2000 : (duration === 2 ? 550 : 800 + (duration-3)*200);
-            priceNote.style.display = (service === "Big Cleaning") ? 'block' : 'none';
             document.getElementById('total_price_display').innerText = price.toLocaleString();
             document.getElementById('total_price_hidden').value = price;
         }
 
-        // --- 3. ป้องกันจองซ้ำ & กฎ 1 ชม. ---
         const fullSlots = ["2026-03-15|09:00"];
-
         const form = document.getElementById('maidForm');
         form.onsubmit = async (e) => {
             e.preventDefault();
             const dateVal = document.getElementById('book_date').value;
             const timeVal = document.getElementById('start_time').value;
 
-            if(!document.getElementById('lat_long').value) return alert("❌ กรุณาปักหมุดตำแหน่งบ้านในแผนที่ก่อนครับ!");
-            if(fullSlots.filter(x => x === `${dateVal}|${timeVal}`).length >= 2) return alert("❌ คิวช่วงเวลานี้เต็มแล้วครับ");
+            if(!document.getElementById('lat_long').value) return alert("❌ กรุณาปักหมุดตำแหน่งบ้านในแผนที่ก่อน!");
+            if(fullSlots.filter(x => x === `${dateVal}|${timeVal}`).length >= 2) return alert("❌ คิวเวลานี้เต็มแล้วครับ");
             
             const now = new Date();
-            const booking = new Date(`${dateVal}T${timeVal}:00`);
-            if(booking - now < 3600000) return alert("❌ ต้องจองล่วงหน้าอย่างน้อย 1 ชั่วโมงครับ!");
+            if(new Date(`${dateVal}T${timeVal}:00`) - now < 3600000) return alert("❌ ต้องจองล่วงหน้าอย่างน้อย 1 ชม.");
 
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('payment-modal').style.display = 'block';
