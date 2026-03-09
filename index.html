@@ -158,7 +158,7 @@
                 <div class="summary-box">
                     <strong>ประเมินเลิกงาน: <span id="display_end">11:00</span> น.</strong>
                     <input type="hidden" name="end_time" id="end_time_input" value="11:00">
-                    <br><span style="color: var(--gold); font-size: 24px; font-weight: 700;">ค่าบริการ: <span id="total_price_display">550</span>.-</span>
+                    <br><span style="color: var(--gold); font-size: 24px; font-weight: 700;">ยอดจอง: <span id="total_price_display">550</span>.-</span>
                     <input type="hidden" name="total_price" id="total_price_hidden" value="550">
                 </div>
 
@@ -171,11 +171,16 @@
     <div id="payment-modal">
         <i class="fas fa-check-circle" style="font-size: 50px; color: #28a745; margin-bottom: 10px;"></i>
         <h3>ข้อมูลถึงแอดมินแล้ว!</h3>
+        <p style="font-size: 14px; color: #333; font-weight: 600;">สามารถแจ้งสลิปมัดจำได้เลยค่ะ<br>ทางเจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันโดยเร็ว<br>กรุณารอสักครู่</p>
         <div class="bank-box">
-            <p><strong>มัดจำ: 200.-</strong><br>กสิกรไทย: 123-x-xxxxx-x<br>บจก. มาสเตอร์เมด อุบล</p>
+            <p><strong>มัดจำ: 200.-</strong><br>ธ.กสิกรไทย: 123-x-xxxxx-x<br>บจก. มาสเตอร์เมด อุบล</p>
         </div>
-        <a href="line://ti/p/@your_line_id" class="line-btn"><i class="fab fa-line"></i> แจ้งสลิปที่ Line (เปิดแอปทันที)</a>
-        <button class="close-modal-btn" onclick="location.reload()">ปิดหน้าต่าง</button>
+        
+        <a href="line://oaMessage/@301xqlpj/?ส่งสลิปมัดจำ" class="line-btn">
+            <i class="fab fa-line"></i> ส่งสลิปแจ้งโอน (เปิดแอปทันที)
+        </a>
+        
+        <button class="close-modal-btn" onclick="location.reload()">ตกลงและกลับหน้าหลัก</button>
     </div>
 
     <script>
@@ -210,8 +215,9 @@
             document.getElementById('work_hours_input').value = (duration === 8) ? "เหมา 8 ชั่วโมง" : duration + " ชั่วโมง";
             let [h, m] = startVal.split(':').map(Number);
             let endH = (h + duration) % 24;
-            document.getElementById('display_end').innerText = endH.toString().padStart(2, '0') + ":00";
-            document.getElementById('end_time_input').value = endH.toString().padStart(2, '0') + ":00";
+            const formattedEnd = endH.toString().padStart(2, '0') + ":00";
+            document.getElementById('display_end').innerText = formattedEnd;
+            document.getElementById('end_time_input').value = formattedEnd;
 
             let price = 0;
             if (service === "Big Cleaning") price = 2000;
@@ -237,4 +243,3 @@
     </script>
 </body>
 </html>
-
