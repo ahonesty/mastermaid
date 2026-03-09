@@ -10,36 +10,81 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
-        :root { --primary: #001F3F; --gold: #D4AF37; --white: #ffffff; --bg: #F8F9FA; --line-green: #06C755; }
+        :root { --primary: #001F3F; --gold: #D4AF37; --gold-dark: #B8962D; --white: #ffffff; --bg: #F8F9FA; --line-green: #06C755; }
         body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #333; scroll-behavior: smooth; }
         
         nav { background: #ffffff; padding: 5px 8%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
         .logo-img { height: 100px; width: auto; }
 
-        .hero { background: linear-gradient(rgba(0,31,63,0.7), rgba(0,31,63,0.7)), url('https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?q=80&w=1920&auto=format&fit=crop'); background-size: cover; background-position: center; height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 0 20px; }
-        .hero h1 { font-size: clamp(28px, 5vw, 42px); margin-bottom: 10px; font-weight: 700; }
+        .hero { background: linear-gradient(rgba(0,31,63,0.7), rgba(0,31,63,0.7)), url('https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?q=80&w=1920&auto=format&fit=crop'); background-size: cover; background-position: center; height: 350px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 0 20px; }
+        .hero h1 { font-size: clamp(26px, 5vw, 38px); margin-bottom: 10px; font-weight: 700; }
 
+        /* Packages */
         .container { max-width: 1100px; margin: 0 auto; padding: 50px 20px; text-align: center; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
-        .card { background: var(--white); padding: 30px; border-radius: 20px; border: 2px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .card { background: var(--white); padding: 35px; border-radius: 20px; border: 2px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: left; transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); }
+        .card h3 { color: var(--primary); text-align: center; font-size: 24px; margin-top: 10px; }
+        .card ul { padding-left: 20px; font-size: 14px; color: #555; line-height: 1.8; }
+        .price-tag { text-align: center; font-size: 26px; font-weight: 700; color: var(--primary); margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
 
+        /* Booking Form */
         .booking-wrap { background: var(--primary); padding: 60px 20px; }
-        .booking-container { background: var(--white); border-radius: 30px; padding: 40px; max-width: 800px; margin: 0 auto; }
+        .booking-container { background: var(--white); border-radius: 30px; padding: 35px; max-width: 800px; margin: 0 auto; box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
         .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
         label { font-weight: 600; display: block; margin-top: 15px; font-size: 14px; color: #666; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Sarabun'; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Sarabun'; box-sizing: border-box; font-size: 15px; }
+        
+        /* Map Tools */
+        .search-box { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-search { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; font-family: 'Sarabun'; }
+        #map { height: 320px; border-radius: 15px; margin: 15px 0; border: 2px solid var(--gold); z-index: 1; }
 
-        #map { height: 350px; border-radius: 15px; margin: 10px 0; border: 2px solid var(--gold); z-index: 1; }
-
+        /* Summary */
         .summary-box { background: #F0F4F8; border-radius: 15px; padding: 25px; margin-top: 25px; border: 1px dashed var(--gold); text-align: center; }
-        .submit-btn { width: 100%; background: var(--gold); color: var(--primary); padding: 20px; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 25px; }
+        
+        /* Premium Submit Button */
+        .submit-btn { 
+            width: 100%; 
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: var(--primary); 
+            padding: 22px; 
+            border: none; 
+            border-radius: 15px; 
+            font-size: 20px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            margin-top: 25px; 
+            transition: all 0.4s;
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .submit-btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 12px 30px rgba(212, 175, 55, 0.6);
+            filter: brightness(1.1);
+        }
+        .submit-btn:active { transform: translateY(1px); }
 
+        /* Reviews Section */
+        .review-section { padding: 80px 20px; background: #fff; }
+        .review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
+        .review-card { background: var(--bg); padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .review-card img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid var(--gold); }
+        .stars { color: var(--gold); margin-bottom: 10px; font-size: 18px; }
+
+        /* Modal */
         .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 9999; backdrop-filter: blur(5px); }
         #payment-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width: 90%; max-width: 420px; background: white; padding: 30px 20px; border-radius: 30px; text-align: center; z-index: 10000; border-top: 10px solid var(--gold); }
         .bank-box { background: #F2FFF7; border: 1px solid #B7EBC8; padding: 20px; border-radius: 15px; margin: 15px 0; }
         .line-btn { display: inline-flex; align-items: center; justify-content: center; background: var(--line-green); color: white !important; text-decoration: none; padding: 15px; border-radius: 10px; font-weight: 700; width: 100%; }
 
-        @media (max-width: 600px) { .time-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 600px) { .time-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 28px; } }
     </style>
 </head>
 <body>
@@ -47,45 +92,74 @@
     <nav><a href="#"><img src="logo.png" alt="Master Maid" class="logo-img"></a></nav>
 
     <section class="hero">
-        <h1>จองคิวแม่บ้านออนไลน์</h1>
-        <p>สะอาด มั่นใจ ปลอดภัย ในพื้นที่อุบลราชธานี</p>
-        <a href="#booking" style="color:white; text-decoration:none; margin-top:20px;">👇 เลื่อนลงเพื่อจองคิว</a>
+        <h1>บริการแม่บ้าน Master Maid อุบลฯ</h1>
+        <p>สะอาด มั่นใจ ทุกตารางนิ้ว ปรับโฉมบ้านให้เหมือนใหม่</p>
     </section>
 
-    <section class="container">
+    <section class="container" id="services">
+        <h2 style="color: var(--primary); margin-bottom: 40px;">แพ็กเกจการบริการ</h2>
         <div class="grid">
-            <div class="card"><i class="fas fa-broom" style="font-size:40px; color:var(--gold);"></i><h3>ทั่วไป</h3><p>550.- / 2 ชม.</p></div>
-            <div class="card"><i class="fas fa-sparkles" style="font-size:40px; color:var(--gold);"></i><h3>Big Cleaning</h3><p>เริ่มต้น 2,000.-</p></div>
+            <div class="card">
+                <div style="text-align: center;"><i class="fas fa-broom" style="font-size: 40px; color: var(--gold);"></i></div>
+                <h3>ทำความสะอาดทั่วไป</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> กวาดพื้น ถูพื้น ลงน้ำยาฆ่าเชื้อ</li>
+                    <li><i class="fas fa-check"></i> เช็ดฝุ่นตามเฟอร์นิเจอร์และขอบหน้าต่าง</li>
+                    <li><i class="fas fa-check"></i> ล้างห้องน้ำ ขัดพื้นและสุขภัณฑ์</li>
+                    <li><i class="fas fa-check"></i> จัดระเบียบของใช้ภายในบ้าน</li>
+                    <li><i class="fas fa-check"></i> เช็ดกระจกภายในและระเบียง</li>
+                    <li><i class="fas fa-check"></i> เปลี่ยนผ้าปูที่นอน (ถ้าลูกค้าจัดไว้)</li>
+                </ul>
+                <div class="price-tag">550.- / 2 ชม.</div>
+            </div>
+
+            <div class="card">
+                <div style="text-align: center;"><i class="fas fa-sparkles" style="font-size: 40px; color: var(--gold);"></i></div>
+                <h3>Big Cleaning</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> เน้นขจัดคราบฝังลึกทุกจุด</li>
+                    <li><i class="fas fa-check"></i> เช็ดมุ้งลวด ขอบหน้าต่างรอบบ้าน</li>
+                    <li><i class="fas fa-check"></i> ทำความสะอาดตู้เย็น/เตาแก๊ส</li>
+                    <li><i class="fas fa-check"></i> ปัดหยากไย่เพดานและจุดอับ</li>
+                    <li><i class="fas fa-check"></i> เหมาะสำหรับย้ายเข้า หรือทำความสะอาดประจำปี</li>
+                </ul>
+                <div class="price-tag">เริ่มต้น 2,000.-</div>
+            </div>
         </div>
     </section>
 
     <section class="booking-wrap" id="booking">
         <div class="booking-container">
-            <h2 style="text-align: center; color: var(--primary); margin-top: 0;">รายละเอียดการจอง</h2>
+            <h2 style="text-align: center; color: var(--primary); margin: 0 0 20px 0;">จองคิวออนไลน์</h2>
             <form id="maidForm" action="https://hook.us2.make.com/u4ddkucyj2gbd9gj14om5cdtu3qjnzxx" method="POST">
                 
                 <div class="time-grid">
-                    <div><label>ชื่อ-นามสกุล:</label><input type="text" name="name" required></div>
-                    <div><label>เบอร์โทรศัพท์:</label><input type="tel" name="phone" required></div>
+                    <div><label>ชื่อ-นามสกุล:</label><input type="text" name="name" required placeholder="ชื่อของคุณ"></div>
+                    <div><label>เบอร์โทรศัพท์:</label><input type="tel" name="phone" required placeholder="06x-xxx-xxxx"></div>
                 </div>
 
-                <label>ที่อยู่ / พิกัดที่ชัดเจน:</label>
-                <input type="text" name="location" required placeholder="หมู่บ้าน / ซอย / จุดสังเกต">
-
-                <label><i class="fas fa-map-marker-alt" style="color:red;"></i> ปักหมุดบ้านของคุณ (คลิกบนแผนที่):</label>
+                <label><i class="fas fa-search"></i> ค้นหาพิกัดบ้าน (พิมพ์เลขที่บ้าน หรือชื่อหมู่บ้าน):</label>
+                <div class="search-box">
+                    <input type="text" id="address_search" placeholder="เช่น หมู่บ้านสุขสบาย อุบล" style="margin-top:0;">
+                    <button type="button" class="btn-search" onclick="searchLocation()">ค้นหา</button>
+                </div>
+                
                 <div id="map"></div>
                 <input type="hidden" name="lat_long" id="lat_long" required>
+                
+                <label>ที่อยู่เพิ่มเติม (หมู่บ้าน/ซอย/เลขที่บ้าน):</label>
+                <input type="text" name="location" required placeholder="กรอกที่อยู่เพื่อให้แม่บ้านไปถูกจุด">
 
                 <div class="time-grid">
                     <div>
-                        <label>ประเภทบริการ:</label>
+                        <label>เลือกบริการ:</label>
                         <select name="service_type" id="service_type" onchange="calculateTime()">
                             <option value="ทำความสะอาดทั่วไป">ทำความสะอาดทั่วไป</option>
                             <option value="Big Cleaning">Big Cleaning</option>
                         </select>
                     </div>
                     <div>
-                        <label>ที่พักอาศัย:</label>
+                        <label>ประเภทที่พัก:</label>
                         <select name="home_type">
                             <option value="บ้านเดี่ยว">บ้านเดี่ยว</option>
                             <option value="ทาวน์โฮม">ทาวน์โฮม</option>
@@ -94,17 +168,17 @@
                     </div>
                 </div>
 
-                <label>จุดที่เน้นเป็นพิเศษ / รายละเอียดบ้าน:</label>
-                <textarea name="home_details" placeholder="เช่น เน้นห้องน้ำ, ล้างมุ้งลวด, บ้าน 2 ชั้น"></textarea>
+                <label>รายละเอียดบ้าน / จุดที่เน้นเป็นพิเศษ:</label>
+                <textarea name="home_details" placeholder="เช่น เน้นห้องน้ำ, บ้าน 2 ชั้น 3 ห้องนอน"></textarea>
 
                 <div class="time-grid">
                     <div><label>วันที่เข้าทำ:</label><input type="date" name="date" id="book_date" required></div>
                     <div><label>เวลาเริ่มงาน:</label>
                         <select name="start_time" id="start_time" onchange="calculateTime()">
-                            <option value="09:00">09:00</option>
-                            <option value="10:00">10:00</option>
-                            <option value="13:00">13:00</option>
-                            <option value="14:00">14:00</option>
+                            <option value="09:00">09:00 น.</option>
+                            <option value="10:00">10:00 น.</option>
+                            <option value="13:00">13:00 น.</option>
+                            <option value="14:00">14:00 น.</option>
                         </select>
                     </div>
                 </div>
@@ -125,42 +199,92 @@
                     </div>
                     <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
                         <input type="hidden" name="total_price" id="total_price_hidden" value="550">
-                        <span style="color: var(--gold); font-size: 24px; font-weight: 700;">ค่าบริการ: <span id="total_price_display">550</span>.-</span>
-                        <div id="price_note" style="color: red; font-size: 13px; font-weight: 600; display: none; margin-top:5px;">*ตรวจสอบราคาจริงที่ Line*</div>
+                        <span style="color: var(--gold); font-size: 24px; font-weight: 700;">ยอดชำระประเมิน: <span id="total_price_display">550</span>.-</span>
+                        <div id="price_note" style="color: red; font-size: 13px; font-weight: 600; display: none; margin-top:5px;">*โปรดตรวจสอบราคาจริงผ่านทาง Line*</div>
                     </div>
                 </div>
-                <button type="submit" class="submit-btn">ยืนยันการจอง</button>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-calendar-check"></i> ยืนยันการจองคิว
+                </button>
             </form>
+        </div>
+    </section>
+
+    <section class="review-section">
+        <h2 style="text-align: center; color: var(--primary); margin-bottom: 50px;">รีวิวจากลูกค้าตัวจริง</h2>
+        <div class="review-grid">
+            <div class="review-card">
+                <img src="https://i.pravatar.cc/150?u=11" alt="Reviewer">
+                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <h4>คุณไหม (อุบลฯ)</h4>
+                <p>"แม่บ้านมาตรงเวลา ทำงานเรียบร้อยมากค่ะ โดยเฉพาะห้องน้ำ ขัดจนขาวสะอาดเหมือนใหม่เลย"</p>
+            </div>
+            <div class="review-card">
+                <img src="https://i.pravatar.cc/150?u=12" alt="Reviewer">
+                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <h4>คุณบอย</h4>
+                <p>"จอง Big Cleaning ไว้ก่อนเข้าอยู่บ้านใหม่ ประทับใจมากครับ แผนที่ปักหมุดใช้ง่าย แม่บ้านมาถูกที่เป๊ะ"</p>
+            </div>
+            <div class="review-card">
+                <img src="https://i.pravatar.cc/150?u=13" alt="Reviewer">
+                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+                <h4>คุณแอน</h4>
+                <p>"ชอบระบบจองผ่านหน้าเว็บมาก สะดวกดีค่ะ ไม่ต้องนั่งอธิบายพิกัดบ้านยาวๆ"</p>
+            </div>
         </div>
     </section>
 
     <div class="overlay" id="overlay"></div>
     <div id="payment-modal">
-        <i class="fas fa-check-circle" style="font-size: 40px; color: #28a745;"></i>
-        <h3>บันทึกข้อมูลแล้ว!</h3>
+        <i class="fas fa-check-circle" style="font-size: 45px; color: #28a745; margin-bottom: 10px;"></i>
+        <h3>รับข้อมูลเรียบร้อย!</h3>
         <div class="bank-box">
-            <p><strong>มัดจำ 200.-</strong><br>กสิกรไทย: 123-x-xxxxx-x<br>(บจก. มาสเตอร์เมด อุบล)</p>
+            <p><strong>มัดจำเพื่อยืนยันคิว: 200.-</strong><br>ธ.กสิกรไทย: 123-x-xxxxx-x<br>บจก. มาสเตอร์เมด อุบล</p>
         </div>
-        <a href="https://line.me/ti/p/@your_id" target="_blank" class="line-btn"><i class="fab fa-line"></i> แจ้งสลิปที่ Line คลิก</a>
-        <button onclick="location.reload()" style="margin-top:10px; background:none; border:none; text-decoration:underline; cursor:pointer; color:#999;">กลับหน้าหลัก</button>
+        <a href="https://line.me/ti/p/@your_id" target="_blank" class="line-btn"><i class="fab fa-line"></i> ทักไลน์ส่งสลิป คลิกที่นี่</a>
+        <button onclick="location.reload()" style="margin-top:15px; background:none; border:none; text-decoration:underline; cursor:pointer; color:#999;">กลับหน้าหลัก</button>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // 1. ระบบแผนที่ปักหมุด
-        var map = L.map('map').setView([15.2294, 104.8564], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        // --- 1. แผนที่และค้นหาที่อยู่ ---
+        var map = L.map('map').setView([15.2294, 104.8564], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© Master Maid' }).addTo(map);
         var marker;
-        map.on('click', function(e) {
-            if (marker) marker.setLatLng(e.latlng); else marker = L.marker(e.latlng).addTo(map);
-            document.getElementById('lat_long').value = e.latlng.lat.toFixed(6) + "," + e.latlng.lng.toFixed(6);
-        });
 
-        // 2. ระบบคำนวณราคาและเวลา
+        map.on('click', function(e) { updateMarker(e.latlng.lat, e.latlng.lng); });
+
+        async function searchLocation() {
+            const query = document.getElementById('address_search').value;
+            if (!query) return alert("กรุณาพิมพ์เลขที่บ้าน หรือชื่อหมู่บ้านครับ");
+            const fullQuery = query + " อุบลราชธานี";
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+                    map.setView([lat, lon], 17);
+                    updateMarker(lat, lon);
+                } else {
+                    alert("❌ ไม่พบตำแหน่งที่ระบุ กรุณาปักหมุดเองบนแผนที่ครับ");
+                }
+            } catch (err) { alert("เกิดข้อผิดพลาดในการค้นหา"); }
+        }
+
+        function updateMarker(lat, lng) {
+            if (marker) marker.setLatLng([lat, lng]); else marker = L.marker([lat, lng]).addTo(map);
+            document.getElementById('lat_long').value = lat.toFixed(6) + "," + lng.toFixed(6);
+        }
+
+        // --- 2. คำนวณราคาและเวลา ---
         function calculateTime() {
             const startVal = document.getElementById('start_time').value;
             const service = document.getElementById('service_type').value;
             const duration = parseInt(document.getElementById('duration').value);
+            const priceNote = document.getElementById('price_note');
             
             document.getElementById('work_hours_input').value = duration + " ชั่วโมง";
             let [h, m] = startVal.split(':').map(Number);
@@ -169,22 +293,22 @@
             document.getElementById('end_time_input').value = formattedEnd;
 
             let price = (service === "Big Cleaning") ? 2000 : (duration === 2 ? 550 : 800 + (duration-3)*200);
-            document.getElementById('price_note').style.display = (service === "Big Cleaning") ? 'block' : 'none';
+            priceNote.style.display = (service === "Big Cleaning") ? 'block' : 'none';
             document.getElementById('total_price_display').innerText = price.toLocaleString();
             document.getElementById('total_price_hidden').value = price;
         }
 
-        // 3. ระบบป้องกันจองซ้ำ & กฎ 1 ชม.
-        const fullSlots = ["2026-03-10|09:00"]; // ใส่ "YYYY-MM-DD|HH:MM" ที่เต็มแล้ว 2 คิว
-        
+        // --- 3. ป้องกันจองซ้ำ & กฎ 1 ชม. ---
+        const fullSlots = ["2026-03-15|09:00"];
+
         const form = document.getElementById('maidForm');
         form.onsubmit = async (e) => {
             e.preventDefault();
             const dateVal = document.getElementById('book_date').value;
             const timeVal = document.getElementById('start_time').value;
 
-            if(!document.getElementById('lat_long').value) return alert("❌ กรุณาปักหมุดแผนที่ตำแหน่งบ้านของคุณก่อนครับ!");
-            if(fullSlots.filter(x => x === `${dateVal}|${timeVal}`).length >= 2) return alert("❌ คิวช่วงเวลานี้เต็มแล้วครับ กรุณาเลือกเวลาอื่น");
+            if(!document.getElementById('lat_long').value) return alert("❌ กรุณาปักหมุดตำแหน่งบ้านในแผนที่ก่อนครับ!");
+            if(fullSlots.filter(x => x === `${dateVal}|${timeVal}`).length >= 2) return alert("❌ คิวช่วงเวลานี้เต็มแล้วครับ");
             
             const now = new Date();
             const booking = new Date(`${dateVal}T${timeVal}:00`);
