@@ -27,30 +27,27 @@
             text-align: center; color: var(--white); padding: 0 20px; 
         }
         .hero h1 { font-size: clamp(28px, 5vw, 42px); margin: 0; font-weight: 700; }
-        .hero p { font-size: 18px; margin: 15px 0 30px 0; opacity: 0.9; }
         .hero-btn { 
             background: var(--gold); color: var(--primary); padding: 18px 45px; border-radius: 50px; 
-            text-decoration: none; font-weight: 800; font-size: 20px; transition: all 0.3s; 
-            border: 2px solid var(--gold); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+            text-decoration: none; font-weight: 800; font-size: 20px; transition: 0.3s; 
+            border: 2px solid var(--gold); margin-top: 30px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
         }
 
         .booking-wrap { background: var(--primary); padding: 60px 20px; }
         .booking-container { background: var(--white); border-radius: 30px; padding: 35px; max-width: 800px; margin: 0 auto; box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
         
-        #geocoder { margin-bottom: 10px; width: 100%; }
-        .mapboxgl-ctrl-geocoder { width: 100% !important; max-width: none !important; box-shadow: none; border: 1px solid #ddd; border-radius: 10px; }
-        #map { height: 350px; border-radius: 20px; border: 2px solid var(--gold); margin-bottom: 15px; }
+        .mapboxgl-ctrl-geocoder { width: 100% !important; max-width: none !important; border: 1px solid #ddd !important; border-radius: 10px !important; }
+        #map { height: 350px; border-radius: 20px; border: 2px solid var(--gold); margin: 15px 0; z-index: 1; }
 
-        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Sarabun'; box-sizing: border-box; font-size: 15px; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Sarabun'; box-sizing: border-box; }
         .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
         label { font-weight: 600; display: block; margin-top: 15px; font-size: 14px; color: #666; }
 
         .summary-box { background: #F0F4F8; border-radius: 15px; padding: 25px; margin-top: 25px; border: 1px dashed var(--gold); text-align: center; }
-        .submit-btn { width: 100%; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--primary); padding: 20px; border: none; border-radius: 15px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 25px; transition: 0.4s; }
+        .submit-btn { width: 100%; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--primary); padding: 20px; border: none; border-radius: 15px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 25px; }
 
         .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 9999; backdrop-filter: blur(5px); }
         #payment-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width: 90%; max-width: 400px; background: white; padding: 30px; border-radius: 30px; text-align: center; z-index: 10000; border-top: 10px solid var(--gold); }
-        .bank-box { background: #F2FFF7; border: 1px solid #B7EBC8; padding: 15px; border-radius: 15px; margin: 15px 0; }
         .line-btn { display: inline-flex; align-items: center; justify-content: center; background: var(--line-green); color: white !important; text-decoration: none; padding: 15px; border-radius: 10px; font-weight: 700; width: 100%; margin-top: 15px; }
     </style>
 </head>
@@ -74,18 +71,17 @@
                     <div><label>เบอร์โทรศัพท์:</label><input type="tel" name="phone" required></div>
                 </div>
 
-                <label><i class="fas fa-search-location"></i> ค้นหาตำแหน่งบ้าน (พิมพ์ชื่อหมู่บ้านหรือซอย):</label>
+                <label>ค้นหาตำแหน่งบ้าน (พิมพ์ชื่อหมู่บ้าน โรงแรม หรือซอย):</label>
                 <div id="geocoder"></div>
                 <div id="map"></div>
                 <p style="font-size: 12px; color: #888; margin-top: -10px;">*หากค้นหาไม่เจอ สามารถคลิกที่แผนที่เพื่อปักหมุดเองได้เลยครับ</p>
                 <input type="hidden" name="lat_long" id="lat_long" required>
                 
-                <label>บ้านเลขที่ / ข้อมูลที่อยู่เพิ่มเติม:</label>
-                <input type="text" name="location" required placeholder="เช่น บ้านเลขที่ 123/45 หมู่บ้าน...">
+                <label>เลขที่บ้าน / ข้อมูลที่อยู่เพิ่มเติม:</label>
+                <input type="text" name="location" required placeholder="เช่น 123/45 หมู่บ้าน...">
 
                 <div class="time-grid">
-                    <div>
-                        <label>บริการ:</label>
+                    <div><label>บริการ:</label>
                         <select name="service_type" id="service_type" onchange="calculateTime()">
                             <option value="ทำความสะอาดทั่วไป">ทำความสะอาดทั่วไป</option>
                             <option value="Big Cleaning">Big Cleaning</option>
@@ -95,8 +91,7 @@
                 </div>
 
                 <div class="time-grid">
-                    <div>
-                        <label>เวลาเริ่มงาน:</label>
+                    <div><label>เวลาเริ่มงาน:</label>
                         <select name="start_time" id="start_time" onchange="calculateTime()">
                             <option value="09:00">09:00 น.</option><option value="10:00">10:00 น.</option>
                             <option value="11:00">11:00 น.</option><option value="12:00">12:00 น.</option>
@@ -104,8 +99,7 @@
                             <option value="15:00">15:00 น.</option><option value="16:00">16:00 น.</option>
                         </select>
                     </div>
-                    <div>
-                        <label>ชั่วโมงที่จอง:</label>
+                    <div><label>จำนวนชั่วโมง:</label>
                         <select id="duration" onchange="calculateTime()">
                             <option value="2">2 ชม.</option><option value="3">3 ชม.</option>
                             <option value="4">4 ชม.</option><option value="5">5 ชม.</option>
@@ -129,19 +123,18 @@
 
     <div class="overlay" id="overlay"></div>
     <div id="payment-modal">
-        <i class="fas fa-check-circle" style="font-size: 50px; color: #28a745; margin-bottom: 10px;"></i>
+        <i class="fas fa-check-circle" style="font-size: 50px; color: #28a745;"></i>
         <h3>ส่งข้อมูลเรียบร้อย!</h3>
         <p style="font-size: 14px; color: #333; font-weight: 600;">แจ้งสลิปมัดจำได้เลยค่ะ เจ้าหน้าที่จะติดต่อยืนยันโดยเร็ว</p>
-        <div class="bank-box"><p><strong>มัดจำ: 200.-</strong><br>ธ.กสิกรไทย: 123-x-xxxxx-x<br>บจก. มาสเตอร์เมด อุบล</p></div>
-        
-        <a id="lineLink" href="#" class="line-btn">
-            <i class="fab fa-line"></i> ส่งสลิปแจ้งโอนทันที
-        </a>
-        <button onclick="location.reload()" style="margin-top:10px; background:none; border:none; color:#999; cursor:pointer;">กลับหน้าหลัก</button>
+        <div class="bank-box"><p><strong>มัดจำ: 200.-</strong><br>ธ.กสิกรไทย: 123-x-xxxxx-x</p></div>
+        <a id="lineLink" href="#" class="line-btn"><i class="fab fa-line"></i> ส่งสลิปแจ้งโอนทันที</a>
+        <button onclick="location.reload()" style="margin-top:10px; border:none; background:none; color:#999; cursor:pointer;">กลับหน้าหลัก</button>
     </div>
 
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiYXdhbmNoYW5hIiwiYSI6ImNtbWl4NjJxYTE3NDEycXB2NndkZHFxNDAifQ.oAA8Vp4AD4UdjjDuPLsgnw';
+        const ubonBounds = [104.3411, 14.3975, 105.6358, 16.0274]; //
+
         const map = new mapboxgl.Map({ 
             container: 'map', style: 'mapbox://styles/mapbox/streets-v12', 
             center: [104.8564, 15.2294], zoom: 14 
@@ -149,8 +142,8 @@
 
         const geocoder = new MapboxGeocoder({ 
             accessToken: mapboxgl.accessToken, mapboxgl: mapboxgl, 
-            placeholder: 'พิมพ์ชื่อหมู่บ้าน ซอย หรือสถานที่ใกล้เคียง...', 
-            countries: 'th', language: 'th',
+            placeholder: 'พิมพ์ชื่อโรงแรม, หมู่บ้าน หรือซอย...', countries: 'th', language: 'th',
+            types: 'poi,address,neighborhood', bbox: ubonBounds, //
             proximity: { longitude: 104.8564, latitude: 15.2294 } 
         });
 
@@ -165,9 +158,8 @@
             document.getElementById('lat_long').value = lat.toFixed(6) + "," + lng.toFixed(6);
         }
 
-        const lineID = "@301xqlpj";
-        const rawMsg = "แจ้งสลิปการมัดจำทำความสะอาดของ Master Maid Thailand";
-        document.getElementById('lineLink').href = `line://oaMessage/${lineID}/?${encodeURIComponent(rawMsg)}`;
+        const msg = encodeURIComponent("แจ้งสลิปการมัดจำทำความสะอาดของ Master Maid Thailand");
+        document.getElementById('lineLink').href = `line://oaMessage/@301xqlpj/?${msg}`;
 
         function calculateTime() {
             const startVal = document.getElementById('start_time').value;
@@ -175,9 +167,8 @@
             const duration = parseInt(document.getElementById('duration').value);
             let [h, m] = startVal.split(':').map(Number);
             let endH = (h + duration) % 24;
-            const formattedEnd = endH.toString().padStart(2, '0') + ":00";
-            document.getElementById('display_end').innerText = formattedEnd;
-            document.getElementById('end_time_input').value = formattedEnd;
+            document.getElementById('display_end').innerText = endH.toString().padStart(2, '0') + ":00";
+            document.getElementById('end_time_input').value = endH.toString().padStart(2, '0') + ":00";
             document.getElementById('work_hours_input').value = (duration === 8) ? "เหมา 8 ชั่วโมง" : duration + " ชั่วโมง";
             let price = (service === "Big Cleaning") ? 2000 : (duration === 2 ? 550 : (duration === 3 ? 800 : (duration === 8 ? 1500 : 800 + (duration-3)*200)));
             document.getElementById('total_price_display').innerText = price.toLocaleString();
