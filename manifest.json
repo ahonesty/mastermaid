@@ -1,0 +1,21 @@
+{
+  "name": "Master Maid Thailand",
+  "short_name": "MasterMaid",
+  "description": "บริการแม่บ้านพรีเมียม อุบลราชธานี",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0A1931",
+  "theme_color": "#D4AF37",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
