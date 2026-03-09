@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid Thailand | บริการแม่บ้านมืออาชีพ ระดับพรีเมียม อุบลราชธานี</title>
+    <title>Master Maid Thailand | บริการแม่บ้านระดับพรีเมียม อุบลราชธานี</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,162 +12,82 @@
 
     <style>
         :root { 
-            --primary: #0A1931; /* Deep Navy - หรูหรา สุขุม */
-            --gold: #D4AF37;    /* Champagne Gold - มีระดับ */
+            --primary: #0A1931; /* Deep Navy */
+            --gold: #D4AF37;    /* Champagne Gold */
             --gold-dark: #B8962D; 
             --white: #ffffff; 
             --bg-light: #F4F7F6; 
             --text-main: #1A1A1A;
-            --text-sub: #666666;
             --line-green: #06C755; 
-            --shadow-premium: 0 20px 40px rgba(0,0,0,0.1);
         }
         
         body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg-light); color: var(--text-main); scroll-behavior: smooth; overflow-x: hidden; }
         
-        /* Navigation - Clean & Center */
         nav { background: var(--white); padding: 15px 8%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 1000; }
-        .logo-img { height: 60px; width: auto; transition: 0.3s; }
-        .logo-img:hover { transform: scale(1.05); }
+        .logo-img { height: 60px; width: auto; }
 
-        /* Hero Section - Luxury Home Background */
         .hero { 
             background: linear-gradient(rgba(10, 25, 49, 0.8), rgba(10, 25, 49, 0.8)), 
                         url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1920&auto=format&fit=crop'); 
-            background-size: cover; background-position: center; height: 500px; 
+            background-size: cover; background-position: center; height: 450px; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--white); padding: 0 20px; 
         }
-        .hero h1 { font-size: clamp(32px, 6vw, 54px); margin: 0; font-weight: 700; letter-spacing: 1px; line-height: 1.2; }
+        .hero h1 { font-size: clamp(32px, 6vw, 54px); margin: 0; font-weight: 700; letter-spacing: 1px; }
         .hero p { font-size: clamp(16px, 3vw, 20px); margin: 20px 0 40px 0; opacity: 0.9; font-weight: 300; max-width: 600px; }
         
-        /* Premium Gold Button */
         .hero-btn { 
             background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); 
             color: var(--primary); padding: 20px 55px; border-radius: 50px; text-decoration: none; 
-            font-weight: 700; font-size: 18px; letter-spacing: 1px; text-transform: uppercase;
+            font-weight: 700; font-size: 18px; text-transform: uppercase;
             transition: 0.3s; box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4); border: none; cursor: pointer;
         }
-        .hero-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.6); }
+        .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.6); }
 
-        /* Packages Section - Elegant Cards */
         .container { max-width: 1200px; margin: 0 auto; padding: 60px 20px; text-align: center; }
         .section-title { font-size: 36px; color: var(--primary); font-weight: 700; margin-bottom: 50px; position: relative; display: inline-block; }
         .section-title::after { content: ''; display: block; width: 60px; height: 3px; background: var(--gold); margin: 15px auto 0; border-radius: 2px; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; }
-        .card { 
-            background: var(--white); border-radius: 25px; overflow: hidden; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.4s; text-align: left;
-            border: 1px solid rgba(0,0,0,0.03);
-        }
-        .card:hover { transform: translateY(-10px); box-shadow: var(--shadow-premium); }
+        .card { background: var(--white); border-radius: 25px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.4s; text-align: left; border: 1px solid rgba(0,0,0,0.03); }
+        .card:hover { transform: translateY(-10px); }
         
-        .card-img-wrap { height: 200px; overflow: hidden; position: relative; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .card:hover .card-img { transform: scale(1.1); }
+        .card-img-wrap { height: 220px; overflow: hidden; position: relative; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; }
         .card-icon-tag { position: absolute; bottom: -25px; right: 25px; background: var(--white); color: var(--gold); width: 60px; height: 60px; border-radius: 50px; display: flex; justify-content: center; align-items: center; font-size: 24px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 2px solid var(--gold); }
 
         .card-body { padding: 40px 30px 30px; }
-        .card h3 { color: var(--primary); font-size: 24px; margin: 0 0 15px 0; font-weight: 700; }
-        .card ul { list-style: none; padding: 0; margin: 0 0 30px 0; color: var(--text-sub); line-height: 2; font-size: 15px; }
-        .card ul li i { color: var(--gold); margin-right: 10px; width: 18px; text-align: center; }
+        .card h3 { color: var(--primary); font-size: 24px; margin: 0 0 15px 0; }
+        .card ul { list-style: none; padding: 0; margin: 0 0 30px 0; color: #666; line-height: 2; font-size: 15px; }
+        .card ul li i { color: var(--gold); margin-right: 10px; }
         
-        .price-tag { 
-            font-size: 28px; font-weight: 700; color: var(--primary); border-top: 1px solid #eee; padding-top: 25px; text-align: center; 
-            background: linear-gradient(to right, var(--gold) 0%, var(--primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+        .price-tag { font-size: 28px; font-weight: 700; color: var(--primary); border-top: 1px solid #eee; padding-top: 25px; text-align: center; }
+        .price-tag span { font-size: 16px; font-weight: 400; opacity: 0.7; }
 
-        /* Booking Section - Glassmorphism */
-        .booking-wrap { 
-            background: linear-gradient(135deg, #0A1931 0%, #152C50 100%);
-            padding: 100px 20px; position: relative;
-        }
-        .booking-wrap::before { 
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3%3G%3Cg fill="none" fill-rule="evenodd"%3%3G%3Cg fill="%23d4af37" fill-opacity="0.05"%3%3G%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2v-4h4v-2H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
-            opacity: 0.5;
-        }
-
-        .booking-container { 
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px); /* Frosted Glass Effect */
-            border-radius: 30px; padding: 50px; max-width: 900px; margin: 0 auto; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3); position: relative; z-index: 5;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+        .booking-wrap { background: linear-gradient(135deg, #0A1931 0%, #152C50 100%); padding: 100px 20px; }
+        .booking-container { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border-radius: 30px; padding: 50px; max-width: 900px; margin: 0 auto; box-shadow: 0 30px 60px rgba(0,0,0,0.3); position: relative; z-index: 5; }
         
-        /* Google Maps Search & Map Style */
-        #pac-input { width: 100%; padding: 16px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; font-family: 'Sarabun'; font-size: 16px; transition: 0.3s; }
-        #pac-input:URI_COMP_PART_START{ outline: none; border-color: var(--gold); box-shadow: 0 0 10px rgba(212, 175, 55, 0.1); }
-        #map { height: 400px; border-radius: 20px; border: 3px solid var(--gold); margin-bottom: 20px; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
+        #pac-input { width: 100%; padding: 16px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; font-family: 'Sarabun'; font-size: 16px; }
+        #map { height: 400px; border-radius: 20px; border: 3px solid var(--gold); margin-bottom: 20px; }
 
-        /* Form Controls - Clean & Elegant */
-        input, select, textarea { 
-            width: 100%; padding: 16px; margin-top: 8px; border: 2px solid #eee; border-radius: 12px; 
-            font-family: 'Sarabun'; box-sizing: border-box; font-size: 15px; transition: 0.3s; color: var(--text-main);
-        }
-        input:URI_COMP_PART_START, select:URI_COMP_PART_START, textarea:URI_COMP_PART_START { outline: none; border-color: var(--gold); background-color: rgba(212, 175, 55, 0.02); }
-        textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
-        
+        input, select, textarea { width: 100%; padding: 16px; margin-top: 8px; border: 2px solid #eee; border-radius: 12px; font-family: 'Sarabun'; box-sizing: border-box; font-size: 15px; }
+        textarea { resize: vertical; min-height: 100px; }
         .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         label { font-weight: 600; display: block; margin-top: 20px; font-size: 14px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Summary Box - Standout */
-        .summary-box { 
-            background: var(--primary); color: var(--white); border-radius: 18px; 
-            padding: 30px; margin-top: 40px; text-align: center; border: 2px solid var(--gold); 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
-        .summary-box strong { font-size: 18px; font-weight: 400; opacity: 0.8; }
-        .summary-box .display-end-time { font-size: 22px; font-weight: 700; color: var(--gold); margin-left: 10px; }
-        .total-price-wrap { color: var(--gold); font-size: 36px; font-weight: 700; margin-top: 15px; display: block; }
-        .total-price-wrap span { font-size: 20px; font-weight: 300; vertical-align: middle; opacity: 0.9; margin-left: 5px;}
+        .summary-box { background: var(--primary); color: var(--white); border-radius: 18px; padding: 30px; margin-top: 40px; text-align: center; border: 2px solid var(--gold); }
+        .total-price-wrap { color: var(--gold); font-size: 36px; font-weight: 700; margin-top: 10px; }
 
-        /* Submit Button - Luxury Gold */
-        .submit-btn { 
-            width: 100%; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); 
-            color: var(--primary); padding: 22px; border: none; border-radius: 15px; 
-            font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
-            cursor: pointer; margin-top: 30px; transition: 0.4s; 
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
-        }
-        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.6); }
+        .submit-btn { width: 100%; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--primary); padding: 22px; border: none; border-radius: 15px; font-size: 20px; font-weight: 800; cursor: pointer; margin-top: 30px; transition: 0.4s; text-transform: uppercase; letter-spacing: 1px; }
+        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.5); }
 
-        /* Modal - Professional & Clean */
         .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10, 25, 49, 0.9); z-index: 9999; backdrop-filter: blur(5px); }
-        #payment-modal { 
-            display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); 
-            width: 90%; max-width: 450px; background: white; padding: 40px; border-radius: 30px; 
-            text-align: center; z-index: 10000; border-top: 10px solid var(--gold);
-            box-shadow: var(--shadow-premium);
-        }
-        #payment-modal h3 { color: var(--primary); font-size: 26px; margin: 15px 0 10px; }
-        #payment-modal p { color: var(--text-sub); line-height: 1.6; margin-bottom: 25px; }
+        #payment-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width: 90%; max-width: 450px; background: white; padding: 40px; border-radius: 30px; text-align: center; z-index: 10000; border-top: 10px solid var(--gold); }
+        .bank-box { background: #FDF9E9; border: 1px solid #F3E5AB; padding: 20px; border-radius: 15px; margin: 20px 0; color: #5C4033; }
         
-        .bank-box { 
-            background: #FDF9E9; border: 1px solid #F3E5AB; padding: 20px; border-radius: 15px; margin: 20px 0;
-            color: #5C4033; font-size: 16px;
-        }
-        
-        /* LINE Button - Luxury Green */
-        .line-btn { 
-            display: inline-flex; align-items: center; justify-content: center; 
-            background: var(--line-green); color: white !important; text-decoration: none; 
-            padding: 18px; border-radius: 12px; font-weight: 700; font-size: 17px; width: 100%; 
-            transition: 0.3s; box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3);
-        }
-        .line-btn:hover { background: #05B34C; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(6, 199, 85, 0.4); }
-        .close-modal-btn { background: #eee; color: #333; border: none; padding: 14px; border-radius: 10px; cursor: pointer; margin-top: 15px; width: 100%; font-family: 'Sarabun'; font-weight: 600; transition: 0.2s;}
-        .close-modal-btn:hover { background: #ddd; }
+        .line-btn { display: inline-flex; align-items: center; justify-content: center; background: var(--line-green); color: white !important; text-decoration: none; padding: 18px; border-radius: 12px; font-weight: 700; width: 100%; margin-top: 15px; }
+        .close-modal-btn { background: #eee; color: #333; border: none; padding: 14px; border-radius: 10px; cursor: pointer; margin-top: 10px; width: 100%; font-family: 'Sarabun'; }
 
-        /* Responsive */
-        @media (max-width: 768px) { 
-            nav { padding: 10px 5%; }
-            .logo-img { height: 50px; }
-            .booking-container { padding: 30px; }
-            .time-grid { grid-template-columns: 1fr; gap: 0; }
-            #map { height: 300px; }
-        }
+        @media (max-width: 768px) { .time-grid { grid-template-columns: 1fr; } .booking-container { padding: 30px; } }
     </style>
 </head>
 <body>
@@ -185,7 +105,7 @@
         <div class="grid">
             <div class="card">
                 <div class="card-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1584622781564-1d987f7333c1?q=80&w=600&auto=format&fit=crop" alt="ทำความสะอาดทั่วไป" class="card-img">
+                    <img src="https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?q=80&w=1000&auto=format&fit=crop" alt="ทำความสะอาดทั่วไป" class="card-img">
                     <div class="card-icon-tag"><i class="fas fa-broom"></i></div>
                 </div>
                 <div class="card-body">
@@ -202,7 +122,7 @@
             
             <div class="card">
                 <div class="card-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1528740561666-dc2479bd08ab?q=80&w=600&auto=format&fit=crop" alt="Big Cleaning" class="card-img">
+                    <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6954?q=80&w=1000&auto=format&fit=crop" alt="Big Cleaning" class="card-img">
                     <div class="card-icon-tag"><i class="fas fa-sparkles"></i></div>
                 </div>
                 <div class="card-body">
@@ -210,8 +130,8 @@
                     <ul>
                         <li><i class="fas fa-check"></i> ขจัดคราบฝังลึก พื้น, ผนัง, สุขภัณฑ์</li>
                         <li><i class="fas fa-check"></i> เช็ดมุ้งลวด ขอบหน้าต่าง กระจกทุกบาน</li>
-                        <li><i class="fas fa-check"></i> ทำความสะอาดตู้เย็น, เตาอบ (ภายใน)</li>
-                        <li><i class="fas fa-check"></i> เหมาะสำหรับบ้านใหม่/หลังตกแต่ง/ย้ายเข้า</li>
+                        <li><i class="fas fa-check"></i> เหมาะสำหรับบ้านใหม่ / ย้ายเข้า-ออก</li>
+                        <li><i class="fas fa-check"></i> ทำความสะอาดตู้เย็น / เตาอบ (ภายใน)</li>
                     </ul>
                     <div class="price-tag">เริ่มต้น 2,000.-</div>
                 </div>
@@ -221,24 +141,24 @@
 
     <section class="booking-wrap" id="booking">
         <div class="booking-container">
-            <h2 style="text-align: center; color: var(--primary); font-size: 30px; margin-bottom: 30px; font-weight: 700;">กรอกข้อมูลการจองออนไลน์</h2>
+            <h2 style="text-align: center; color: var(--primary); font-size: 30px; margin-bottom: 30px;">จองคิวบริการ</h2>
             <form id="maidForm" action="https://hook.us2.make.com/u4ddkucyj2gbd9gj14om5cdtu3qjnzxx" method="POST">
                 
                 <div class="time-grid">
-                    <div><label>ชื่อ-นามสกุล:</label><input type="text" name="name" required placeholder="ชื่อ-นามสกุลของคุณ"></div>
+                    <div><label>ชื่อ-นามสกุล:</label><input type="text" name="name" required placeholder="ชื่อของคุณ"></div>
                     <div><label>เบอร์โทรศัพท์:</label><input type="tel" name="phone" required placeholder="06x-xxx-xxxx"></div>
                 </div>
 
-                <label><i class="fas fa-map-marker-alt" style="color:red; margin-right: 5px;"></i> ค้นหาพิกัดบ้าน หรือ <b>จิ้มลงบนแผนที่เพื่อปักหมุด</b>:</label>
-                <input id="pac-input" type="text" placeholder="พิมพ์ชื่อหมู่บ้าน, โรงแรม, หรือสถานที่ใกล้เคียง...">
+                <label><i class="fas fa-map-marker-alt" style="color:red;"></i> ค้นหาพิกัดบ้าน หรือ <b>คลิกบนแผนที่เพื่อปักหมุด</b>:</label>
+                <input id="pac-input" type="text" placeholder="พิมพ์ชื่อหมู่บ้าน, โรงแรม หรือสถานที่ใกล้เคียง...">
                 <div id="map"></div>
                 <input type="hidden" name="lat_long" id="lat_long" required>
                 
-                <label>เลขที่บ้าน / รายละเอียดที่อยู่เพิ่มเติม:</label>
-                <input type="text" name="location" required placeholder="เช่น บ้านเลขที่ 123/45, ซอย 9, บ้านสีฟ้า...">
+                <label>เลขที่บ้าน / ข้อมูลที่อยู่เพิ่มเติม:</label>
+                <input type="text" name="location" required placeholder="เช่น 123/45 หมู่บ้านสาริน...">
 
                 <label>รายละเอียดงานเพิ่มเติม (สัตว์เลี้ยง / จุดที่เน้นเป็นพิเศษ):</label>
-                <textarea name="details" placeholder="เช่น มีสุนัข 1 ตัว (ขังแล้ว), เน้นขัดพื้นห้องครัว, ฝากกุญแจไว้ที่นิติ..."></textarea>
+                <textarea name="details" placeholder="เช่น มีน้องหมา 1 ตัว, เน้นขัดห้องน้ำ, ฝากกุญแจที่นิติ..."></textarea>
 
                 <div class="time-grid">
                     <div><label>ประเภทบริการ:</label>
@@ -259,7 +179,7 @@
                             <option value="15:00">15:00 น.</option><option value="16:00">16:00 น.</option>
                         </select>
                     </div>
-                    <div><label>จำนวนชั่วโมงงาน:</label>
+                    <div><label>จำนวนชั่วโมง:</label>
                         <select id="duration" onchange="calculateTime()">
                             <option value="2">2 ชั่วโมง</option><option value="3">3 ชั่วโมง</option>
                             <option value="4">4 ชั่วโมง</option><option value="5">5 ชั่วโมง</option>
@@ -269,9 +189,8 @@
                 </div>
 
                 <div class="summary-box">
-                    <strong>เลิกงานประมาณ: <span id="display_end" class="display-end-time">11:00 น.</span></strong>
+                    <strong>เลิกงานประมาณ: <span id="display_end" style="color: var(--gold); font-weight: 700;">11:00 น.</span></strong>
                     <div class="total-price-wrap">ยอดรวม: <span id="total_price_display">550</span>.- <span>บาท</span></div>
-                    
                     <input type="hidden" name="total_price" id="total_price_hidden" value="550">
                     <input type="hidden" name="work_hours" id="work_hours_input" value="2 ชั่วโมง">
                     <input type="hidden" name="end_time" id="end_time_input" value="11:00">
@@ -285,64 +204,43 @@
     <div class="overlay" id="overlay"></div>
     <div id="payment-modal">
         <i class="fas fa-check-circle" style="font-size: 60px; color: #28a745;"></i>
-        <h3>ส่งข้อมูลการจองแล้ว!</h3>
-        <p>กรุณาชำระยอดมัดจำเพื่อยืนยันคิวงาน<br>และส่งสลิปหลักฐานผ่านทาง LINE ของเราครับ</p>
+        <h3>ข้อมูลถึงแอดมินแล้ว!</h3>
+        <p>กรุณาชำระยอดมัดจำ 200.- บาท เพื่อยืนยันคิวงาน<br>และส่งสลิปผ่านทาง LINE ทันทีครับ</p>
         <div class="bank-box">
-            <p><strong>มัดจำ: 200.- บาท</strong><br>ธ.กสิกรไทย: 123-x-xxxxx-x<br>บจก. มาสเตอร์เมด อุบล</p>
+            <strong>ธ.กสิกรไทย: 123-x-xxxxx-x</strong><br>บจก. มาสเตอร์เมด อุบล
         </div>
-        
-        <a id="lineLink" href="line://oaMessage/@301xqlpj/?%E0%B9%80%E0%B8%86%E0%B9%89%E0%B8%87%E0%B8%AA%E0%B8%A5%E0%B8%B4%E0%B8%9B%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%A1%E0%B8%B1%E0%B8%9D%E0%B8%87%E0%B8%B3%E0%B8%97%E0%B8%B3%E0%B8%81%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B8%AA%E0%B8%B1%E0%B8%AD%E0%B8%B2%E0%B8%94%E0%B8%82%E0%B8%AD%E0%B8%87%20Master%20Maid%20Thailand" class="line-btn">
-            <i class="fab fa-line" style="font-size: 20px; margin-right: 10px;"></i> แจ้งสลิปหลักฐานโอนทันที
-        </a>
-        
-        <button class="close-modal-btn" onclick="location.reload()">ตกลงและกลับหน้าหลัก</button>
+        <a id="lineLink" href="#" class="line-btn"><i class="fab fa-line" style="font-size: 20px; margin-right: 10px;"></i> แจ้งสลิปหลักฐานทันที</a>
+        <button class="close-modal-btn" onclick="location.reload()">กลับหน้าหลัก</button>
     </div>
 
     <script>
         let map, marker, autocomplete;
 
-        // Init Google Maps with your Key
         function initMap() {
             const ubonCenter = { lat: 15.2294, lng: 104.8564 };
             map = new google.maps.Map(document.getElementById("map"), {
-                center: ubonCenter,
-                zoom: 14,
-                mapTypeControl: false,
-                streetViewControl: false,
-                styles: [ /* Optional: Minimal Map Style for Premium look */
-                    { "featureType": "administrative", "elementType": "geometry", "stylers": [{ "visibility": "off" }] },
-                    { "featureType": "poi", "stylers": [{ "visibility": "off" }] }
-                ]
+                center: ubonCenter, zoom: 14, mapTypeControl: false, streetViewControl: false
             });
 
-            // หมุดสีทองตามสไตล์แบรนด์
             marker = new google.maps.Marker({
-                map: map,
-                draggable: true,
-                position: ubonCenter,
-                animation: google.maps.Animation.DROP,
-                icon: {
-                    url: "https://maps.google.com/mapfiles/ms/icons/gold-dot.png" 
-                }
+                map: map, draggable: true, position: ubonCenter, animation: google.maps.Animation.DROP,
+                icon: "https://maps.google.com/mapfiles/ms/icons/gold-dot.png"
             });
 
-            // 📍 จิ้มปักหมุด
             map.addListener("click", (e) => {
                 marker.setPosition(e.latLng);
                 updateLatLng(e.latLng.lat(), e.latLng.lng());
             });
 
-            // 🖱️ ลากหมุด
             marker.addListener("dragend", () => {
                 const pos = marker.getPosition();
                 updateLatLng(pos.lat(), pos.lng());
             });
 
-            // 🔍 ค้นหา (Google Autocomplete)
             const input = document.getElementById("pac-input");
             autocomplete = new google.maps.places.Autocomplete(input, {
                 componentRestrictions: { country: "th" },
-                fields: ["geometry", "name", "formatted_address"]
+                fields: ["geometry", "name"]
             });
 
             autocomplete.addListener("place_changed", () => {
@@ -359,7 +257,6 @@
             document.getElementById("lat_long").value = lat.toFixed(6) + "," + lng.toFixed(6);
         }
 
-        // Price & Time Calculation
         function calculateTime() {
             const startVal = document.getElementById('start_time').value;
             const service = document.getElementById('service_type').value;
@@ -370,22 +267,21 @@
             document.getElementById('display_end').innerText = formattedEnd;
             document.getElementById('end_time_input').value = formattedEnd.replace(" น.", "");
             document.getElementById('work_hours_input').value = (duration === 8) ? "เหมา 8 ชั่วโมง" : duration + " ชั่วโมง";
-            
             let price = (service === "Big Cleaning") ? 2000 : (duration === 2 ? 550 : (duration === 3 ? 800 : (duration === 8 ? 1500 : 800 + (duration-3)*200)));
             document.getElementById('total_price_display').innerText = price.toLocaleString();
             document.getElementById('total_price_hidden').value = price;
         }
 
-        // Form Submit to Make Webhook
         document.getElementById('maidForm').onsubmit = async (e) => {
             e.preventDefault();
-            if(!document.getElementById('lat_long').value) return alert("❌ กรุณาปักหมุดตำแหน่งบ้านในแผนที่ก่อนครับ (หรือจิ้มลงบนแผนที่)");
+            if(!document.getElementById('lat_long').value) return alert("❌ กรุณาปักหมุดในแผนที่ก่อนครับ (คลิกที่แผนที่ได้เลย)");
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('payment-modal').style.display = 'block';
-            
-            // Send data to Webhook, but user can click LINE link immediately
             fetch(e.target.action, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
         };
+
+        const rawMsg = "แจ้งสลิปการมัดจำทำความสะอาดของ Master Maid Thailand";
+        document.getElementById('lineLink').href = `line://oaMessage/@301xqlpj/?${encodeURIComponent(rawMsg)}`;
 
         google.maps.event.addDomListener(window, 'load', initMap);
         window.onload = () => { calculateTime(); document.getElementById('book_date').min = new Date().toISOString().split("T")[0]; };
