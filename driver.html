@@ -3,77 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid | Driver Panel</title>
+    <title>Master Maid | Driver</title>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Sarabun', sans-serif; text-align: center; padding: 40px 20px; background: #0A1931; color: white; margin: 0; }
-        .card { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 25px; border: 1px solid #D4AF37; max-width: 400px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .btn { width: 100%; padding: 20px; border-radius: 15px; border: none; font-size: 20px; font-weight: bold; cursor: pointer; margin: 10px 0; transition: 0.3s; }
+        .card { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 25px; border: 1px solid #D4AF37; max-width: 400px; margin: 0 auto; }
+        .btn { width: 100%; padding: 20px; border-radius: 15px; border: none; font-size: 20px; font-weight: bold; cursor: pointer; margin: 10px 0; }
         .btn-start { background: #D4AF37; color: #0A1931; }
         .btn-arrive { background: #28a745; color: white; display: none; }
         .btn-finish { background: #dc3545; color: white; display: none; }
-        .timer-display { font-size: 48px; font-weight: bold; color: #D4AF37; margin: 20px 0; display: none; }
+        .timer { font-size: 48px; font-weight: bold; color: #D4AF37; margin: 20px 0; display: none; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2 style="color: #D4AF37;">MASTER MAID</h2>
-        <p>บริหารงานแม่บ้าน (อุบลราชธานี)</p>
-        <hr style="border: 0.1px solid rgba(212,175,55,0.2); margin: 20px 0;">
-        <div id="timer" class="timer-display">00:00:00</div>
-        <button id="startBtn" class="btn btn-start" onclick="startTracking()">🚀 เริ่มเดินทาง</button>
-        <button id="arriveBtn" class="btn btn-arrive" onclick="arrive()">📍 ถึงที่หมาย/เริ่มงาน</button>
-        <button id="finishBtn" class="btn btn-finish" onclick="finishJob()">🏁 จบงาน/ส่งรายงาน</button>
+        <div id="timer" class="timer">00:00:00</div>
+        <button id="sBtn" class="btn btn-start" onclick="st()">🚀 เริ่มเดินทาง</button>
+        <button id="aBtn" class="btn btn-arrive" onclick="ar()">📍 ถึงที่หมาย</button>
+        <button id="fBtn" class="btn btn-finish" onclick="fi()">🏁 จบงาน</button>
     </div>
 
     <script>
-        const firebaseConfig = {
+        const config = {
             apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
             databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "mastermaid-ubon",
             appId: "1:272279135131:web:18a1d12073e601688c773e"
         };
-        firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(config);
         const db = firebase.database();
-        const webhookURL = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23"; 
+        const hook = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23"; 
 
-        let watchId = null, timerInterval = null, seconds = 0;
+        let w = null, t = null, s = 0;
 
-        function startTracking() {
-            document.getElementById('startBtn').style.display = "none";
-            document.getElementById('arriveBtn').style.display = "block";
-            watchId = navigator.geolocation.watchPosition((pos) => {
-                db.ref('tracking/maid_01').set({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        function st() {
+            document.getElementById('sBtn').style.display='none';
+            document.getElementById('aBtn').style.display='block';
+            w = navigator.geolocation.watchPosition(p => {
+                db.ref('tracking/maid_01').set({ lat: p.coords.latitude, lng: p.coords.longitude });
             }, null, { enableHighAccuracy: true });
         }
 
-        function arrive() {
-            if (watchId) navigator.geolocation.clearWatch(watchId);
+        function ar() {
+            if(w) navigator.geolocation.clearWatch(w);
             db.ref('tracking/maid_01').remove();
-            document.getElementById('arriveBtn').style.display = "none";
-            document.getElementById('finishBtn').style.display = "block";
-            document.getElementById('timer').style.display = "block";
-            timerInterval = setInterval(() => {
-                seconds++;
-                let h = Math.floor(seconds/3600).toString().padStart(2,'0');
-                let m = Math.floor((seconds%3600)/60).toString().padStart(2,'0');
-                let s = (seconds%60).toString().padStart(2,'0');
-                document.getElementById('timer').innerText = `${h}:${m}:${s}`;
+            document.getElementById('aBtn').style.display='none';
+            document.getElementById('fBtn').style.display='block';
+            document.getElementById('timer').style.display='block';
+            t = setInterval(() => {
+                s++;
+                let h=Math.floor(s/3600).toString().padStart(2,'0');
+                let m=Math.floor((s%3600)/60).toString().padStart(2,'0');
+                let sec=(s%60).toString().padStart(2,'0');
+                document.getElementById('timer').innerText = `${h}:${m}:${sec}`;
             }, 1000);
         }
 
-        function finishJob() {
-            clearInterval(timerInterval);
-            const duration = document.getElementById('timer').innerText;
-            fetch(webhookURL, {
+        function fi() {
+            clearInterval(t);
+            const d = document.getElementById('timer').innerText;
+            fetch(hook, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ maid_name: "แม่บ้าน 01", duration: duration, finished_at: new Date().toLocaleTimeString() })
+                body: JSON.stringify({ maid_name: "แม่บ้าน 01", duration: d, finished_at: new Date().toLocaleTimeString() })
+            }).then(() => {
+                alert("ส่งแจ้งเตือนสำเร็จ!");
+                location.reload();
             });
-            alert("ส่งรายงานเข้า LINE เรียบร้อย!");
-            location.reload();
         }
     </script>
 </body>
