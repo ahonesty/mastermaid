@@ -16,6 +16,7 @@
         #finishBtn { background: #dc3545; color: white; display: none; }
         .timer-display { font-size: 42px; font-weight: bold; color: #D4AF37; margin: 15px 0; display: none; }
         .info-row { font-size: 14px; color: #D4AF37; margin: 5px 0; display: none; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; }
+        #loading { display: none; color: #D4AF37; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -35,10 +36,10 @@
         <button id="startBtn" class="btn" onclick="startTracking()">🚀 เริ่มเดินทาง</button>
         <button id="arriveBtn" class="btn" onclick="arriveAtDestination()">📍 ถึงที่หมาย / เริ่มงาน</button>
         <button id="finishBtn" class="btn" onclick="finishJob()">🏁 จบงานและส่งรายงาน</button>
+        <div id="loading">⏳ กำลังส่งข้อมูล... โปรดรอสักครู่</div>
     </div>
 
     <script>
-        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
             databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -47,8 +48,6 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        // 2. Make.com Webhook
         const webhookURL = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23"; 
 
         let watchId = null, timerInterval = null, seconds = 0;
@@ -91,43 +90,53 @@
             }, 1000);
         }
 
-        function finishJob() {
-            if (!confirm("ต้องการจบงานและส่งรายงานใช่ไหม?")) return;
+        async function finishJob() {
+            if (!confirm("จบงานและส่งรายงานเข้า LINE CEO?")) return;
             
             clearInterval(timerInterval);
+            document.getElementById('finishBtn').disabled = true;
+            document.getElementById('loading').style.display = "block";
+
             const duration = document.getElementById('timer').innerText;
             const finishTime = new Date().toLocaleTimeString('th-TH');
 
-            const sendData = (locUrl = "ไม่ระบุพิกัด") => {
-                fetch(webhookURL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        maid_name: "แม่บ้าน 01",
-                        work_date: jobDate,
-                        start_at: jobStartTime,
-                        finished_at: finishTime,
-                        duration: duration,
-                        location_url: locUrl
-                    })
-                }).then(() => {
-                    alert("ส่งรายงานเข้า LINE เรียบร้อย!");
+            // สร้างฟังก์ชันส่งข้อมูล
+            const sendReport = async (locUrl) => {
+                try {
+                    await fetch(webhookURL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            maid_name: "แม่บ้าน 01",
+                            work_date: jobDate,
+                            start_at: jobStartTime,
+                            finished_at: finishTime,
+                            duration: duration,
+                            location_url: locUrl || "ไม่ระบุพิกัด"
+                        })
+                    });
+                    alert("✅ แจ้งเตือนเข้า LINE เรียบร้อยแล้ว!");
                     location.reload();
-                }).catch(err => alert("Error: " + err));
+                } catch (e) {
+                    alert("❌ ส่งไม่สำเร็จ: " + e.message);
+                    document.getElementById('finishBtn').disabled = false;
+                    document.getElementById('loading').style.display = "none";
+                }
             };
 
-            // ดึงพิกัดก่อนส่ง ถ้าช้าเกิน 5 วิ ให้ส่งเลย
+            // ดึงพิกัด (จำกัดเวลา 3 วินาที ถ้าไม่มาให้ส่งเลย)
             if (navigator.geolocation) {
+                const timeout = setTimeout(() => sendReport(), 3500);
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
-                        const url = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-                        sendData(url);
+                        clearTimeout(timeout);
+                        sendReport(`https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`);
                     },
-                    () => sendData(), 
-                    { enableHighAccuracy: true, timeout: 5000 }
+                    () => { clearTimeout(timeout); sendReport(); },
+                    { enableHighAccuracy: true, timeout: 3000 }
                 );
             } else {
-                sendData();
+                sendReport();
             }
         }
     </script>
