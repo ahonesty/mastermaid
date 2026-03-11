@@ -168,61 +168,72 @@
 
         let map, marker, maidMarker;
 
-        function initMap() {
-            const ubon = { lat: 15.2294, lng: 104.8564 };
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: ubon, zoom: 14, mapTypeControl: false, streetViewControl: false
-            });
+        // --- ส่วนที่ต้องแก้ไขใน Script ---
 
-            // หมุดสำหรับลูกค้าปักหมุด
-            marker = new google.maps.Marker({ map: map, draggable: true, position: ubon });
-            map.addListener("click", (e) => {
-                marker.setPosition(e.latLng);
-                document.getElementById("lat_long").value = e.latLng.lat().toFixed(6) + "," + e.latLng.lng().toFixed(6);
-            });
+function initMap() {
+    const ubon = { lat: 15.2294, lng: 104.8564 };
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: ubon, zoom: 14, mapTypeControl: false, streetViewControl: false
+    });
 
-            // หมุดติดตามแม่บ้าน (Real-time)
-            maidMarker = new google.maps.Marker({
-                map: map,
-                icon: { url: "https://cdn-icons-png.flaticon.com/512/1904/1904925.png", scaledSize: new google.maps.Size(45, 45) }
-            });
+    // 1. หมุดสำหรับลูกค้า (เพิ่มเหตุการณ์ dragend เพื่ออัปเดตพิกัดขณะลาก)
+    marker = new google.maps.Marker({ map: map, draggable: true, position: ubon });
+    
+    // ฟังก์ชันช่วยอัปเดตค่าพิกัดลงใน Input
+    const updateLatLngInput = (latLng) => {
+        document.getElementById("lat_long").value = latLng.lat().toFixed(6) + "," + latLng.lng().toFixed(6);
+    };
 
-            // ดึงพิกัดจาก Firebase
-            database.ref('tracking/maid_01').on('value', (snapshot) => {
-                const pos = snapshot.val();
-                if (pos) { maidMarker.setPosition({ lat: pos.lat, lng: pos.lng }); }
-            });
+    map.addListener("click", (e) => {
+        marker.setPosition(e.latLng);
+        updateLatLngInput(e.latLng);
+    });
 
-            // ค้นหาสถานที่
-            const input = document.getElementById("pac-input");
-            const autocomplete = new google.maps.places.Autocomplete(input);
-            autocomplete.addListener("place_changed", () => {
-                const place = autocomplete.getPlace();
-                map.setCenter(place.geometry.location);
-                marker.setPosition(place.geometry.location);
-                document.getElementById("lat_long").value = place.geometry.location.lat().toFixed(6) + "," + place.geometry.location.lng().toFixed(6);
-            });
-        }
+    marker.addListener("dragend", (e) => {
+        updateLatLngInput(e.latLng);
+    });
 
-        function calculate() {
-            const service = document.getElementById('service_type').value;
-            const hours = parseInt(document.getElementById('duration').value);
-            const start = parseInt(document.getElementById('start_time').value);
-            
-            let price = (service === "Big") ? 2000 : (hours === 2 ? 550 : (hours === 3 ? 800 : 800 + (hours-3)*200));
-            if (hours === 8 && service !== "Big") price = 1500;
+    // 2. หมุดติดตามแม่บ้าน (คงเดิม)
+    maidMarker = new google.maps.Marker({
+        map: map,
+        icon: { url: "https://cdn-icons-png.flaticon.com/512/1904/1904925.png", scaledSize: new google.maps.Size(45, 45) }
+    });
 
-            document.getElementById('total_display').innerText = price.toLocaleString();
-            document.getElementById('total_hidden').value = price;
-            document.getElementById('end_time_display').innerText = (start + hours) + ":00 น.";
-        }
+    database.ref('tracking/maid_01').on('value', (snapshot) => {
+        const pos = snapshot.val();
+        if (pos) { maidMarker.setPosition({ lat: pos.lat, lng: pos.lng }); }
+    });
 
-        document.getElementById('maidForm').onsubmit = (e) => {
-            e.preventDefault();
-            if(!document.getElementById('lat_long').value) return alert("❌ กรุณาปักหมุดบ้านในแผนที่ก่อนครับ");
-            document.getElementById('overlay').style.display = 'block';
-            fetch(e.target.action, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
-        };
+    // 3. ค้นหาสถานที่ (Autocomplete)
+    const input = document.getElementById("pac-input");
+    const autocomplete = new google.maps.places.Autocomplete(input);
+    autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) return;
+        map.setCenter(place.geometry.location);
+        marker.setPosition(place.geometry.location);
+        updateLatLngInput(place.geometry.location);
+    });
+}
+
+function calculate() {
+    const service = document.getElementById('service_type').value;
+    const hours = parseInt(document.getElementById('duration').value);
+    const start = parseInt(document.getElementById('start_time').value);
+    
+    let price = (service === "Big") ? 2000 : (hours === 2 ? 550 : (hours === 3 ? 800 : 800 + (hours-3)*200));
+    if (hours === 8 && service !== "Big") price = 1500;
+
+    document.getElementById('total_display').innerText = price.toLocaleString();
+    document.getElementById('total_hidden').value = price;
+    
+    // คำนวณเวลาเลิกงานให้สวยงาม
+    let endHour = start + hours;
+    document.getElementById('end_time_display').innerText = (endHour > 24 ? endHour - 24 : endHour) + ":00 น.";
+}
+
+// ปรับลิงก์ LINE ให้เสถียรขึ้น
+document.getElementById('lineLink').href = `https://line.me/ti/p/@301xqlpj`;
 
         document.getElementById('lineLink').href = `line://oaMessage/@301xqlpj/?${encodeURIComponent("แจ้งยอดมัดจำ Master Maid Thailand")}`;
 
@@ -231,4 +242,5 @@
     </script>
 </body>
 </html>
-เช็คความผิดปกติของโค้ดนี้ให้หน่อย
+
+
