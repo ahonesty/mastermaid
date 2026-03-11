@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid | ระบบแม่บ้าน</title>
+    <title>Master Maid | Driver Panel</title>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
@@ -32,10 +32,11 @@
         <button id="arriveBtn" class="btn btn-arrive" onclick="arriveAtDestination()">📍 ถึงที่หมายแล้ว / เริ่มงาน</button>
         <button id="finishBtn" class="btn btn-finish" onclick="finishJob()">🏁 จบงานและส่งรายงาน</button>
         
-        <p id="info" style="font-size: 13px; opacity: 0.7; margin-top: 20px;">* โปรดเปิด GPS และหน้าจอค้างไว้ขณะเดินทาง *</p>
+        <p style="font-size: 13px; opacity: 0.7; margin-top: 20px;">* โปรดเปิด GPS และหน้าจอค้างไว้ขณะเดินทาง *</p>
     </div>
 
     <script>
+        // 1. ตั้งค่า Firebase (ใช้ข้อมูลของคุณ)
         const firebaseConfig = {
             apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
             databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -45,11 +46,15 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // 2. ตั้งค่า Webhook ของ Make.com (วางลิงก์สีม่วงของคุณที่นี่)
+        const webhookURL = "https://hook.us2.make.com/xxxxxxxxxxxxxxxxx"; 
+
         let watchId = null;
         let timerInterval = null;
         let seconds = 0;
+        let startTime = "";
 
-        // 1. กดเมื่อเริ่มเดินทาง
+        // ฟังก์ชันเริ่มเดินทาง (Tracking)
         function startTracking() {
             if (navigator.geolocation) {
                 document.getElementById('startBtn').style.display = "none";
@@ -60,27 +65,24 @@
                     db.ref('tracking/maid_01').set({
                         lat: pos.coords.latitude,
                         lng: pos.coords.longitude,
-                        status: "On the way"
+                        status: "กำลังเดินทาง"
                     });
                 }, null, { enableHighAccuracy: true });
             }
         }
 
-        // 2. กดเมื่อถึงหน้าบ้านลูกค้า
+        // ฟังก์ชันเมื่อถึงที่หมาย (Stop Tracking + Start Timer)
         function arriveAtDestination() {
             if (confirm("ยืนยันว่าถึงที่หมายแล้ว? ระบบจะหยุดแชร์พิกัดและเริ่มจับเวลาทำงาน")) {
-                // หยุดส่ง GPS
                 if (watchId) navigator.geolocation.clearWatch(watchId);
-                // ลบพิกัดออกจากแผนที่ลูกค้า
-                db.ref('tracking/maid_01').remove();
+                db.ref('tracking/maid_01').remove(); // ลบหมุดออกจากแผนที่ลูกค้า
                 
-                // สลับปุ่ม
+                startTime = new Date().toLocaleTimeString();
                 document.getElementById('arriveBtn').style.display = "none";
                 document.getElementById('finishBtn').style.display = "block";
                 document.getElementById('status').innerText = "🧹 กำลังปฏิบัติงาน...";
                 document.getElementById('timer').style.display = "block";
 
-                // เริ่มจับเวลาทำงาน
                 timerInterval = setInterval(() => {
                     seconds++;
                     let h = Math.floor(seconds / 3600).toString().padStart(2, '0');
@@ -91,43 +93,38 @@
             }
         }
 
-        // 3. กดเมื่อทำความสะอาดเสร็จ
-      function onFinishWork() {
-    if (confirm("งานเสร็จเรียบร้อยแล้วใช่ไหม?")) {
-        clearInterval(timerInterval);
-        const workDuration = document.getElementById('timerDisplay').innerText;
-        const finishTime = new Date().toLocaleTimeString();
-        const date = new Date().toLocaleDateString();
+        // ฟังก์ชันจบงาน (Stop Timer + Send to LINE CEO)
+        function finishJob() {
+            if (confirm("งานเสร็จเรียบร้อยและต้องการส่งรายงานใช่ไหม?")) {
+                clearInterval(timerInterval);
+                const workDuration = document.getElementById('timer').innerText;
+                const finishTime = new Date().toLocaleTimeString();
+                const date = new Date().toLocaleDateString();
 
-        // 1. ส่งข้อมูลไปที่ LINE CEO (ผ่าน Make.com Webhook)
-        // *** เอา URL จาก Make.com มาวางตรงนี้ ***
-        const webhookURL = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23
-"; 
+                // ส่งข้อมูลเข้า LINE (ผ่าน Make.com)
+                fetch(webhookURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        maid_name: "แม่บ้าน 01",
+                        work_date: date,
+                        duration: workDuration,
+                        start_at: startTime,
+                        finished_at: finishTime
+                    })
+                });
 
-        fetch(webhookURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                maid_name: "แม่บ้าน 01",
-                work_date: date,
-                duration: workDuration,
-                finished_at: finishTime,
-                status: "จบงานเรียบร้อย"
-            })
-        });
+                // บันทึกลง Firebase History
+                db.ref('job_history').push({
+                    date: date,
+                    duration: workDuration,
+                    status: "Completed"
+                });
 
-        // 2. บันทึกเข้า Firebase (เหมือนเดิม)
-        db.ref('job_history').push({
-            date: date,
-            duration: workDuration,
-            finish_time: finishTime,
-            status: "Completed"
-        });
-
-        alert("ส่งรายงานจบงานและแจ้งเตือน LINE CEO สำเร็จ!\nเวลาทำงาน: " + workDuration);
-        location.reload();
-    }
-}
+                alert("ส่งรายงานเข้ากลุ่ม LINE CEO เรียบร้อยแล้ว!");
+                location.reload();
+            }
+        }
     </script>
 </body>
 </html>
