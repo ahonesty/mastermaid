@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid | ระบบจองพรีเมียม</title>
+    <title>Master Maid | จองบริการ</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
@@ -11,172 +11,106 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #D4AF37; --dark: #0A1931; --navy: #1A2F4F; }
-        
-        /* จัดวางทุกอย่างให้อยู่กึ่งกลางหน้าจอ */
-        body { 
-            font-family: 'Sarabun', sans-serif; 
-            background: var(--dark); 
-            color: white; 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; /* ให้ความสูงเต็มจอเพื่อจัดกึ่งกลาง */
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .container { width: 100%; max-width: 450px; }
-        
-        .card { 
-            background: rgba(255,255,255,0.1); 
-            padding: 30px; 
-            border-radius: 25px; 
-            border: 1px solid var(--gold); 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
-            backdrop-filter: blur(10px);
-            text-align: center;
-        }
-
-        .logo { font-size: 28px; font-weight: bold; color: var(--gold); margin-bottom: 20px; letter-spacing: 2px; }
-        
-        .input-group { text-align: left; margin-bottom: 15px; }
-        label { font-size: 14px; color: var(--gold); font-weight: bold; margin-left: 5px; }
-        
-        input, select { 
-            width: 100%; padding: 14px; margin-top: 5px; 
-            border-radius: 12px; border: 1px solid var(--gold); 
-            background: var(--navy); color: white; 
-            box-sizing: border-box; font-size: 16px; 
-        }
-
+        body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; text-align: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
         .row { display: flex; gap: 10px; }
-        .row .input-group { flex: 1; }
-
-        /* ปรับปรุงปุ่มจองให้เด่นและอยู่ตรงกลางกึ่งกลาง Card */
-        .btn-booking { 
-            width: 100%; 
-            background: var(--gold); 
-            color: var(--dark); 
-            padding: 18px; 
-            border: none; 
-            border-radius: 12px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 20px; 
-            margin-top: 25px; 
-            transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
-        }
-        .btn-booking:hover { background: #f1c40f; transform: scale(1.02); }
-
-        .pac-container { border-radius: 12px; font-family: 'Sarabun'; }
+        button { width: 100%; background: #D4AF37; color: white; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; margin-top: 10px; }
+        button:hover { background: #b8952e; }
+        .pac-container { border-radius: 8px; font-family: 'Sarabun'; }
     </style>
 </head>
 <body>
 
-<div class="container">
     <div class="card">
-        <div class="logo">MASTER MAID</div>
+        <h2 style="color: #0A1931; margin-bottom: 5px;">MASTER MAID</h2>
+        <p style="color: #666; margin-bottom: 20px;">จองบริการทำความสะอาด</p>
         
-        <div class="input-group">
-            <label>👤 ชื่อลูกค้า:</label>
-            <input type="text" id="custName" placeholder="ระบุชื่อผู้จอง">
-        </div>
+        <input type="text" id="custName" placeholder="ชื่อ-นามสกุล ของคุณ">
+        
+        <select id="propertyType">
+            <option value="บ้านเดี่ยว">บ้านเดี่ยว</option>
+            <option value="ทาวน์โฮม / ตึกแถว">ทาวน์โฮม / ตึกแถว</option>
+            <option value="คอนโด / หอพัก">คอนโด / หอพัก</option>
+            <option value="ออฟฟิศ / สำนักงาน">ออฟฟิศ / สำนักงาน</option>
+        </select>
+
+        <input type="date" id="serviceDate">
 
         <div class="row">
-            <div class="input-group">
-                <label>📅 วันที่รับบริการ:</label>
-                <input type="date" id="serviceDate">
-            </div>
-            <div class="input-group">
-                <label>💰 ราคา (บาท):</label>
-                <input type="number" id="price" placeholder="ระบุราคา">
-            </div>
+            <input type="time" id="startTime" placeholder="เวลาเริ่ม">
+            <input type="time" id="endTime" placeholder="เวลาสิ้นสุด">
         </div>
 
-        <div class="row">
-            <div class="input-group">
-                <label>⏰ เวลาเริ่ม:</label>
-                <input type="time" id="startTime">
-            </div>
-            <div class="input-group">
-                <label>⌛ เวลาสิ้นสุด:</label>
-                <input type="time" id="endTime">
-            </div>
-        </div>
-
-        <div class="input-group">
-            <label>📍 ค้นหาที่อยู่ (Google Maps):</label>
-            <input type="text" id="custLoc" placeholder="พิมพ์ชื่อหมู่บ้าน...">
-        </div>
-
-        <div class="input-group">
-            <label>📞 เบอร์โทรศัพท์:</label>
-            <input type="tel" id="phone" placeholder="ระบุเบอร์โทร">
-        </div>
+        <input type="number" id="price" placeholder="ราคาค่าบริการ (บาท)">
         
-        <button class="btn-booking" onclick="confirmBooking()">✅ ยืนยันการจองบริการ</button>
+        <input type="text" id="custLoc" placeholder="พิมพ์ชื่อหมู่บ้าน หรือซอย...">
+        
+        <input type="tel" id="phone" placeholder="เบอร์โทรศัพท์ติดต่อ">
+        
+        <button onclick="confirmBooking()">ยืนยันการจองตอนนี้</button>
     </div>
-</div>
 
-<script>
-    const firebaseConfig = { 
-        apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
-        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app", 
-        projectId: "mastermaid-ubon" 
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    <script>
+        // --- ตั้งค่า Firebase ---
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
+            databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app", 
+            projectId: "mastermaid-ubon" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-    let selectedLat = null, selectedLng = null;
+        let selectedLat = null, selectedLng = null;
 
-    function initMap() {
-        const autocomplete = new google.maps.places.Autocomplete(document.getElementById('custLoc'), {
-            componentRestrictions: { country: "th" },
-            fields: ["geometry", "formatted_address"]
-        });
-        autocomplete.addListener("place_changed", () => {
-            const place = autocomplete.getPlace();
-            if (place.geometry) {
-                selectedLat = place.geometry.location.lat();
-                selectedLng = place.geometry.location.lng();
-            }
-        });
-    }
-    google.maps.event.addDomListener(window, 'load', initMap);
-
-    function confirmBooking() {
-        const name = document.getElementById('custName').value;
-        const loc = document.getElementById('custLoc').value;
-        const price = document.getElementById('price').value;
-        const date = document.getElementById('serviceDate').value;
-        const start = document.getElementById('startTime').value;
-        const end = document.getElementById('endTime').value;
-        const tel = document.getElementById('phone').value;
-
-        if(!name || !loc || !selectedLat || !price) {
-            return alert("❌ กรุณากรอกข้อมูลและเลือกที่อยู่ให้ครบถ้วนครับ");
+        // --- ระบบ Google Maps ---
+        function initAutocomplete() {
+            const autocomplete = new google.maps.places.Autocomplete(document.getElementById('custLoc'), {
+                componentRestrictions: { country: "th" },
+                fields: ["geometry", "formatted_address"]
+            });
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                    selectedLat = place.geometry.location.lat();
+                    selectedLng = place.geometry.location.lng();
+                }
+            });
         }
+        google.maps.event.addDomListener(window, 'load', initAutocomplete);
 
-        db.ref('available_jobs').push({
-            title: name,
-            booking_date: date,
-            booking_time: start,
-            end_time_plan: end,
-            price: price,
-            detail: loc,
-            phone: tel,
-            location_url: `https://www.google.com/maps?q=${selectedLat},${selectedLng}`,
-            status: "available",
-            postedAt: Date.now()
-        }).then(() => {
-            alert("✅ จองสำเร็จ! ข้อมูลถูกส่งถึงทีมงานแล้ว");
-            location.reload();
-        });
-    }
-</script>
+        // --- ส่งข้อมูลเข้า Firebase ---
+        function confirmBooking() {
+            const name = document.getElementById('custName').value;
+            const type = document.getElementById('propertyType').value;
+            const date = document.getElementById('serviceDate').value;
+            const start = document.getElementById('startTime').value;
+            const end = document.getElementById('endTime').value;
+            const price = document.getElementById('price').value;
+            const loc = document.getElementById('custLoc').value;
+            const tel = document.getElementById('phone').value;
 
+            if(!name || !loc || !selectedLat || !date || !start || !end) {
+                return alert("❌ กรุณากรอกข้อมูลให้ครบถ้วนและเลือกที่อยู่จากรายการครับ");
+            }
+
+            db.ref('available_jobs').push({
+                title: name,
+                property_type: type,
+                booking_date: date,
+                booking_time: start,
+                end_time_plan: end,
+                price: price,
+                detail: loc,
+                phone: tel,
+                location_url: `https://www.google.com/maps?q=${selectedLat},${selectedLng}`,
+                status: "available",
+                postedAt: Date.now()
+            }).then(() => {
+                alert("✅ ส่งข้อมูลการจองเรียบร้อยแล้ว!");
+                location.reload();
+            });
+        }
+    </script>
 </body>
 </html>
