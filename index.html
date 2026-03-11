@@ -154,71 +154,80 @@
         <p style="margin-top: 20px; font-size: 14px; opacity: 0.7;" onclick="location.reload()">กลับหน้าหลัก</p>
     </div>
 
-    <<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
-        authDomain: "mastermaid-ubon.firebaseapp.com",
-        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "mastermaid-ubon",
-        appId: "1:272279135131:web:18a1d12073e601688c773e"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    <script>
+        // 1. Firebase Config จากข้อมูลจริงของคุณ
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
+            authDomain: "mastermaid-ubon.firebaseapp.com",
+            databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "mastermaid-ubon",
+            appId: "1:272279135131:web:18a1d12073e601688c773e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-    let map, marker, maidMarker, travelPath;
-    let pathCoordinates = [];
+        let map, marker, maidMarker;
 
-    function initMap() {
-        const ubon = { lat: 15.2294, lng: 104.8564 };
-        map = new google.maps.Map(document.getElementById("map"), {
-            center: ubon, zoom: 14, mapTypeControl: false
-        });
+        function initMap() {
+            const ubon = { lat: 15.2294, lng: 104.8564 };
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: ubon, zoom: 14, mapTypeControl: false, streetViewControl: false
+            });
 
-        // 1. ตั้งค่าเส้นทางการเดินทางสีทอง
-        travelPath = new google.maps.Polyline({
-            path: pathCoordinates,
-            geodesic: true,
-            strokeColor: "#D4AF37", // สีทอง Luxury
-            strokeOpacity: 0.8,
-            strokeWeight: 4
-        });
-        travelPath.setMap(map);
+            // หมุดสำหรับลูกค้าปักหมุด
+            marker = new google.maps.Marker({ map: map, draggable: true, position: ubon });
+            map.addListener("click", (e) => {
+                marker.setPosition(e.latLng);
+                document.getElementById("lat_long").value = e.latLng.lat().toFixed(6) + "," + e.latLng.lng().toFixed(6);
+            });
 
-        // 2. หมุดลูกค้า
-        marker = new google.maps.Marker({ map: map, draggable: true, position: ubon });
+            // หมุดติดตามแม่บ้าน (Real-time)
+            maidMarker = new google.maps.Marker({
+                map: map,
+                icon: { url: "https://cdn-icons-png.flaticon.com/512/1904/1904925.png", scaledSize: new google.maps.Size(45, 45) }
+            });
 
-        // 3. หมุดแม่บ้าน (Real-time Icon)
-        maidMarker = new google.maps.Marker({
-            map: map,
-            visible: false, // ซ่อนไว้ก่อนจนกว่าแม่บ้านจะเริ่มเดินทาง
-            icon: {
-                url: "https://cdn-icons-png.flaticon.com/512/1904/1904925.png",
-                scaledSize: new google.maps.Size(45, 45)
-            }
-        });
+            // ดึงพิกัดจาก Firebase
+            database.ref('tracking/maid_01').on('value', (snapshot) => {
+                const pos = snapshot.val();
+                if (pos) { maidMarker.setPosition({ lat: pos.lat, lng: pos.lng }); }
+            });
 
-        // 4. ฟังพิกัดและวาดเส้นจาก Firebase
-        database.ref('tracking/maid_01').on('value', (snapshot) => {
-            const pos = snapshot.val();
-            if (pos) {
-                const newPos = { lat: pos.lat, lng: pos.lng };
-                maidMarker.setVisible(true);
-                maidMarker.setPosition(newPos);
-                
-                // วาดเส้นทาง
-                pathCoordinates.push(newPos);
-                travelPath.setPath(pathCoordinates);
-            } else {
-                // ถ้าไม่มีข้อมูล (แม่บ้านกดจบงาน)
-                maidMarker.setVisible(false);
-                pathCoordinates = [];
-                travelPath.setPath([]);
-            }
-        });
-    }
-    // ... ส่วนการคำนวณราคาและ autocomplete คงเดิม ...
-    google.maps.event.addDomListener(window, 'load', initMap);
-</script>
+            // ค้นหาสถานที่
+            const input = document.getElementById("pac-input");
+            const autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                map.setCenter(place.geometry.location);
+                marker.setPosition(place.geometry.location);
+                document.getElementById("lat_long").value = place.geometry.location.lat().toFixed(6) + "," + place.geometry.location.lng().toFixed(6);
+            });
+        }
+
+        function calculate() {
+            const service = document.getElementById('service_type').value;
+            const hours = parseInt(document.getElementById('duration').value);
+            const start = parseInt(document.getElementById('start_time').value);
+            
+            let price = (service === "Big") ? 2000 : (hours === 2 ? 550 : (hours === 3 ? 800 : 800 + (hours-3)*200));
+            if (hours === 8 && service !== "Big") price = 1500;
+
+            document.getElementById('total_display').innerText = price.toLocaleString();
+            document.getElementById('total_hidden').value = price;
+            document.getElementById('end_time_display').innerText = (start + hours) + ":00 น.";
+        }
+
+        document.getElementById('maidForm').onsubmit = (e) => {
+            e.preventDefault();
+            if(!document.getElementById('lat_long').value) return alert("❌ กรุณาปักหมุดบ้านในแผนที่ก่อนครับ");
+            document.getElementById('overlay').style.display = 'block';
+            fetch(e.target.action, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
+        };
+
+        document.getElementById('lineLink').href = `line://oaMessage/@301xqlpj/?${encodeURIComponent("แจ้งยอดมัดจำ Master Maid Thailand")}`;
+
+        google.maps.event.addDomListener(window, 'load', initMap);
+        window.onload = () => { calculate(); document.getElementById('book_date').min = new Date().toISOString().split("T")[0]; };
+    </script>
 </body>
 </html>
-
