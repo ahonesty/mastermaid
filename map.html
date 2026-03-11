@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Master Maid | CEO Dashboard</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <style>
+        #map { height: 100vh; width: 100%; }
+        .maid-label { background: white; border: 2px solid #D4AF37; padding: 2px 5px; border-radius: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
+            databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "mastermaid-ubon",
+            appId: "1:272279135131:web:18a1d12073e601688c773e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // ตั้งค่าแผนที่เริ่มต้น (อุบลราชธานี)
+        const map = L.map('map').setView([15.2287, 104.8475], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // เก็บ Marker ของแม่บ้านแต่ละคนไว้ใน Object
+        const markers = {};
+
+        // ฟังก์ชันดึงข้อมูลจากโฟลเดอร์ tracking ทั้งหมด
+        db.ref('tracking').on('value', (snapshot) => {
+            const data = snapshot.val();
+            
+            // วนลูปเช็คแม่บ้านทุกคนที่กำลังออนไลน์ (มีพิกัดใน Firebase)
+            for (let maidID in data) {
+                const info = data[maidID];
+                const lat = info.lat;
+                const lng = info.lng;
+
+                if (markers[maidID]) {
+                    // ถ้ามีหมุดอยู่แล้ว ให้เลื่อนตำแหน่ง
+                    markers[maidID].setLatLng([lat, lng]);
+                } else {
+                    // ถ้ายังไม่มีหมุด ให้สร้างใหม่พร้อมใส่ชื่อแม่บ้าน
+                    markers[maidID] = L.marker([lat, lng]).addTo(map)
+                        .bindTooltip(maidID, { permanent: true, direction: 'top', className: 'maid-label' })
+                        .openTooltip();
+                }
+            }
+
+            // ลบหมุดกรณีที่แม่บ้านกดจบงาน (ข้อมูลใน Firebase หายไป)
+            for (let id in markers) {
+                if (!data || !data[id]) {
+                    map.removeLayer(markers[id]);
+                    delete markers[id];
+                }
+            }
+        });
+    </script>
+</body>
+</html>
