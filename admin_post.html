@@ -3,110 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid CEO | จ่ายงานแม่บ้าน</title>
+    <title>CEO | Post Job</title>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Sarabun', sans-serif; background: #0A1931; color: white; padding: 20px; text-align: center; margin: 0; }
-        .container { max-width: 500px; margin: auto; padding: 20px; }
-        .box { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; border: 1px solid #D4AF37; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-        h2 { color: #D4AF37; margin-bottom: 20px; }
-        label { display: block; text-align: left; margin: 10px 0 5px; color: #D4AF37; font-size: 14px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #D4AF37; background: #1A2F4F; color: white; box-sizing: border-box; font-family: 'Sarabun'; }
-        button { width: 100%; background: #D4AF37; color: #0A1931; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.3s; }
-        button:hover { background: #f1c40f; transform: scale(1.02); }
-        .status-list { margin-top: 20px; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; }
-        .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .online { background-color: #28a745; }
-        .offline { background-color: #dc3545; }
+        body { font-family: 'Sarabun', sans-serif; background: #0A1931; color: white; padding: 20px; text-align: center; }
+        .box { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; border: 1px solid #D4AF37; max-width: 400px; margin: auto; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #D4AF37; background: #1A2F4F; color: white; box-sizing: border-box; }
+        button { width: 100%; background: #D4AF37; color: #0A1931; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .status-item { text-align: left; padding: 5px; border-bottom: 0.5px solid #333; }
+        .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 10px; }
     </style>
 </head>
 <body>
-
-<div class="container">
     <div class="box">
         <h2>📢 จ่ายงาน Master Maid</h2>
-        
-        <label>👤 เลือกแม่บ้านที่ต้องการส่งงานให้:</label>
         <select id="assignTo">
             <option value="">-- เลือกแม่บ้าน --</option>
             <option value="พี่เอ (MM01)">พี่เอ (MM01)</option>
             <option value="พี่บี (MM02)">พี่บี (MM02)</option>
             <option value="พี่ซี (MM03)">พี่ซี (MM03)</option>
         </select>
-
-        <label>📍 ชื่อลูกค้า / สถานที่งาน:</label>
-        <input type="text" id="customerName" placeholder="เช่น บ้านคุณหมอ หมู่บ้านสมหวัง">
-
-        <label>📝 รายละเอียดงาน:</label>
-        <textarea id="jobDetail" rows="3" placeholder="เช่น ล้างพื้นชั้น 1 และรีดผ้า 10 ชิ้น"></textarea>
-
-        <button onclick="sendJob()">ส่งงาน (นับถอยหลัง 15 นาที)</button>
+        <input type="text" id="cust" placeholder="ชื่อลูกค้า">
+        <textarea id="det" rows="3" placeholder="รายละเอียดงาน"></textarea>
+        <button onclick="send()">ส่งงาน (15 นาที)</button>
+        <hr>
+        <div id="statusArea"></div>
     </div>
 
-    <div class="status-list">
-        <h4 style="margin: 0 0 10px 0; color: #D4AF37;">เช็คสถานะแม่บ้านล่าสุด:</h4>
-        <div id="statusArea">กำลังโหลดข้อมูล...</div>
-    </div>
-</div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
+            databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "mastermaid-ubon"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
-        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "mastermaid-ubon"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // 1. ฟังก์ชันส่งงาน
-    function sendJob() {
-        const maid = document.getElementById('assignTo').value;
-        const customer = document.getElementById('customerName').value;
-        const detail = document.getElementById('jobDetail').value;
-
-        if(!maid || !customer) return alert("❌ โปรดเลือกแม่บ้านและใส่ชื่อลูกค้า");
-
-        const now = Date.now();
-        const expiryTime = now + (15 * 60 * 1000); // ตั้งค่าหมดอายุในอีก 15 นาที
-
-        db.ref('personal_jobs/' + maid).set({
-            customer: customer,
-            detail: detail,
-            status: "waiting",
-            postedAt: now,
-            expiryAt: expiryTime
-        }).then(() => {
-            alert("✅ ส่งงานให้ " + maid + " เรียบร้อย!\nงานจะหมดอายุและโอนไปกองกลางหากไม่รับใน 15 นาที");
-            document.getElementById('customerName').value = "";
-            document.getElementById('jobDetail').value = "";
-        }).catch(e => alert("เกิดข้อผิดพลาด: " + e));
-    }
-
-    // 2. ฟังก์ชันดึงสถานะแม่บ้านมาโชว์ (ว่าง/ไม่ว่าง)
-    db.ref('maid_status').on('value', (snapshot) => {
-        const statuses = snapshot.val();
-        const area = document.getElementById('statusArea');
-        area.innerHTML = "";
-
-        if (!statuses) {
-            area.innerHTML = "ไม่มีข้อมูลสถานะ";
-            return;
+        function send() {
+            const maid = document.getElementById('assignTo').value;
+            const cust = document.getElementById('cust').value;
+            if(!maid || !cust) return alert("กรอกข้อมูลให้ครบ");
+            db.ref('personal_jobs/'+maid).set({
+                customer: cust, detail: document.getElementById('det').value,
+                status: "waiting", expiryAt: Date.now() + (15*60*1000)
+            }).then(() => alert("ส่งงานสำเร็จ!"));
         }
 
-        for (let name in statuses) {
-            const status = statuses[name];
-            const isOnline = status === "available";
-            area.innerHTML += `
-                <div style="margin-bottom: 5px;">
-                    <span class="dot ${isOnline ? 'online' : 'offline'}"></span>
-                    <b>${name}:</b> ${isOnline ? '<span style="color:#28a745">ว่าง</span>' : '<span style="color:#dc3545">ไม่สะดวก</span>'}
-                </div>
-            `;
-        }
-    });
-</script>
-
+        db.ref('maid_status').on('value', (snap) => {
+            const data = snap.val();
+            const area = document.getElementById('statusArea');
+            area.innerHTML = "<h4>สถานะปัจจุบัน:</h4>";
+            for(let name in data) {
+                const s = data[name];
+                const color = s === "available" ? "#28a745" : "#dc3545";
+                area.innerHTML += `<div class="status-item"><span class="dot" style="background:${color}"></span>${name}: ${s}</div>`;
+            }
+        });
+    </script>
 </body>
 </html>
