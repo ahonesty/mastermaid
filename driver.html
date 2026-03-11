@@ -10,10 +10,10 @@
     <style>
         body { font-family: 'Sarabun', sans-serif; text-align: center; padding: 20px; background: #0A1931; color: white; margin: 0; }
         .card { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; border: 1px solid #D4AF37; max-width: 380px; margin: 20px auto; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-        .btn { width: 100%; padding: 18px; border-radius: 12px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; margin: 8px 0; transition: 0.2s; }
-        .btn-start { background: #D4AF37; color: #0A1931; }
-        .btn-arrive { background: #28a745; color: white; display: none; }
-        .btn-finish { background: #dc3545; color: white; display: none; }
+        .btn { width: 100%; padding: 20px; border-radius: 15px; border: none; font-size: 20px; font-weight: bold; cursor: pointer; margin: 10px 0; transition: 0.3s; display: block; }
+        #startBtn { background: #D4AF37; color: #0A1931; }
+        #arriveBtn { background: #28a745; color: white; display: none; }
+        #finishBtn { background: #dc3545; color: white; display: none; }
         .timer-display { font-size: 42px; font-weight: bold; color: #D4AF37; margin: 15px 0; display: none; }
         .info-row { font-size: 14px; color: #D4AF37; margin: 5px 0; display: none; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; }
     </style>
@@ -21,8 +21,8 @@
 <body>
 
     <div class="card">
-        <h2 style="color: #D4AF37; margin-bottom: 5px;">MASTER MAID</h2>
-        <p style="font-size: 14px; margin-top: 0;">ระบบบันทึกเวลาปฏิบัติงาน</p>
+        <h2 style="color: #D4AF37;">MASTER MAID</h2>
+        <p>ระบบบันทึกเวลาปฏิบัติงาน (อุบลฯ)</p>
         <hr style="border: 0.1px solid rgba(212,175,55,0.2); margin: 15px 0;">
 
         <div id="jobDetails" class="info-row">
@@ -32,13 +32,13 @@
 
         <div id="timer" class="timer-display">00:00:00</div>
         
-        <button id="startBtn" class="btn btn-start" onclick="startTracking()">🚀 เริ่มเดินทาง</button>
-        <button id="arriveBtn" class="btn btn-arrive" onclick="arriveAtDestination()">📍 ถึงที่หมาย / เริ่มงาน</button>
-        <button id="finishBtn" class="btn btn-finish" onclick="finishJob()">🏁 จบงานและส่งรายงาน</button>
+        <button id="startBtn" class="btn" onclick="startTracking()">🚀 เริ่มเดินทาง</button>
+        <button id="arriveBtn" class="btn" onclick="arriveAtDestination()">📍 ถึงที่หมาย / เริ่มงาน</button>
+        <button id="finishBtn" class="btn" onclick="finishJob()">🏁 จบงานและส่งรายงาน</button>
     </div>
 
     <script>
-        // 1. Firebase Config (ใช้ค่าเดิมของคุณ)
+        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
             databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -48,78 +48,87 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 2. Webhook URL (ลิงก์ของคุณ)
+        // 2. Make.com Webhook
         const webhookURL = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23"; 
 
         let watchId = null, timerInterval = null, seconds = 0;
-        let jobDate = "", jobStartTime = "", currentLoc = "";
+        let jobDate = "", jobStartTime = "";
 
         function startTracking() {
             document.getElementById('startBtn').style.display = "none";
             document.getElementById('arriveBtn').style.display = "block";
             watchId = navigator.geolocation.watchPosition((pos) => {
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-                currentLoc = `https://www.google.com/maps?q=${lat},${lng}`;
-                db.ref('tracking/maid_01').set({ lat, lng, status: "กำลังเดินทาง" });
+                db.ref('tracking/maid_01').set({ 
+                    lat: pos.coords.latitude, 
+                    lng: pos.coords.longitude, 
+                    status: "กำลังเดินทาง" 
+                });
             }, null, { enableHighAccuracy: true });
         }
 
         function arriveAtDestination() {
-            if (confirm("เริ่มนับเวลาทำงานใช่หรือไม่?")) {
-                if (watchId) navigator.geolocation.clearWatch(watchId);
-                db.ref('tracking/maid_01').remove();
-                
-                const now = new Date();
-                jobDate = now.toLocaleDateString('th-TH');
-                jobStartTime = now.toLocaleTimeString('th-TH');
+            if (!confirm("เริ่มนับเวลาทำงานใช่หรือไม่?")) return;
+            if (watchId) navigator.geolocation.clearWatch(watchId);
+            db.ref('tracking/maid_01').remove();
+            
+            const now = new Date();
+            jobDate = now.toLocaleDateString('th-TH');
+            jobStartTime = now.toLocaleTimeString('th-TH');
 
-                document.getElementById('dText').innerText = "📅 วันที่: " + jobDate;
-                document.getElementById('sText').innerText = "⏰ เริ่มงาน: " + jobStartTime;
-                document.getElementById('jobDetails').style.display = "block";
-                document.getElementById('arriveBtn').style.display = "none";
-                document.getElementById('finishBtn').style.display = "block";
-                document.getElementById('timer').style.display = "block";
+            document.getElementById('dText').innerText = "📅 วันที่: " + jobDate;
+            document.getElementById('sText').innerText = "⏰ เริ่มงาน: " + jobStartTime;
+            document.getElementById('jobDetails').style.display = "block";
+            document.getElementById('arriveBtn').style.display = "none";
+            document.getElementById('finishBtn').style.display = "block";
+            document.getElementById('timer').style.display = "block";
 
-                timerInterval = setInterval(() => {
-                    seconds++;
-                    let h = Math.floor(seconds/3600).toString().padStart(2,'0');
-                    let m = Math.floor((seconds%3600)/60).toString().padStart(2,'0');
-                    let s = (seconds%60).toString().padStart(2,'0');
-                    document.getElementById('timer').innerText = `${h}:${m}:${s}`;
-                }, 1000);
-            }
+            timerInterval = setInterval(() => {
+                seconds++;
+                let h = Math.floor(seconds/3600).toString().padStart(2,'0');
+                let m = Math.floor((seconds%3600)/60).toString().padStart(2,'0');
+                let s = (seconds%60).toString().padStart(2,'0');
+                document.getElementById('timer').innerText = `${h}:${m}:${s}`;
+            }, 1000);
         }
 
         function finishJob() {
-            navigator.geolocation.getCurrentPosition((pos) => {
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-                const finalLoc = `https://www.google.com/maps?q=${lat},${lng}`;
+            if (!confirm("ต้องการจบงานและส่งรายงานใช่ไหม?")) return;
+            
+            clearInterval(timerInterval);
+            const duration = document.getElementById('timer').innerText;
+            const finishTime = new Date().toLocaleTimeString('th-TH');
 
-                if (confirm("ต้องการจบงานและส่งรายงานเข้า LINE CEO?")) {
-                    clearInterval(timerInterval);
-                    const duration = document.getElementById('timer').innerText;
-                    const finishTime = new Date().toLocaleTimeString('th-TH');
+            const sendData = (locUrl = "ไม่ระบุพิกัด") => {
+                fetch(webhookURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        maid_name: "แม่บ้าน 01",
+                        work_date: jobDate,
+                        start_at: jobStartTime,
+                        finished_at: finishTime,
+                        duration: duration,
+                        location_url: locUrl
+                    })
+                }).then(() => {
+                    alert("ส่งรายงานเข้า LINE เรียบร้อย!");
+                    location.reload();
+                }).catch(err => alert("Error: " + err));
+            };
 
-                    // ส่งข้อมูลแยกตัวแปรให้ Make.com
-                    fetch(webhookURL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            maid_name: "แม่บ้าน 01",
-                            work_date: jobDate,
-                            start_at: jobStartTime,
-                            finished_at: finishTime,
-                            duration: duration,
-                            location_url: finalLoc
-                        })
-                    }).then(() => {
-                        alert("รายงานถูกส่งเข้ากลุ่ม LINE เรียบร้อยแล้ว!");
-                        location.reload();
-                    });
-                }
-            }, (err) => { alert("โปรดอนุญาตให้เข้าถึงตำแหน่งเพื่อจบงาน"); }, { enableHighAccuracy: true });
+            // ดึงพิกัดก่อนส่ง ถ้าช้าเกิน 5 วิ ให้ส่งเลย
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const url = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                        sendData(url);
+                    },
+                    () => sendData(), 
+                    { enableHighAccuracy: true, timeout: 5000 }
+                );
+            } else {
+                sendData();
+            }
         }
     </script>
 </body>
