@@ -3,46 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid | Driver Panel</title>
+    <title>Master Maid | Staff Panel</title>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Sarabun', sans-serif; text-align: center; padding: 20px; background: #0A1931; color: white; margin: 0; }
         .card { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; border: 1px solid #D4AF37; max-width: 380px; margin: 20px auto; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-        .btn { width: 100%; padding: 20px; border-radius: 15px; border: none; font-size: 20px; font-weight: bold; cursor: pointer; margin: 10px 0; transition: 0.3s; display: block; }
+        .btn { width: 100%; padding: 18px; border-radius: 12px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; margin: 8px 0; transition: 0.2s; display: block; }
         #startBtn { background: #D4AF37; color: #0A1931; }
         #arriveBtn { background: #28a745; color: white; display: none; }
         #finishBtn { background: #dc3545; color: white; display: none; }
         .timer-display { font-size: 42px; font-weight: bold; color: #D4AF37; margin: 15px 0; display: none; }
+        select { background: #1A2F4F; color: white; border: 1px solid #D4AF37; padding: 15px; width: 100%; border-radius: 12px; font-size: 16px; margin-bottom: 10px; }
         
-        /* สไตล์หน้าต่างยืนยัน (Custom Modal) */
+        /* Modal Style - เพื่อให้นาฬิกาไม่หยุดเดินตอนกดยืนยัน */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background: #0A1931; padding: 30px; border-radius: 20px; border: 2px solid #D4AF37; width: 80%; max-width: 300px; }
-        .btn-confirm { background: #28a745; color: white; margin-bottom: 10px; }
-        .btn-cancel { background: #6c757d; color: white; }
+        .modal-content { background: #0A1931; padding: 25px; border-radius: 20px; border: 2px solid #D4AF37; width: 85%; max-width: 300px; }
     </style>
 </head>
 <body>
 
     <div class="card">
         <h2 style="color: #D4AF37;">MASTER MAID</h2>
-        <p>ระบบบันทึกเวลาทำงาน</p>
-        <hr style="border: 0.1px solid rgba(212,175,55,0.2); margin: 15px 0;">
+        
+        <div id="setupSection">
+            <p style="margin-bottom: 10px;">👤 โปรดเลือกชื่อของคุณ:</p>
+            <select id="maidSelect">
+                <option value="พี่เอ (MM01)">แม่บ้าน 01 - พี่เอ</option>
+                <option value="พี่บี (MM02)">แม่บ้าน 02 - พี่บี</option>
+                <option value="พี่ซี (MM03)">แม่บ้าน 03 - พี่ซี</option>
+            </select>
+        </div>
 
         <div id="timer" class="timer-display">00:00:00</div>
         
         <button id="startBtn" class="btn" onclick="startTracking()">🚀 เริ่มเดินทาง</button>
         <button id="arriveBtn" class="btn" onclick="arriveAtDestination()">📍 ถึงที่หมาย / เริ่มงาน</button>
-        <button id="finishBtn" class="btn" onclick="showConfirmModal()">🏁 จบงานและส่งรายงาน</button>
+        <button id="finishBtn" class="btn" onclick="showConfirm()">🏁 จบงานและส่งรายงาน</button>
     </div>
 
     <div id="confirmModal" class="modal">
         <div class="modal-content">
-            <h3 style="color: #D4AF37;">ยืนยันการจบงาน?</h3>
-            <p>เมื่อกดตกลง ระบบจะส่งเวลาและพิกัดให้ CEO ทันที</p>
-            <button class="btn btn-confirm" onclick="finishJob()">✅ ตกลง จบงาน</button>
-            <button class="btn btn-cancel" onclick="hideConfirmModal()">❌ ยกเลิก</button>
+            <h3 style="color: #D4AF37; margin-top: 0;">ยืนยันการจบงาน?</h3>
+            <p style="font-size: 14px;">นาฬิกายังเดินต่อไปจนกว่าคุณจะกดยืนยัน</p>
+            <button class="btn" style="background: #28a745; color: white;" onclick="finishJob()">✅ ยืนยัน</button>
+            <button class="btn" style="background: #6c757d; color: white;" onclick="hideConfirm()">❌ ยกเลิก</button>
         </div>
     </div>
 
@@ -58,21 +64,27 @@
         const webhookURL = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23"; 
 
         let watchId = null, timerInterval = null, seconds = 0;
-        let jobDate = "", jobStartTime = "";
+        let jobDate = "", jobStartTime = "", selectedMaid = "";
 
         function startTracking() {
+            selectedMaid = document.getElementById('maidSelect').value;
+            document.getElementById('setupSection').style.display = "none";
             document.getElementById('startBtn').style.display = "none";
             document.getElementById('arriveBtn').style.display = "block";
+            
             watchId = navigator.geolocation.watchPosition((pos) => {
-                db.ref('tracking/maid_01').set({ 
-                    lat: pos.coords.latitude, lng: pos.coords.longitude, status: "กำลังเดินทาง" 
+                // แยกตำแหน่งใน Firebase ตามชื่อแม่บ้าน
+                db.ref('tracking/' + selectedMaid).set({ 
+                    lat: pos.coords.latitude, 
+                    lng: pos.coords.longitude, 
+                    status: "กำลังเดินทาง" 
                 });
             }, null, { enableHighAccuracy: true });
         }
 
         function arriveAtDestination() {
             if (watchId) navigator.geolocation.clearWatch(watchId);
-            db.ref('tracking/maid_01').remove();
+            db.ref('tracking/' + selectedMaid).remove(); // ลบพิกัดเดินทางเมื่อถึงงาน
             
             const now = new Date();
             jobDate = now.toLocaleDateString('th-TH');
@@ -82,7 +94,7 @@
             document.getElementById('finishBtn').style.display = "block";
             document.getElementById('timer').style.display = "block";
 
-            // เริ่มนับเวลา (ซึ่งจะไม่หยุดเดินแม้จะเปิด Modal)
+            // เริ่มนับเวลา (ไม่หยุดเดินแม้เปิด Modal)
             timerInterval = setInterval(() => {
                 seconds++;
                 let h = Math.floor(seconds/3600).toString().padStart(2,'0');
@@ -92,55 +104,41 @@
             }, 1000);
         }
 
-        function showConfirmModal() {
-            document.getElementById('confirmModal').style.display = "flex";
-        }
-
-        function hideConfirmModal() {
-            document.getElementById('confirmModal').style.display = "none";
-        }
+        function showConfirm() { document.getElementById('confirmModal').style.display = "flex"; }
+        function hideConfirm() { document.getElementById('confirmModal').style.display = "none"; }
 
         async function finishJob() {
-            hideConfirmModal();
+            hideConfirm();
             const duration = document.getElementById('timer').innerText;
-            clearInterval(timerInterval); // หยุดเวลาเฉพาะตอนที่กด "ตกลง" จริงๆ เท่านั้น
+            clearInterval(timerInterval);
             
             document.getElementById('finishBtn').disabled = true;
             document.getElementById('finishBtn').innerText = "⏳ กำลังส่งข้อมูล...";
 
-            const finishTime = new Date().toLocaleTimeString('th-TH');
-
-            const sendReport = async (locUrl) => {
-                try {
-                    await fetch(webhookURL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            maid_name: "แม่บ้าน 01",
-                            work_date: jobDate,
-                            start_at: jobStartTime,
-                            finished_at: finishTime,
-                            duration: duration,
-                            location_url: locUrl || "ไม่ระบุพิกัด"
-                        })
-                    });
-                    alert("✅ ส่งรายงานสำเร็จ!");
+            const sendReport = (locUrl) => {
+                fetch(webhookURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        maid_name: selectedMaid,
+                        work_date: jobDate,
+                        start_at: jobStartTime,
+                        finished_at: new Date().toLocaleTimeString('th-TH'),
+                        duration: duration,
+                        location_url: locUrl || "ไม่ระบุพิกัด"
+                    })
+                }).then(() => {
+                    alert("✅ ส่งรายงานเข้า LINE เรียบร้อย!");
                     location.reload();
-                } catch (e) {
-                    alert("❌ ส่งไม่สำเร็จ กรุณาลองใหม่");
-                    location.reload();
-                }
+                });
             };
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (pos) => sendReport(`https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`),
-                    () => sendReport(),
-                    { enableHighAccuracy: true, timeout: 5000 }
+                    (p) => sendReport(`https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`),
+                    () => sendReport(), { timeout: 5000 }
                 );
-            } else {
-                sendReport();
-            }
+            } else { sendReport(); }
         }
     </script>
 </body>
