@@ -3,50 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid | Staff Panel</title>
+    <title>CEO | Post Job</title>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Sarabun', sans-serif; text-align: center; padding: 20px; background: #0A1931; color: white; margin: 0; }
-        .card { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; border: 1px solid #D4AF37; max-width: 380px; margin: 20px auto; }
-        .btn { width: 100%; padding: 18px; border-radius: 12px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; margin: 8px 0; display: block; }
-        #startBtn { background: #D4AF37; color: #0A1931; }
-        #arriveBtn { background: #28a745; color: white; display: none; }
-        #finishBtn { background: #dc3545; color: white; display: none; }
-        .timer-display { font-size: 42px; font-weight: bold; color: #D4AF37; margin: 15px 0; display: none; }
-        select { background: #1A2F4F; color: white; border: 1px solid #D4AF37; padding: 15px; width: 100%; border-radius: 12px; font-size: 16px; margin-bottom: 10px; }
-        select:disabled { opacity: 0.5; }
-        .job-box { background: rgba(212,175,55,0.1); padding: 15px; border-radius: 15px; border: 2px solid #D4AF37; margin-top: 15px; display: none; text-align: left; }
+        body { font-family: 'Sarabun', sans-serif; background: #0A1931; color: white; padding: 20px; text-align: center; }
+        .box { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; border: 1px solid #D4AF37; max-width: 400px; margin: auto; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #D4AF37; background: #1A2F4F; color: white; box-sizing: border-box; }
+        button { width: 100%; background: #D4AF37; color: #0A1931; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .status-item { text-align: left; padding: 5px; border-bottom: 0.5px solid #333; }
+        .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 10px; }
     </style>
 </head>
 <body>
-
-    <div class="card">
-        <h2 style="color: #D4AF37;">MASTER MAID</h2>
-        
-        <div id="setupSection">
-            <select id="maidSelect" onchange="initStaff()">
-                <option value="">-- เลือกชื่อของคุณ --</option>
-                <option value="พี่เอ (MM01)">พี่เอ (MM01)</option>
-                <option value="พี่บี (MM02)">พี่บี (MM02)</option>
-                <option value="พี่ซี (MM03)">พี่ซี (MM03)</option>
-            </select>
-            <button id="statusBtn" class="btn" style="background: #28a745; color: white; font-size: 14px; width: auto; padding: 5px 15px;" onclick="toggleStatus()">ว่าง (พร้อมรับงาน)</button>
-        </div>
-
-        <div id="personalJobArea" class="job-box">
-            <h4 style="margin: 0; color: #D4AF37;">🔔 งานใหม่เสนอถึงคุณ!</h4>
-            <p id="jobInfo" style="font-size: 14px; margin: 10px 0;"></p>
-            <p id="expiryTimer" style="color: #ff4444; font-weight: bold; font-size: 13px;"></p>
-            <button class="btn" style="background: #28a745; color: white; padding: 10px;" onclick="acceptPersonalJob()">✅ ตกลงรับงานนี้</button>
-        </div>
-
-        <div id="timer" class="timer-display">00:00:00</div>
-        
-        <button id="startBtn" class="btn" onclick="startTracking()" style="display:none;">🚀 เริ่มเดินทาง</button>
-        <button id="arriveBtn" class="btn" onclick="arriveAtDestination()">📍 ถึงที่หมาย / เริ่มงาน</button>
-        <button id="finishBtn" class="btn" onclick="showConfirm()">🏁 จบงานและส่งรายงาน</button>
+    <div class="box">
+        <h2>📢 จ่ายงาน Master Maid</h2>
+        <select id="assignTo">
+            <option value="">-- เลือกแม่บ้าน --</option>
+            <option value="พี่เอ (MM01)">พี่เอ (MM01)</option>
+            <option value="พี่บี (MM02)">พี่บี (MM02)</option>
+            <option value="พี่ซี (MM03)">พี่ซี (MM03)</option>
+        </select>
+        <input type="text" id="cust" placeholder="ชื่อลูกค้า">
+        <textarea id="det" rows="3" placeholder="รายละเอียดงาน"></textarea>
+        <button onclick="send()">ส่งงาน (15 นาที)</button>
+        <hr>
+        <div id="statusArea"></div>
     </div>
 
     <script>
@@ -57,130 +39,27 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const webhookURL = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23";
 
-        let watchId, timerInterval, seconds = 0;
-        let selectedMaid, currentJob, expiryInterval, isAvailable = true;
-
-        // --- ระบบเช็คสถานะและล็อคชื่อซ้ำ (ปรับปรุงใหม่) ---
-        function checkMaidStatus() {
-            db.ref('maid_status').on('value', (snapshot) => {
-                const statuses = snapshot.val();
-                const selectElement = document.getElementById('maidSelect');
-                for (let i = 0; i < selectElement.options.length; i++) {
-                    const option = selectElement.options[i];
-                    if (!option.value) continue;
-
-                    const s = statuses ? statuses[option.value] : null;
-                    // ล็อคชื่อถ้าสถานะเป็น: busy (กดปิดรับงาน), traveling (เดินทาง), working (กำลังทำงาน)
-                    if (s === "busy" || s === "traveling" || s === "working") {
-                        option.disabled = true;
-                        let label = (s === "busy") ? " (ไม่สะดวก)" : " (⏳ ติดงาน)";
-                        if (!option.text.includes("(")) option.text += label;
-                    } else {
-                        option.disabled = false;
-                        option.text = option.text.split(" (")[0];
-                    }
-                }
-            });
-        }
-        window.onload = checkMaidStatus;
-
-        function toggleStatus() {
-            if (!selectedMaid) return alert("กรุณาเลือกชื่อก่อน");
-            isAvailable = !isAvailable;
-            const btn = document.getElementById('statusBtn');
-            btn.innerText = isAvailable ? "ว่าง (พร้อมรับงาน)" : "ไม่สะดวกรับงาน";
-            btn.style.background = isAvailable ? "#28a745" : "#dc3545";
-            db.ref('maid_status/' + selectedMaid).set(isAvailable ? "available" : "busy");
+        function send() {
+            const maid = document.getElementById('assignTo').value;
+            const cust = document.getElementById('cust').value;
+            if(!maid || !cust) return alert("กรอกข้อมูลให้ครบ");
+            db.ref('personal_jobs/'+maid).set({
+                customer: cust, detail: document.getElementById('det').value,
+                status: "waiting", expiryAt: Date.now() + (15*60*1000)
+            }).then(() => alert("ส่งงานสำเร็จ!"));
         }
 
-        function initStaff() {
-            selectedMaid = document.getElementById('maidSelect').value;
-            if (!selectedMaid) return;
-            document.getElementById('startBtn').style.display = "block";
-            
-            db.ref('personal_jobs/' + selectedMaid).on('value', (snapshot) => {
-                const job = snapshot.val();
-                if (job && job.status === "waiting") {
-                    currentJob = job;
-                    document.getElementById('jobInfo').innerHTML = `📍 <b>${job.customer}</b><br>📝 ${job.detail}`;
-                    document.getElementById('personalJobArea').style.display = "block";
-                    startExpiryTimer(job.expiryAt);
-                } else {
-                    document.getElementById('personalJobArea').style.display = "none";
-                }
-            });
-        }
-
-        function startExpiryTimer(expiryAt) {
-            if (expiryInterval) clearInterval(expiryInterval);
-            expiryInterval = setInterval(() => {
-                const timeLeft = Math.floor((expiryAt - Date.now()) / 1000);
-                if (timeLeft <= 0) {
-                    clearInterval(expiryInterval);
-                    reassignJob();
-                } else {
-                    const m = Math.floor(timeLeft / 60);
-                    const s = timeLeft % 60;
-                    document.getElementById('expiryTimer').innerText = `⚠️ ยืนยันภายใน ${m}:${s.toString().padStart(2,'0')} นาที`;
-                }
-            }, 1000);
-        }
-
-        function startTracking() {
-            db.ref('maid_status/' + selectedMaid).set("traveling"); // เปลี่ยนสถานะเป็นเดินทาง
-            document.getElementById('setupSection').style.display = "none";
-            document.getElementById('personalJobArea').style.display = "none";
-            document.getElementById('startBtn').style.display = "none";
-            document.getElementById('arriveBtn').style.display = "block";
-            
-            watchId = navigator.geolocation.watchPosition((pos) => {
-                db.ref('tracking/' + selectedMaid).set({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-            }, null, { enableHighAccuracy: true });
-        }
-
-        function arriveAtDestination() {
-            if (!confirm("เริ่มนับเวลาทำงานใช่หรือไม่?")) return;
-            if (watchId) navigator.geolocation.clearWatch(watchId);
-            db.ref('tracking/' + selectedMaid).remove();
-            db.ref('maid_status/' + selectedMaid).set("working"); // เปลี่ยนสถานะเป็นกำลังทำงาน (ชื่อจะยังถูกล็อคอยู่)
-
-            const now = new Date();
-            window.jobStartTime = now.toLocaleTimeString('th-TH');
-            document.getElementById('arriveBtn').style.display = "none";
-            document.getElementById('finishBtn').style.display = "block";
-            document.getElementById('timer').style.display = "block";
-
-            timerInterval = setInterval(() => {
-                seconds++;
-                let h = Math.floor(seconds/3600).toString().padStart(2,'0');
-                let m = Math.floor((seconds%3600)/60).toString().padStart(2,'0');
-                let s = (seconds%60).toString().padStart(2,'0');
-                document.getElementById('timer').innerText = `${h}:${m}:${s}`;
-            }, 1000);
-        }
-
-        function finishJob() {
-            const duration = document.getElementById('timer').innerText;
-            db.ref('maid_status/' + selectedMaid).set("available"); // ปลดล็อคชื่อเมื่อจบงาน
-            
-            fetch(webhookURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    maid_name: selectedMaid,
-                    customer: currentJob ? currentJob.customer : "งานทั่วไป",
-                    duration: duration,
-                    finished_at: new Date().toLocaleTimeString('th-TH')
-                })
-            }).then(() => {
-                alert("✅ จบงานสำเร็จ!");
-                location.reload();
-            });
-        }
-
-        function showConfirm() { if(confirm("จบงานและส่งรายงาน?")) finishJob(); }
+        db.ref('maid_status').on('value', (snap) => {
+            const data = snap.val();
+            const area = document.getElementById('statusArea');
+            area.innerHTML = "<h4>สถานะปัจจุบัน:</h4>";
+            for(let name in data) {
+                const s = data[name];
+                const color = s === "available" ? "#28a745" : "#dc3545";
+                area.innerHTML += `<div class="status-item"><span class="dot" style="background:${color}"></span>${name}: ${s}</div>`;
+            }
+        });
     </script>
 </body>
 </html>
