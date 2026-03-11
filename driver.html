@@ -15,24 +15,17 @@
         .btn-arrive { background: #28a745; color: white; display: none; }
         .btn-finish { background: #dc3545; color: white; display: none; }
         .timer-display { font-size: 48px; font-weight: bold; color: #D4AF37; margin: 20px 0; display: none; }
-        .status-badge { display: inline-block; padding: 8px 15px; border-radius: 50px; background: #06C755; color: white; font-size: 14px; margin-bottom: 15px; display: none; }
     </style>
 </head>
 <body>
-
     <div class="card">
         <h2 style="color: #D4AF37;">MASTER MAID</h2>
-        <p>ระบบบริหารจัดการงานแม่บ้าน</p>
+        <p>บริหารงานแม่บ้าน (อุบลราชธานี)</p>
         <hr style="border: 0.1px solid rgba(212,175,55,0.2); margin: 20px 0;">
-
-        <div id="status" class="status-badge">🟢 กำลังแชร์ตำแหน่ง...</div>
         <div id="timer" class="timer-display">00:00:00</div>
-        
-        <button id="startBtn" class="btn btn-start" onclick="startTracking()">🚀 เริ่มเดินทางไปหาลูกค้า</button>
-        <button id="arriveBtn" class="btn btn-arrive" onclick="arriveAtDestination()">📍 ถึงที่หมายแล้ว / เริ่มงาน</button>
-        <button id="finishBtn" class="btn btn-finish" onclick="finishJob()">🏁 จบงานและส่งรายงาน</button>
-        
-        <p style="font-size: 13px; opacity: 0.7; margin-top: 20px;">* โปรดเปิด GPS และหน้าจอค้างไว้ขณะเดินทาง *</p>
+        <button id="startBtn" class="btn btn-start" onclick="startTracking()">🚀 เริ่มเดินทาง</button>
+        <button id="arriveBtn" class="btn btn-arrive" onclick="arrive()">📍 ถึงที่หมาย/เริ่มงาน</button>
+        <button id="finishBtn" class="btn btn-finish" onclick="finishJob()">🏁 จบงาน/ส่งรายงาน</button>
     </div>
 
     <script>
@@ -44,88 +37,43 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        // ลิงก์ Webhook ที่คุณส่งมา
         const webhookURL = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23"; 
 
-        let watchId = null;
-        let timerInterval = null;
-        let seconds = 0;
-        let startTime = "";
+        let watchId = null, timerInterval = null, seconds = 0;
 
         function startTracking() {
-            if (navigator.geolocation) {
-                document.getElementById('startBtn').style.display = "none";
-                document.getElementById('arriveBtn').style.display = "block";
-                document.getElementById('status').style.display = "inline-block";
-
-                watchId = navigator.geolocation.watchPosition((pos) => {
-                    db.ref('tracking/maid_01').set({
-                        lat: pos.coords.latitude,
-                        lng: pos.coords.longitude,
-                        status: "กำลังเดินทาง"
-                    });
-                }, null, { enableHighAccuracy: true });
-            }
+            document.getElementById('startBtn').style.display = "none";
+            document.getElementById('arriveBtn').style.display = "block";
+            watchId = navigator.geolocation.watchPosition((pos) => {
+                db.ref('tracking/maid_01').set({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+            }, null, { enableHighAccuracy: true });
         }
 
-        function arriveAtDestination() {
-            if (confirm("ยืนยันว่าถึงที่หมายแล้ว? ระบบจะหยุดแชร์พิกัดและเริ่มจับเวลาทำงาน")) {
-                if (watchId) navigator.geolocation.clearWatch(watchId);
-                db.ref('tracking/maid_01').remove();
-                
-                startTime = new Date().toLocaleTimeString();
-                document.getElementById('arriveBtn').style.display = "none";
-                document.getElementById('finishBtn').style.display = "block";
-                document.getElementById('status').innerText = "🧹 กำลังปฏิบัติงาน...";
-                document.getElementById('timer').style.display = "block";
-
-                timerInterval = setInterval(() => {
-                    seconds++;
-                    let h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-                    let m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-                    let s = (seconds % 60).toString().padStart(2, '0');
-                    document.getElementById('timer').innerText = `${h}:${m}:${s}`;
-                }, 1000);
-            }
+        function arrive() {
+            if (watchId) navigator.geolocation.clearWatch(watchId);
+            db.ref('tracking/maid_01').remove();
+            document.getElementById('arriveBtn').style.display = "none";
+            document.getElementById('finishBtn').style.display = "block";
+            document.getElementById('timer').style.display = "block";
+            timerInterval = setInterval(() => {
+                seconds++;
+                let h = Math.floor(seconds/3600).toString().padStart(2,'0');
+                let m = Math.floor((seconds%3600)/60).toString().padStart(2,'0');
+                let s = (seconds%60).toString().padStart(2,'0');
+                document.getElementById('timer').innerText = `${h}:${m}:${s}`;
+            }, 1000);
         }
 
         function finishJob() {
-            if (confirm("งานเสร็จเรียบร้อยและต้องการส่งรายงานใช่ไหม?")) {
-                clearInterval(timerInterval);
-                const workDuration = document.getElementById('timer').innerText;
-                const finishTime = new Date().toLocaleTimeString();
-                const date = new Date().toLocaleDateString();
-
-                // ส่งข้อมูลเข้า Make.com ทันที
-                fetch(webhookURL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        maid_name: "แม่บ้าน 01",
-                        work_date: date,
-                        duration: workDuration,
-                        start_at: startTime,
-                        finished_at: finishTime,
-                        location: "อุบลราชธานี"
-                    })
-                }).then(() => {
-                    console.log("ส่งข้อมูลเข้ากลุ่ม LINE สำเร็จ");
-                }).catch(err => {
-                    console.error("การส่งข้อมูลผิดพลาด:", err);
-                });
-
-                // บันทึกเข้า Firebase ประวัติงาน
-                db.ref('job_history').push({
-                    date: date,
-                    duration: workDuration,
-                    status: "Completed",
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                });
-
-                alert("ส่งรายงานเข้ากลุ่ม LINE CEO เรียบร้อยแล้ว!");
-                location.reload();
-            }
+            clearInterval(timerInterval);
+            const duration = document.getElementById('timer').innerText;
+            fetch(webhookURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ maid_name: "แม่บ้าน 01", duration: duration, finished_at: new Date().toLocaleTimeString() })
+            });
+            alert("ส่งรายงานเข้า LINE เรียบร้อย!");
+            location.reload();
         }
     </script>
 </body>
