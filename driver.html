@@ -92,22 +92,41 @@
         }
 
         // 3. กดเมื่อทำความสะอาดเสร็จ
-        function finishJob() {
-            if (confirm("งานเสร็จเรียบร้อยแล้วใช่ไหม?")) {
-                clearInterval(timerInterval);
-                const workDuration = document.getElementById('timer').innerText;
-                
-                // ส่งรายงานเข้าประวัติใน Firebase
-                db.ref('job_history').push({
-                    date: new Date().toLocaleDateString(),
-                    duration: workDuration,
-                    status: "Completed"
-                });
+      function onFinishWork() {
+    if (confirm("งานเสร็จเรียบร้อยแล้วใช่ไหม?")) {
+        clearInterval(timerInterval);
+        const workDuration = document.getElementById('timerDisplay').innerText;
+        const finishTime = new Date().toLocaleTimeString();
+        const date = new Date().toLocaleDateString();
 
-                alert("ส่งรายงานจบงานสำเร็จ! ใช้เวลาไปทั้งสิ้น: " + workDuration);
-                location.reload(); // รีเซ็ตเพื่อรับงานใหม่
-            }
-        }
+        // 1. ส่งข้อมูลไปที่ LINE CEO (ผ่าน Make.com Webhook)
+        // *** เอา URL จาก Make.com มาวางตรงนี้ ***
+        const webhookURL = "https://hook.us2.make.com/xxxxxxxxxxxxxxxxx"; 
+
+        fetch(webhookURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                maid_name: "แม่บ้าน 01",
+                work_date: date,
+                duration: workDuration,
+                finished_at: finishTime,
+                status: "จบงานเรียบร้อย"
+            })
+        });
+
+        // 2. บันทึกเข้า Firebase (เหมือนเดิม)
+        db.ref('job_history').push({
+            date: date,
+            duration: workDuration,
+            finish_time: finishTime,
+            status: "Completed"
+        });
+
+        alert("ส่งรายงานจบงานและแจ้งเตือน LINE CEO สำเร็จ!\nเวลาทำงาน: " + workDuration);
+        location.reload();
+    }
+}
     </script>
 </body>
 </html>
