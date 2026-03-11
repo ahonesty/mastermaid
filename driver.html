@@ -15,100 +15,15 @@
         .btn-arrive { background: #28a745; color: white; display: none; }
         .btn-finish { background: #dc3545; color: white; display: none; }
         .timer-display { font-size: 48px; font-weight: bold; color: #D4AF37; margin: 10px 0; display: none; }
-        .info-text { font-size: 16px; color: #D4AF37; margin: 10px 0; display: none; }
+        .info-text { font-size: 16px; color: #D4AF37; margin: 5px 0; display: none; }
     </style>
 </head>
 <body>
 
     <div class="card">
         <h2 style="color: #D4AF37;">MASTER MAID</h2>
-        <p>ระบบบันทึกงานแม่บ้าน (อุบลฯ)</p>
+        <p>ระบบบันทึกเวลาทำงาน (อุบลราชธานี)</p>
         <hr style="border: 0.1px solid rgba(212,175,55,0.2); margin: 20px 0;">
 
-        <div id="startTimeText" class="info-text">⏰ เริ่มงานเมื่อ: --:--:--</div>
-        <div id="timer" class="timer-display">00:00:00</div>
-        
-        <button id="startBtn" class="btn btn-start" onclick="startTracking()">🚀 เริ่มเดินทาง</button>
-        <button id="arriveBtn" class="btn btn-arrive" onclick="arriveAtDestination()">📍 ถึงที่หมาย / เริ่มงาน</button>
-        <button id="finishBtn" class="btn btn-finish" onclick="finishJob()">🏁 จบงานและส่งรายงาน</button>
-    </div>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
-            databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "mastermaid-ubon",
-            appId: "1:272279135131:web:18a1d12073e601688c773e"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        const webhookURL = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23"; 
-
-        let watchId = null, timerInterval = null, seconds = 0, jobStartTime = "", currentPos = "";
-
-        function startTracking() {
-            document.getElementById('startBtn').style.display = "none";
-            document.getElementById('arriveBtn').style.display = "block";
-            watchId = navigator.geolocation.watchPosition((pos) => {
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-                currentPos = `https://www.google.com/maps?q=${lat},${lng}`; // สร้างลิงก์แผนที่
-                db.ref('tracking/maid_01').set({ lat, lng, status: "กำลังเดินทาง" });
-            }, null, { enableHighAccuracy: true });
-        }
-
-        function arriveAtDestination() {
-            if (confirm("ยืนยันการเริ่มงาน?")) {
-                if (watchId) navigator.geolocation.clearWatch(watchId);
-                db.ref('tracking/maid_01').remove();
-                
-                jobStartTime = new Date().toLocaleTimeString('th-TH');
-                document.getElementById('startTimeText').innerText = "⏰ เริ่มงานเมื่อ: " + jobStartTime;
-                document.getElementById('startTimeText').style.display = "block";
-                document.getElementById('arriveBtn').style.display = "none";
-                document.getElementById('finishBtn').style.display = "block";
-                document.getElementById('timer').style.display = "block";
-
-                timerInterval = setInterval(() => {
-                    seconds++;
-                    let h = Math.floor(seconds/3600).toString().padStart(2,'0');
-                    let m = Math.floor((seconds%3600)/60).toString().padStart(2,'0');
-                    let s = (seconds%60).toString().padStart(2,'0');
-                    document.getElementById('timer').innerText = `${h}:${m}:${s}`;
-                }, 1000);
-            }
-        }
-
-        function finishJob() {
-            // ดึงพิกัดสุดท้ายก่อนจบงาน
-            navigator.geolocation.getCurrentPosition((pos) => {
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-                const finishLoc = `https://www.google.com/maps?q=${lat},${lng}`;
-
-                if (confirm("ต้องการจบงานและส่งรายงานใช่ไหม?")) {
-                    clearInterval(timerInterval);
-                    const duration = document.getElementById('timer').innerText;
-                    const finishTime = new Date().toLocaleTimeString('th-TH');
-
-                    fetch(webhookURL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            maid_name: "แม่บ้าน 01",
-                            start_at: jobStartTime,
-                            finished_at: finishTime,
-                            duration: duration,
-                            location_url: finishLoc // ส่งลิงก์โลเคชั่นไป
-                        })
-                    });
-
-                    alert("ส่งรายงานและพิกัดเรียบร้อย!");
-                    location.reload();
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+        <div id="dateText" class="info-text">📅 วันที่: --/--/----</div>
+        <div id="startTimeText" class="info-text">⏰
