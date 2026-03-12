@@ -95,43 +95,44 @@
             // เรียงลำดับวันที่ล่าสุดขึ้นก่อน
             const sortedKeys = Object.keys(jobs).sort((a, b) => new Date(jobs[b].date) - new Date(jobs[a].date));
 
-            sortedKeys.forEach(key => {
-                const j = jobs[key];
-                const jobCard = `
-                    <div class="job-card">
-                        <div class="job-date">📅 วันที่: ${j.date}</div>
-                        <div class="job-time">🕒 เวลา: ${j.end_time || (j.start_time + ':00')}</div>
-                        
-                        <div class="info-row">
-                            <i class="fas fa-user"></i>
-                            <span><b>ลูกค้า:</b> ${j.name} (${j.phone})</span>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-home"></i>
-                            <span><b>บ้าน:</b> ${j.home_type} (${j.home_size})</span>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-ruler-combined"></i>
-                            <span><b>พื้นที่:</b> ${j.area_sqm || '-'} ตร.ม.</span>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span><b>ที่อยู่:</b> ${j.address_detail}</span>
-                        </div>
+            // แก้ไขในส่วน loop ที่สร้างการ์ดงาน (บรรทัดที่ประมาณ 100)
+sortedKeys.forEach(key => {
+    const j = jobs[key];
+    // ตรวจสอบชื่อตัวแปรให้ตรงกับหน้าจอง
+    const jobCard = `
+        <div class="job-card">
+            <div class="job-date">📅 วันที่: ${j.date || '-'}</div>
+            <div class="job-time">🕒 เวลา: ${j.end_time || '-'}</div>
+            
+            <div class="info-row">
+                <i class="fas fa-user"></i>
+                <span><b>ลูกค้า:</b> ${j.name || 'ไม่ระบุ'} (${j.phone || '-'})</span>
+            </div>
+            <div class="info-row">
+                <i class="fas fa-home"></i>
+                <span><b>บ้าน:</b> ${j.home_type || '-'} (${j.home_size || '-'})</span>
+            </div>
+            <div class="info-row">
+                <i class="fas fa-ruler-combined"></i>
+                <span><b>พื้นที่:</b> ${j.area_sqm || '-'} ตร.ม.</span>
+            </div>
+            <div class="info-row">
+                <i class="fas fa-map-marker-alt"></i>
+                <span><b>ที่อยู่:</b> ${j.address_detail || '-'}</span>
+            </div>
 
-                        ${j.special_focus ? `
-                        <div class="special-box">
-                            <b><i class="fas fa-star"></i> จุดที่ต้องเน้นพิเศษ:</b><br>${j.special_focus}
-                        </div>` : ''}
+            ${j.special_focus ? `
+            <div class="special-box">
+                <b>✨ จุดที่ต้องเน้นพิเศษ:</b><br>${j.special_focus}
+            </div>` : ''}
 
-                        <a href="${j.google_maps_link}" target="_blank" class="btn-gps">
-                            <i class="fas fa-location-arrow"></i> เปิดแผนที่นำทาง (GPS)
-                        </a>
-                    </div>
-                `;
-                jobListDiv.innerHTML += jobCard;
-            });
-        });
+            <a href="${j.google_maps_link}" target="_blank" class="btn-gps">
+                <i class="fas fa-location-arrow"></i> เปิดแผนที่นำทาง (GPS)
+            </a>
+        </div>
+    `;
+    jobListDiv.innerHTML += jobCard;
+});
     }
 </script>
 
