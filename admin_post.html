@@ -147,7 +147,7 @@
         const maidId = document.getElementById('select_' + bookingKey).value;
         if (!maidId) return alert("กรุณาเลือกแม่บ้านก่อนครับ");
 
-        db.ref('bookings/' + bookingKey).update({
+        db.ref('job_history/' + bookingKey).update({
             maid_id: maidId
         }).then(() => {
             alert("จัดสรรงานเรียบร้อย! งานจะไปอยู่ในปฏิทินแม่บ้านทันที");
@@ -158,7 +158,7 @@
         document.getElementById('calendarModal').style.display = 'block';
         document.getElementById('modalMaidName').innerText = "ตารางงาน: " + maidName;
         
-        db.ref('bookings').orderByChild('maid_id').equalTo(maidId).once('value', (snap) => {
+        db.ref('job_history').orderByChild('maid_id').equalTo(maidId).once('value', (snap) => {
             const jobs = snap.val() || {};
             let events = [];
             for(let key in jobs) {
