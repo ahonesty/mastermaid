@@ -202,8 +202,8 @@
     document.getElementById('total_hidden').value = price;
 
     // คำนวณเวลา (เติม :00 ให้สวยงาม)
-    const startTimeFormatted = start + ":00";
-    const end = start + hours;
+    const startTimeFormatted = start.toString().padStart(2, '0') + ":00";
+const endTimeFormatted = end.toString().padStart(2, '0') + ":00";
     const endTimeFormatted = (end > 24 ? end - 24 : end) + ":00";
 
     // แสดงผลที่หน้าเว็บ (โชว์แค่เวลาจบ)
@@ -223,6 +223,7 @@
     </script>
 </body>
 </html>
+
 
 
 
