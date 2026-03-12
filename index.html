@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid Thailand | จองแม่บ้านและติดตาม Real-time</title>
+    <title>Master Maid Thailand | จองแม่บ้านระดับพรีเมียม</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
@@ -19,7 +19,6 @@
         nav { background: #fff; padding: 15px 8%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
         .logo-img { height: 60px; }
 
-        /* Hero & Package Info */
         .hero { 
             background: linear-gradient(rgba(10, 25, 49, 0.85), rgba(10, 25, 49, 0.85)), 
                         url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1920'); 
@@ -39,25 +38,21 @@
 
         /* Booking Form Styles */
         .booking-box { background: #fff; border-radius: 30px; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); }
-        .section-title { border-left: 5px solid var(--gold); padding-left: 15px; margin: 30px 0 20px; color: var(--primary); font-size: 20px; }
+        .section-title { border-left: 5px solid var(--gold); padding-left: 15px; margin: 30px 0 20px; color: var(--primary); font-size: 20px; font-weight: 700; }
         
         input, select, textarea { width: 100%; padding: 16px; margin-top: 8px; border: 1px solid #ddd; border-radius: 12px; font-family: 'Sarabun'; box-sizing: border-box; font-size: 15px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         label { font-weight: 600; display: block; margin-top: 15px; font-size: 14px; color: var(--primary); }
 
-        /* Map & Location */
         #map { height: 400px; border-radius: 20px; border: 2px solid #eee; margin-top: 15px; }
         #pac-input { width: 90%; left: 5% !important; top: 15px !important; padding: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
 
-        /* Summary */
         .summary-box { background: var(--primary); color: #fff; border-radius: 20px; padding: 30px; margin-top: 30px; text-align: center; }
         .total-price-display { color: var(--gold); font-size: 36px; font-weight: 700; margin-top: 5px; }
 
-        /* Sticky Bottom Bar */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 1001; text-align: center; }
         .submit-btn { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--primary); padding: 18px 60px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; transition: 0.3s; width: 100%; max-width: 400px; }
 
-        /* Success Overlay */
         .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10, 25, 49, 0.98); z-index: 10001; color:#fff; text-align:center; padding-top:15vh; }
         .line-btn { display: inline-flex; align-items: center; background: #06C755; color: white !important; text-decoration: none; padding: 15px 30px; border-radius: 12px; font-weight: 700; margin-top: 20px; }
 
@@ -70,7 +65,7 @@
 
     <div class="hero">
         <h1>บริการแม่บ้านระดับพรีเมียม อุบลฯ</h1>
-        <p>สะอาด ปลอดภัย ตรวจสอบตำแหน่งแม่บ้านได้แบบ Real-time</p>
+        <p>สะอาด ปลอดภัย ตรวจสอบตารางงานแม่บ้านได้แบบ Real-time</p>
     </div>
 
     <div class="container">
@@ -79,7 +74,7 @@
                 <img src="https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?q=80&w=1000">
                 <div class="card-body">
                     <h3>ทำความสะอาดทั่วไป</h3>
-                    <p>กวาด ถู ดูดฝุ่น เช็ดหน้าต่าง และล้างห้องน้ำพื้นฐาน เหมาะสำหรับดูแลบ้านประจำสัปดาห์</p>
+                    <p>กวาด ถู ดูดฝุ่น เหมาะสำหรับดูแลบ้านประจำสัปดาห์</p>
                     <div class="price-label">550.- <span>/ 2 ชม.</span></div>
                 </div>
             </div>
@@ -87,7 +82,7 @@
                 <img src="https://images.pexels.com/photos/4099467/pexels-photo-4099467.jpeg?auto=compress&w=1260">
                 <div class="card-body">
                     <h3>Deep / Big Cleaning</h3>
-                    <p>ขจัดคราบฝังลึก เหมาะสำหรับบ้านใหม่ย้ายเข้า หรือทำความสะอาดใหญ่ประจำปี</p>
+                    <p>ขจัดคราบฝังลึก สำหรับบ้านใหม่หรือทำความสะอาดใหญ่</p>
                     <div class="price-label">เริ่มต้น 2,000.-</div>
                 </div>
             </div>
@@ -98,30 +93,40 @@
             
             <form id="maidForm" action="https://hook.us2.make.com/u4ddkucyj2gbd9gj14om5cdtu3qjnzxx" method="POST">
                 
-                <div class="section-title">1. ข้อมูลติดต่อและประเภทที่พัก</div>
+                <div class="section-title">1. ข้อมูลติดต่อและแม่บ้าน</div>
                 <div class="grid-2">
                     <div><label>ชื่อลูกค้า:</label><input type="text" name="name" placeholder="ระบุชื่อของคุณ" required></div>
                     <div><label>เบอร์โทรศัพท์:</label><input type="tel" name="phone" id="phone" placeholder="08x-xxx-xxxx" required></div>
                 </div>
-                <div>
-                    <label>ประเภทที่อยู่อาศัย:</label>
-                    <select name="home_type" required>
-                        <option value="Condo">คอนโด / หอพัก</option>
-                        <option value="Townhome">ทาวน์โฮม / อาคารพาณิชย์</option>
-                        <option value="House">บ้านเดี่ยว</option>
-                        <option value="Office">สำนักงาน</option>
-                    </select>
+                <div class="grid-2">
+                    <div>
+                        <label>ประเภทที่อยู่อาศัย:</label>
+                        <select name="home_type" required>
+                            <option value="House">บ้านเดี่ยว</option>
+                            <option value="Condo">คอนโด / หอพัก</option>
+                            <option value="Townhome">ทาวน์โฮม</option>
+                            <option value="Office">สำนักงาน</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>เลือกแม่บ้านที่ต้องการ:</label>
+                        <select name="maid_id" required>
+                            <option value="maid_01">พี่สมใจ (เขตเมือง)</option>
+                            <option value="maid_02">พี่สายใจ (เขตวารินฯ)</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="section-title">2. ปักหมุดที่อยู่ (เพื่อให้แม่บ้านนำทาง)</div>
-                <input id="pac-input" class="controls" type="text" placeholder="ค้นหาชื่อหมู่บ้านหรือสถานที่...">
-                <div id="map"></div>
-                
+                <div class="section-title">2. ปักหมุดที่อยู่</div>
+                <div style="position: relative;">
+                    <input id="pac-input" type="text" placeholder="🔍 ค้นหาชื่อหมู่บ้านหรือสถานที่...">
+                    <div id="map"></div>
+                </div>
                 <input type="hidden" name="google_maps_link" id="google_maps_link">
                 <label>ที่อยู่โดยละเอียด (บ้านเลขที่/ซอย/จุดสังเกต):</label>
                 <textarea name="address_detail" placeholder="เช่น บ้านเลขที่ 123/45 ซอย 5 (บ้านสีขาวรั้วไม้)" required></textarea>
 
-                <div class="section-title">3. เลือกวันและเวลาบริการ</div>
+                <div class="section-title">3. วันและเวลาบริการ</div>
                 <div class="grid-2">
                     <div><label>ประเภทบริการ:</label>
                         <select name="service_type" id="service_type" onchange="calculate()">
@@ -148,7 +153,7 @@
                 </div>
 
                 <label>หมายเหตุ/สิ่งที่ต้องการเน้น:</label>
-                <textarea name="details" placeholder="เช่น เน้นล้างห้องน้ำ, มีสุนัขในบ้าน..."></textarea>
+                <textarea name="details" placeholder="เช่น เน้นล้างห้องน้ำ, มีสัตว์เลี้ยง..."></textarea>
 
                 <div class="summary-box">
                     <strong>เลิกงานประมาณ: <span id="end_time_display">11:00 น.</span></strong>
@@ -175,13 +180,9 @@
     </div>
 
     <script>
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
-            authDomain: "mastermaid-ubon.firebaseapp.com",
             databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "mastermaid-ubon",
-            appId: "1:272279135131:web:18a1d12073e601688c773e"
         };
         firebase.initializeApp(firebaseConfig);
 
@@ -196,7 +197,6 @@
             map = new google.maps.Map(document.getElementById("map"), {
                 center: ubon, zoom: 14, mapTypeControl: false, streetViewControl: false
             });
-
             marker = new google.maps.Marker({ map: map, draggable: true, position: ubon });
             updateGMLink(ubon.lat, ubon.lng);
 
