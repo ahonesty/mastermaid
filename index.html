@@ -129,7 +129,14 @@
             <div class="grid-2">
                 <select name="start_time" id="start_time" onchange="calculate()">
                     <option value="9">ช่วงเช้า (09:00 น.)</option>
+                     <option value="9">ช่วงเช้า (10:00 น.)</option>
+                     <option value="9">ช่วงเช้า (11:00 น.)</option>
+                     <option value="9">ช่วงเช้า (12:00 น.)</option>
                     <option value="13">ช่วงบ่าย (13:00 น.)</option>
+                     <option value="9">ช่วงเช้า (14:00 น.)</option>
+                     <option value="9">ช่วงเช้า (15:00 น.)</option>
+                     <option value="9">ช่วงเช้า (16:00 น.)</option>
+                     <option value="9">ช่วงเช้า (17:00 น.)</option>
                 </select>
                 <select name="duration" id="duration" onchange="calculate()">
                     <option value="2">2 ชั่วโมง</option>
@@ -142,11 +149,34 @@
             <input type="hidden" name="maid_id" value="Pending">
             <input type="hidden" name="total_price" id="total_hidden">
 
-            <div class="summary-box">
-                <strong>ยอดรวมบริการ</strong>
-                <div class="total-price"><span id="total_display">550</span>.- <span>บาท</span></div>
-                <p style="margin-top:10px; opacity:0.8;">คาดว่างานเสร็จสิ้นเวลา: <span id="end_time_display">11:00</span> น.</p>
-            </div>
+           <div class="summary-box">
+    <strong>ยอดรวมบริการ</strong>
+    <div class="total-price"><span id="total_display">550</span>.- <span>บาท</span></div>
+    <p>เสร็จสิ้นเวลาประมาณ: <span id="end_time_display">11:00</span> น.</p>
+    
+    <input type="hidden" name="end_time" id="end_time_hidden" value="11:00">
+</div>
+
+<script>
+    // แก้ไขฟังก์ชัน calculate() ให้บันทึกค่าลงในตัวแปร hidden ด้วย
+    function calculate() {
+        const service = document.getElementById('service_type').value;
+        const hours = parseInt(document.getElementById('duration').value);
+        const start = parseInt(document.getElementById('start_time').value);
+        
+        // คำนวณราคา
+        let price = (service === "Big") ? 2000 : (hours === 2 ? 550 : 800 + (hours-3)*200);
+        if (hours === 8 && service !== "Big") price = 1500;
+        
+        document.getElementById('total_display').innerText = price.toLocaleString();
+        document.getElementById('total_hidden').value = price;
+
+        // 📍 คำนวณเวลาเสร็จงาน และส่งเข้าตัวแปร hidden
+        const endTime = (start + hours) + ":00";
+        document.getElementById('end_time_display').innerText = endTime;
+        document.getElementById('end_time_hidden').value = endTime; // ส่งค่านี้ไป Make.com
+    }
+</script>
         </form>
     </div>
 
@@ -234,3 +264,4 @@
 
 </body>
 </html>
+
