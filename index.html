@@ -238,14 +238,32 @@
             document.getElementById('end_time_display').innerText = (start + hours) + ":00 น.";
         }
 
-        document.getElementById('maidForm').onsubmit = (e) => {
-            e.preventDefault();
-            const phone = document.getElementById('phone').value.replace(/-/g, "");
-            if (!/^0[0-9]{9}$/.test(phone)) return alert("❌ กรุณากรอกเบอร์โทรศัพท์ 10 หลัก");
-            
-            document.getElementById('overlay').style.display = 'block';
-            fetch(e.target.action, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
-        };
+        document.getElementById('maidForm').onsubmit = function(e) {
+    e.preventDefault(); // หยุดการโหลดหน้าใหม่
+
+    // 1. ตรวจสอบเบอร์โทร
+    const phone = document.getElementById('phone').value.replace(/-/g, "");
+    if (!/^0[0-9]{9}$/.test(phone)) {
+        return alert("❌ กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก");
+    }
+
+    // 2. แสดงหน้าจอสำเร็จ (Overlay) ทันทีเพื่อให้ลูกค้ารู้สึกว่าส่งแล้ว
+    document.getElementById('overlay').style.display = 'block';
+
+    // 3. ส่งข้อมูลไป Make.com แบบชัวร์ๆ
+    const formData = new FormData(this);
+    const webhookURL = this.action;
+
+    fetch(webhookURL, {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors' // สำคัญมาก: ป้องกันการติด Block จาก Browser
+    }).then(() => {
+        console.log("Data sent to Make.com");
+    }).catch(err => {
+        console.error("Error sending data:", err);
+    });
+};
 
         google.maps.event.addDomListener(window, 'load', initMap);
         window.onload = () => { 
@@ -255,3 +273,4 @@
     </script>
 </body>
 </html>
+
