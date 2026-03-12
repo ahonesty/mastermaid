@@ -133,14 +133,35 @@
 
     <div class="footer-bar"><button type="button" class="btn-submit" onclick="document.getElementById('maidForm').requestSubmit()">ยืนยันการจอง</button></div>
 
-    <div class="overlay" id="overlay">
-        <i class="fas fa-check-circle" style="font-size: 50px; color: var(--gold);"></i>
-        <h2>จองสำเร็จ!</h2>
-        <p>กรุณาชำระมัดจำ 200.- เพื่อยืนยันคิว</p>
-        <div class="qr-card"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PROMPTPAY_QR" alt="QR"></div>
-        <div style="background:rgba(255,255,255,0.1); padding:15px; border-radius:10px;">กสิกรไทย: 123-x-xxxxx-x<br>บจก. มาสเตอร์เมด อุบล</div><br>
-        <a href="https://line.me/ti/p/@301xqlpj" style="background:#06C755; color:white; padding:15px 30px; border-radius:50px; text-decoration:none; font-weight:700;">ส่งสลิปยืนยันทาง LINE</a>
+    <<div class="overlay" id="overlay">
+    <div style="max-width: 500px; margin: 0 auto; padding-bottom: 50px;">
+        <i class="fas fa-check-circle" style="font-size: 60px; color: var(--gold); margin-bottom: 15px;"></i>
+        <h2 style="margin-bottom: 5px;">ส่งข้อมูลการจองสำเร็จ!</h2>
+        <p style="opacity: 0.9;">กรุณาชำระมัดจำ 200.- เพื่อล็อกคิวงาน</p>
+
+        <div class="qr-card">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PROMPTPAY_DATA" alt="QR Code Payment">
+            <p style="margin-top: 10px; font-size: 14px; color: #333;"><b>สแกนจ่ายผ่านแอปธนาคาร</b></p>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2);">
+            <b style="color: var(--gold);">ธนาคารกสิกรไทย (K-Bank)</b><br>
+            เลขบัญชี: <span style="font-size: 18px; letter-spacing: 1px;">123-x-xxxxx-x</span><br>
+            ชื่อบัญชี: บจก. มาสเตอร์เมด อุบล
+        </div>
+
+        <a href="https://line.me/ti/p/@301xqlpj" 
+           style="background: #06C755; color: white; padding: 16px 40px; border-radius: 50px; text-decoration: none; font-weight: 700; display: block; margin-bottom: 15px; font-size: 18px;">
+            <i class="fab fa-line"></i> ส่งสลิปแจ้งแม่บ้านทันที
+        </a>
+
+        <button type="button" 
+                onclick="window.location.reload();" 
+                style="background: transparent; color: #fff; border: 1px solid #666; padding: 10px 30px; border-radius: 50px; cursor: pointer; font-size: 14px; opacity: 0.7;">
+            <i class="fas fa-arrow-left"></i> กลับหน้าหลักการจอง
+        </button>
     </div>
+</div>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app" };
@@ -191,3 +212,4 @@
     </script>
 </body>
 </html>
+
