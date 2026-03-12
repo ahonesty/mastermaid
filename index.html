@@ -189,27 +189,22 @@
             map.addListener("click", (e) => { marker.setPosition(e.latLng); updateLink(e.latLng.lat(), e.latLng.lng()); });
         }
 
-        function calculate() {
+       function calculate() {
     const service = document.getElementById('service_type').value;
     const hours = parseInt(document.getElementById('duration').value);
     const start = parseInt(document.getElementById('start_time').value);
     
-    // คำนวณราคา
     let price = (service === "Big") ? 2000 : (hours === 2 ? 550 : 800 + (hours-3)*200);
     if (hours === 8 && service !== "Big") price = 1500;
     
     document.getElementById('total_display').innerText = price.toLocaleString();
     document.getElementById('total_hidden').value = price;
 
-    // คำนวณเวลา (เติม :00 ให้สวยงาม)
     const startTimeFormatted = start.toString().padStart(2, '0') + ":00";
-const endTimeFormatted = end.toString().padStart(2, '0') + ":00";
-    const endTimeFormatted = (end > 24 ? end - 24 : end) + ":00";
+    const end = start + hours;
+    const endTimeFormatted = (end > 24 ? end - 24 : end).toString().padStart(2, '0') + ":00";
 
-    // แสดงผลที่หน้าเว็บ (โชว์แค่เวลาจบ)
     document.getElementById('end_time_display').innerText = endTimeFormatted;
-
-    // 📍 ส่งค่าไปที่ Hidden เพื่อส่งเข้า Make.com (รวมเป็นช่วงเวลาให้เสร็จ)
     document.getElementById('end_time_hidden').value = startTimeFormatted + " - " + endTimeFormatted;
 }
 
@@ -223,6 +218,7 @@ const endTimeFormatted = end.toString().padStart(2, '0') + ":00";
     </script>
 </body>
 </html>
+
 
 
 
