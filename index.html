@@ -198,9 +198,11 @@
             document.getElementById('total_display').innerText = price.toLocaleString();
             document.getElementById('total_hidden').value = price;
             const end = (start + hours);
-            document.getElementById('end_time_display').innerText = (end > 24 ? end-24 : end) + ":00";
-            document.getElementById('end_time_hidden').value = (end > 24 ? end-24 : end) + ":00";
-        }
+            const startTimeFormatted = start + ":00";
+            const endTimeFormatted = (start + hours) + ":00";
+            document.getElementById('end_time_display').innerText = endTimeFormatted;
+            document.getElementById('end_time_hidden').value = startTimeFormatted + " - " + endTimeFormatted;
+}
 
         document.getElementById('maidForm').onsubmit = (e) => {
             e.preventDefault();
@@ -212,4 +214,5 @@
     </script>
 </body>
 </html>
+
 
