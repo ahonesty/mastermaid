@@ -58,33 +58,7 @@
             <tbody id="pendingList"></tbody>
         </table>
     </div>
-// แก้ไขบรรทัดในตาราง PendingList ของหน้า admin.html
-list.innerHTML += `
-    <tr class="pending-row">
-        <td>
-            📅 ${j.date}<br>
-            🕒 <b>${j.end_time || (j.start_time + ':00')}</b>
-        </td>
-        <td>
-            👤 <b>${j.name}</b> (${j.phone})<br>
-            <small>🏠 ${j.home_type} | 🛏️ ${j.home_size}</small>
-        </td>
-        <td>
-            <a href="${j.google_maps_link}" target="_blank" style="color:#4285F4; text-decoration:none;">
-                <i class="fas fa-map-marker-alt"></i> แผนที่
-            </a>
-        </td>
-        <td>
-            <select id="sel_${key}">${maidOptions}</select> 
-            <button class="btn btn-assign" onclick="assign('${key}')">ยืนยัน</button>
-            
-            <button onclick="deleteJob('${key}')" 
-                    style="background:none; border:none; color:#ff4d4d; cursor:pointer; margin-left:10px;" 
-                    title="ลบรายการนี้">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-        </td>
-    </tr>`;
+
     <div class="card">
         <h2><i class="fas fa-users-cog"></i> รายชื่อแม่บ้าน</h2>
         <table>
@@ -167,29 +141,36 @@ list.innerHTML += `
                             <td>
                                 <select id="sel_${key}">${maidOptions}</select> 
                                 <button class="btn btn-assign" onclick="assign('${key}')">ยืนยัน</button>
+                                <button onclick="deleteJob('${key}')" style="background:none; border:none; color:#ff4d4d; cursor:pointer; margin-left:10px;" title="ลบรายการนี้">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
                             </td>
                         </tr>`;
                 }
             }
         });
 
-        // 3. ฟังก์ชันมอบหมายงาน
         function assign(key) {
             const mId = document.getElementById('sel_'+key).value;
             if(!mId) return alert("กรุณาเลือกแม่บ้านก่อนกดยืนยันครับ");
-            
             if(confirm("ยืนยันการจัดงานให้แม่บ้านท่านนี้ใช่หรือไม่?")) {
                 db.ref('job_history/'+key).update({ maid_id: mId })
-                .then(() => alert("จัดสรรงานสำเร็จ! ข้อมูลจะย้ายไปที่ตารางงานแม่บ้านทันที"))
+                .then(() => alert("จัดสรรงานสำเร็จ!"))
                 .catch(err => alert("เกิดข้อผิดพลาด: " + err));
             }
         }
 
-        // 4. ฟังก์ชันปฏิทินงานแม่บ้าน
+        function deleteJob(key) {
+            if(confirm("⚠️ คุณต้องการลบรายการจองนี้ใช่หรือไม่?\n(ข้อมูลจะหายถาวรจากระบบ)")) {
+                db.ref('job_history/' + key).remove()
+                .then(() => alert("ลบรายการสำเร็จแล้ว"))
+                .catch(err => alert("เกิดข้อผิดพลาด: " + err));
+            }
+        }
+
         function openProfile(mId, mName) {
             document.getElementById('calendarModal').style.display = 'block';
             document.getElementById('modalMaidName').innerText = "ตารางงาน: " + mName;
-            
             db.ref('job_history').orderByChild('maid_id').equalTo(mId).once('value', (snap) => {
                 const jobs = snap.val() || {};
                 let evs = [];
@@ -201,32 +182,14 @@ list.innerHTML += `
                         borderColor: '#D4AF37'
                     });
                 }
-                
                 if(calendar) calendar.destroy();
                 calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-                    initialView: 'dayGridMonth',
-                    locale: 'th',
-                    events: evs,
-                    headerToolbar: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek'
-                    }
+                    initialView: 'dayGridMonth', locale: 'th', events: evs
                 });
                 calendar.render();
             });
         }
-
         function closeModal() { document.getElementById('calendarModal').style.display = 'none'; }
-
-        // เพิ่มฟังก์ชันนี้ไว้ท้ายๆ ของสคริปต์ในหน้า admin.html
-function deleteJob(key) {
-    if(confirm("⚠️ คุณต้องการลบรายการจองนี้ใช่หรือไม่?\n(ข้อมูลจะหายถาวรจากระบบ)")) {
-        db.ref('job_history/' + key).remove()
-        .then(() => alert("ลบรายการสำเร็จแล้ว"))
-        .catch(err => alert("เกิดข้อผิดพลาด: " + err));
-    }
-}
     </script>
 </body>
 </html>
