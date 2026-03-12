@@ -3,194 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Master Maid Thailand</title>
-    
+    <title>Admin Master Maid | จัดสรรงาน</title>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0A1931; --gold: #D4AF37; --bg: #f4f7f6; }
-        body { font-family: 'Sarabun', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        h2 { color: var(--primary); border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-top: 0; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #eee; font-weight: 600; }
-        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
-
-        /* Pending Row Highlight */
-        .pending-row { background: #fffdf5; }
-        .btn-assign { background: var(--primary); color: white; padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.3s; }
-        .btn-assign:hover { background: var(--gold); color: var(--primary); }
-
-        .maid-link { color: var(--primary); font-weight: 700; cursor: pointer; text-decoration: underline; }
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; background: #e3f2fd; color: #1976d2; }
-
-        /* Modal */
+        body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        .pending-row { background: #fffdf5; border-left: 5px solid #D4AF37; }
+        .btn { background: #0A1931; color: white; padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: white; margin: 2% auto; padding: 30px; border-radius: 20px; width: 90%; max-width: 1000px; position: relative; max-height: 90vh; overflow-y: auto; }
-        .close { float: right; font-size: 28px; cursor: pointer; color: #666; }
-
-        .select-maid { padding: 10px; border-radius: 8px; border: 1px solid #ddd; width: 180px; font-family: 'Sarabun'; }
+        .modal-content { background: white; margin: 2% auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 1000px; position: relative; }
     </style>
 </head>
 <body>
-
-<div class="admin-container">
     <div class="card">
-        <h2><i class="fas fa-bell" style="color: #f39c12;"></i> รายการจองใหม่ (รอจัดสรรแม่บ้าน)</h2>
-        <table id="pendingTable">
-            <thead>
-                <tr>
-                    <th>วันที่/เวลา</th>
-                    <th>ชื่อลูกค้า</th>
-                    <th>แผนที่</th>
-                    <th>เลือกแม่บ้าน</th>
-                    <th>ดำเนินการ</th>
-                </tr>
-            </thead>
-            <tbody id="pendingList">
-                <tr><td colspan="5" style="text-align:center;">กำลังโหลดข้อมูล...</td></tr>
-            </tbody>
+        <h2>จองใหม่ (รอจัดสรร)</h2>
+        <table>
+            <thead><tr><th>วัน/เวลา</th><th>ข้อมูลลูกค้า/บ้าน</th><th>แผนที่</th><th>จัดงาน</th></tr></thead>
+            <tbody id="pendingList"></tbody>
         </table>
     </div>
-
     <div class="card">
-        <h2><i class="fas fa-user-friends"></i> รายชื่อแม่บ้านและการสแตนบาย</h2>
-        <table id="maidTable">
-            <thead>
-                <tr>
-                    <th>ชื่อแม่บ้าน</th>
-                    <th>สถานะ</th>
-                    <th>ตารางงาน</th>
-                </tr>
-            </thead>
-            <tbody id="maidList">
-                </tbody>
+        <h2>จัดการแม่บ้าน</h2>
+        <table>
+            <thead><tr><th>ชื่อแม่บ้าน</th><th>สถานะ</th><th>ตารางงาน</th></tr></thead>
+            <tbody id="maidList"></tbody>
         </table>
     </div>
-</div>
-
-<div id="calendarModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2 id="modalMaidName">ตารางงานแม่บ้าน</h2>
-        <div id='calendar'></div>
+    <div id="calendarModal" class="modal">
+        <div class="modal-content"><span style="float:right; cursor:pointer;" onclick="closeModal()">×</span><h2 id="modalMaidName">ตารางงาน</h2><div id='calendar'></div></div>
     </div>
-</div>
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let calendar, maidOptions = '<option value="">-- เลือกแม่บ้าน --</option>';
 
-<script>
-    // 1. Firebase Config (ใช้ฐานข้อมูลเดิมของคุณ)
-    const firebaseConfig = {
-        apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
-        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    let calendar;
-    let maidOptions = '<option value="">-- เลือกแม่บ้าน --</option>';
-
-    // 2. ดึงรายชื่อแม่บ้านจาก maid_status
-    db.ref('maid_status').on('value', (snapshot) => {
-        const maids = snapshot.val();
-        const tbody = document.getElementById('maidList');
-        tbody.innerHTML = '';
-        maidOptions = '<option value="">-- เลือกแม่บ้าน --</option>';
-
-        for (let id in maids) {
-            maidOptions += `<option value="${id}">${maids[id].name}</option>`;
-            tbody.innerHTML += `
-                <tr>
-                    <td><strong class="maid-link" onclick="openProfile('${id}', '${maids[id].name}')">${maids[id].name}</strong></td>
-                    <td><span class="status-badge">${maids[id].status || 'Available'}</span></td>
-                    <td><button onclick="openProfile('${id}', '${maids[id].name}')" class="btn-assign">เปิดปฏิทินงาน</button></td>
-                </tr>
-            `;
-        }
-    });
-
-    // 3. ดึงรายการจองจาก job_history (เฉพาะงานที่ยังไม่ระบุแม่บ้าน)
-    db.ref('job_history').on('value', (snapshot) => {
-        const bookings = snapshot.val();
-        const tbody = document.getElementById('pendingList');
-        tbody.innerHTML = '';
-
-        let hasPending = false;
-        for (let key in bookings) {
-            const b = bookings[key];
-            if (b.maid_id === "Pending" || !b.maid_id) {
-                hasPending = true;
-                tbody.innerHTML += `
-                    <tr class="pending-row">
-                        <td>${b.date}<br><b>${b.start_time}:00 น.</b></td>
-                        <td>${b.name}<br><small>${b.phone}</small></td>
-                        <td><a href="${b.google_maps_link}" target="_blank" style="color:#1976d2;"><i class="fas fa-map-marker-alt"></i> ดูแผนที่</a></td>
-                        <td>
-                            <select id="select_${key}" class="select-maid">
-                                ${maidOptions}
-                            </select>
-                        </td>
-                        <td><button class="btn-assign" onclick="assignJob('${key}')">ยืนยันจัดงาน</button></td>
-                    </tr>
-                `;
+        db.ref('maid_status').on('value', (snap) => {
+            const maids = snap.val();
+            const list = document.getElementById('maidList');
+            list.innerHTML = ''; maidOptions = '<option value="">-- เลือกแม่บ้าน --</option>';
+            for(let id in maids) {
+                maidOptions += `<option value="${id}">${maids[id].name}</option>`;
+                list.innerHTML += `<tr><td><b>${maids[id].name}</b></td><td>${maids[id].status}</td><td><button class="btn" onclick="openProfile('${id}', '${maids[id].name}')">ดูปฏิทิน</button></td></tr>`;
             }
-        }
-        if (!hasPending) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#999;">ไม่มีงานค้างจัดสรรในขณะนี้</td></tr>';
-    });
-
-    // 4. ฟังก์ชันมอบหมายงาน
-    function assignJob(bookingKey) {
-        const maidId = document.getElementById('select_' + bookingKey).value;
-        if (!maidId) return alert("กรุณาเลือกแม่บ้านก่อนจัดงานครับ");
-
-        db.ref('job_history/' + bookingKey).update({
-            maid_id: maidId
-        }).then(() => {
-            alert("มอบหมายงานสำเร็จ! งานนี้จะไปแสดงในปฏิทินของแม่บ้านทันที");
         });
-    }
 
-    // 5. ระบบปฏิทินรายคน
-    function openProfile(maidId, maidName) {
-        document.getElementById('calendarModal').style.display = 'block';
-        document.getElementById('modalMaidName').innerText = "ตารางงานของ: " + maidName;
-        
-        db.ref('job_history').orderByChild('maid_id').equalTo(maidId).once('value', (snap) => {
-            const jobs = snap.val() || {};
-            let events = [];
+        db.ref('job_history').on('value', (snap) => {
+            const jobs = snap.val();
+            const list = document.getElementById('pendingList');
+            list.innerHTML = '';
             for(let key in jobs) {
                 const j = jobs[key];
-                events.push({ 
-                    title: "งาน: " + j.name, 
-                    start: j.date + "T" + (j.start_time || "09").toString().padStart(2, '0') + ":00:00",
-                    color: '#0A1931'
-                });
+                if(j.maid_id === "Pending") {
+                    list.innerHTML += `<tr class="pending-row">
+                        <td>${j.date}<br><b>${j.start_time}:00 - ${j.end_time || '?'}</b></td>
+                        <td>${j.name} (${j.phone})<br><small>${j.home_size || 'ไม่ได้ระบุ'}</small></td>
+                        <td><a href="${j.google_maps_link}" target="_blank">📍 แผนที่</a></td>
+                        <td><select id="sel_${key}">${maidOptions}</select> <button class="btn" onclick="assign('${key}')">ยืนยัน</button></td>
+                    </tr>`;
+                }
             }
-            if(calendar) calendar.destroy();
-            calendar = new FullCalendar.Calendar(document.getElementById('calendar'), { 
-                initialView: 'dayGridMonth', 
-                locale: 'th', 
-                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
-                events: events 
-            });
-            calendar.render();
         });
-    }
 
-    function closeModal() {
-        document.getElementById('calendarModal').style.display = 'none';
-        if(calendar) calendar.destroy();
-    }
+        function assign(key) {
+            const mId = document.getElementById('sel_'+key).value;
+            if(!mId) return alert("เลือกแม่บ้านก่อน");
+            db.ref('job_history/'+key).update({ maid_id: mId });
+        }
 
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('calendarModal')) closeModal();
-    }
-</script>
+        function openProfile(mId, mName) {
+            document.getElementById('calendarModal').style.display = 'block';
+            document.getElementById('modalMaidName').innerText = mName;
+            db.ref('job_history').orderByChild('maid_id').equalTo(mId).once('value', (snap) => {
+                const jobs = snap.val() || {};
+                let evs = [];
+                for(let k in jobs) evs.push({ title: jobs[k].name, start: jobs[k].date+"T"+jobs[k].start_time.padStart(2,'0')+":00:00" });
+                if(calendar) calendar.destroy();
+                calendar = new FullCalendar.Calendar(document.getElementById('calendar'), { initialView: 'dayGridMonth', events: evs });
+                calendar.render();
+            });
+        }
+        function closeModal() { document.getElementById('calendarModal').style.display = 'none'; }
+    </script>
 </body>
 </html>
