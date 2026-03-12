@@ -17,62 +17,53 @@
         .hero { background: linear-gradient(rgba(10, 25, 49, 0.7), rgba(10, 25, 49, 0.7)), url('https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1920') center/cover; height: 320px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; padding: 0 20px; }
         .container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
         
-        /* 1. Package Section with Terms Included */
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-top: -60px; margin-bottom: 50px; }
-        .card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-        .card img { width: 100%; height: 180px; object-fit: cover; }
-        .card-body { padding: 20px; flex-grow: 1; }
-        .card h3 { color: var(--primary); margin: 0 0 10px; font-size: 20px; }
-        .terms-mini { list-style: none; padding: 0; margin: 10px 0; font-size: 13px; color: #666; line-height: 1.6; }
-        .terms-mini li::before { content: "✔"; color: var(--gold); margin-right: 8px; font-weight: bold; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-top: -80px; margin-bottom: 50px; }
+        .card-clean { background: #fff; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); padding: 30px; border-top: 8px solid var(--gold); }
+        .card-title { color: var(--primary); font-size: 22px; font-weight: 700; margin-bottom: 10px; text-align: center; }
+        .card-price { text-align: center; font-size: 28px; color: var(--gold-dark); font-weight: 800; margin-bottom: 15px; }
+        .terms-grid { display: grid; gap: 10px; }
+        .term-item { display: flex; align-items: flex-start; font-size: 14px; color: #444; }
+        .term-item i { color: var(--gold); margin-right: 10px; margin-top: 3px; }
 
-        /* 2. Search & Map */
-        #pac-input { width: 100%; padding: 15px; border: 2px solid var(--gold); border-radius: 12px; margin-bottom: 10px; font-family: 'Sarabun'; box-sizing: border-box; font-size: 16px; }
-        #map { height: 400px; border-radius: 20px; border: 2px solid #eee; }
-
-        /* 3. Booking Form */
         .booking-box { background: #fff; border-radius: 30px; padding: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
         .section-title { border-left: 5px solid var(--gold); padding-left: 15px; margin: 30px 0 15px; font-weight: 700; color: var(--primary); font-size: 20px; }
         input, select, textarea { width: 100%; padding: 15px; margin-top: 10px; border: 1.5px solid #eee; border-radius: 12px; font-family: 'Sarabun'; font-size: 15px; box-sizing: border-box; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         
+        #map { height: 400px; border-radius: 20px; border: 2px solid #eee; margin-top: 15px; }
         .summary-box { background: var(--primary); color: white; padding: 30px; border-radius: 25px; text-align: center; margin-top: 30px; border: 2px solid var(--gold); }
-        .total-price { font-size: 38px; color: var(--gold); font-weight: 700; }
         .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; padding: 15px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); text-align: center; z-index: 999; }
         .btn-submit { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); border: none; padding: 18px 60px; border-radius: 50px; color: var(--primary); font-weight: 800; font-size: 18px; cursor: pointer; width: 95%; max-width: 450px; }
-
+        
         .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,25,49,0.98); z-index: 2000; color:#fff; text-align:center; padding: 40px 20px; overflow-y: auto; }
         .qr-card { background: white; width: 220px; padding: 15px; border-radius: 15px; margin: 20px auto; color: #333; }
-        .qr-card img { width: 100%; }
         @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
     <nav><img src="logo.png" alt="Master Maid" class="logo-img"></nav>
-    <div class="hero"><h1>Master Maid Thailand</h1><p>ความสะอาดที่คุณเลือกได้ ปักหมุดแม่บ้านมาถูกเป๊ะ</p></div>
+    <div class="hero"><h1>Master Maid Thailand</h1><p>ความสะอาดที่คุณไว้วางใจได้เสมอ</p></div>
     
     <div class="container">
         <div class="card-grid">
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6958?q=80&w=1000">
-                <div class="card-body">
-                    <h3>แม่บ้านทั่วไป (550.- / 2 ชม.)</h3>
-                    <ul class="terms-mini">
-                        <li>บริการแม่บ้าน 1 คน พร้อมอุปกรณ์พื้นฐาน</li>
-                        <li>กวาด ถู ทิ้งขยะ เช็ดกระจกภายใน จัดของ</li>
-                        <li>ล้างจาน/ซิงค์ เช็ดตู้เย็น ทำความสะอาดห้องน้ำ</li>
-                        <li>จัดเก็บที่นอน เปลี่ยนผ้าปู (ลูกค้าเตรียมไว้)</li>
-                        <li>ฟรีค่าเดินทาง (แม่บ้านจัดการเอง)</li>
-                    </ul>
+            <div class="card-clean">
+                <div class="card-title">ทำความสะอาดทั่วไป</div>
+                <div class="card-price">550.- <span style="font-size:14px; font-weight:400; color:#888;">/ 2 ชม.</span></div>
+                <div class="terms-grid">
+                   <div class="term-item"><i class="fas fa-check-circle"></i> บริการโดยแม่บ้านมืออาชีพ 1 คน</div>
+                <div class="term-item"><i class="fas fa-check-circle"></i> รวมค่าเดินทางแม่บ้านทั้งหมด</div>
+                <div class="term-item"><i class="fas fa-check-circle"></i> ดูดฝุ่น กวาดพื้น ถูพื้น และทิ้งขยะ</div>
+                <div class="term-item"><i class="fas fa-check-circle"></i> เช็ดกระจกภายในและจัดชั้นวางของ</div>
+                <div class="term-item"><i class="fas fa-check-circle"></i> ล้างห้องน้ำ และทำความสะอาดห้องครัว</div>
+                <div class="term-item"><i class="fas fa-check-circle"></i> ล้างจาน ซิงค์ และเช็ดตู้เย็น</div>
+                <div class="term-item"><i class="fas fa-check-circle"></i> เปลี่ยนผ้าปูที่นอน (ลูกค้าเตรียมผ้าไว้)</div>
+                <div class="term-item"><i class="fas fa-check-circle"></i> รวมอุปกรณ์ทำความสะอาดพื้นฐาน</div>
                 </div>
             </div>
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1528740561666-dc2479da08ad?q=80&w=1000">
-                <div class="card-body">
-                    <h3>Deep Clean / Big Clean</h3>
-                    <p style="font-size:14px; color:#666;">เหมาะสำหรับบ้านใหม่ย้ายเข้า หรือทำความสะอาดใหญ่ประจำปี ขจัดคราบฝังลึกทุกจุด</p>
-                    <div style="color:var(--gold-dark); font-weight:700; margin-top:10px;">เริ่มต้น 2,000.-</div>
-                </div>
+            <div class="card-clean" style="background: var(--primary); color: white;">
+                <div class="card-title" style="color: var(--gold);">Deep / Big Clean</div>
+                <div class="card-price" style="color: #fff;">เริ่มต้น 2,000.-</div>
+                <p style="text-align:center; font-size:14px;">เหมาะสำหรับบ้านใหม่ย้ายเข้า หรือทำความสะอาดใหญ่ประจำปี ขจัดคราบฝังลึกทุกจุด</p>
             </div>
         </div>
 
@@ -81,7 +72,7 @@
                 <div class="section-title">1. ข้อมูลลูกค้าและที่พัก</div>
                 <div class="grid-2">
                     <input type="text" name="name" placeholder="ชื่อลูกค้า" required>
-                    <input type="tel" name="phone" id="phone" placeholder="เบอร์โทรศัพท์ (10 หลัก)" required>
+                    <input type="tel" name="phone" placeholder="เบอร์โทรศัพท์" required>
                 </div>
                 <div class="grid-2">
                     <select name="home_type" required>
@@ -91,58 +82,64 @@
                     </select>
                     <input type="text" name="home_size" placeholder="ลักษณะบ้าน (เช่น 3 นอน 2 น้ำ)" required>
                 </div>
-                <input type="number" name="area_sqm" placeholder="ขนาดพื้นที่โดยประมาณ (ตารางเมตร)" required>
+                <input type="number" name="area_sqm" placeholder="พื้นที่โดยประมาณ (ตารางเมตร)" required>
 
-                <div class="section-title">2. ปักหมุดและระบุจุดเน้นพิเศษ</div>
-                <input id="pac-input" type="text" placeholder="🔍 ค้นหาเลขที่บ้าน หรือสถานที่ใกล้เคียง...">
+                <div class="section-title">2. ปักหมุดบ้านและระบุจุดเน้น</div>
+                <input id="pac-input" type="text" placeholder="🔍 ค้นหาที่อยู่/เลขที่บ้าน..." style="border:2px solid var(--gold);">
                 <div id="map"></div>
                 <input type="hidden" name="google_maps_link" id="google_maps_link">
-                <textarea name="address_detail" rows="2" placeholder="เลขที่บ้าน/หมู่บ้าน/จุดสังเกต..." required style="margin-top:15px;"></textarea>
-                
-                <textarea name="special_focus" rows="3" placeholder="ระบุจุดที่ต้องการให้เน้นเป็นพิเศษ (เช่น เน้นล้างระเบียง, เช็ดคราบน้ำมันในครัว, รดน้ำต้นไม้กรณีเวลาเหลือ)"></textarea>
+                <textarea name="address_detail" rows="2" placeholder="บ้านเลขที่/หมู่บ้าน/จุดสังเกต..." required></textarea>
+                <textarea name="special_focus" rows="3" placeholder="ระบุจุดที่ต้องการให้เน้นเป็นพิเศษ (เช่น เน้นระเบียง, เช็ดในตู้เย็น)"></textarea>
 
-                <div class="section-title">3. วันและเวลา</div>
+                <div class="section-title">3. เลือกวันและเวลาบริการ</div>
                 <div class="grid-2">
                     <select name="service_type" id="service_type" onchange="calculate()">
-                        <option value="General">ทั่วไป</option>
+                        <option value="General">ทำความสะอาดทั่วไป</option>
                         <option value="Big">Big Clean</option>
                     </select>
                     <input type="date" name="date" id="book_date" required>
                 </div>
                 <div class="grid-2">
                     <select name="start_time" id="start_time" onchange="calculate()">
-                        <option value="9">09:00 น.</option><option value="13">13:00 น.</option>
+                        <option value="9">09:00 น.</option>
+                        <option value="10">10:00 น.</option>
+                        <option value="11">11:00 น.</option>
+                        <option value="12">12:00 น.</option>
+                        <option value="13">13:00 น.</option>
+                        <option value="14">14:00 น.</option>
+                        <option value="15">15:00 น.</option>
+                        <option value="16">16:00 น.</option>
+                        <option value="17">17:00 น.</option>
                     </select>
                     <select name="duration" id="duration" onchange="calculate()">
-                        <option value="2">2 ชม.</option><option value="3">3 ชม.</option>
-                        <option value="4">4 ชม.</option><option value="8">8 ชม.</option>
+                        <option value="2">2 ชม.</option>
+                        <option value="3">3 ชม.</option>
+                        <option value="4">4 ชม.</option>
+                        <option value="8">8 ชม. (เหมาวัน)</option>
                     </select>
                 </div>
 
-                <input type="hidden" name="maid_id" value="Pending">
                 <input type="hidden" name="total_price" id="total_hidden">
                 <input type="hidden" name="end_time" id="end_time_hidden">
+                <input type="hidden" name="maid_id" value="Pending">
 
                 <div class="summary-box">
-                    <strong>ยอดรวม: <span id="total_display">550</span>.- บาท</strong><br>
-                    <small>คาดว่าเสร็จงานเวลา: <span id="end_time_display">11:00</span> น.</small>
+                    <strong>ยอดรวมชำระ: <span id="total_display">550</span>.- บาท</strong><br>
+                    <small>เวลาเสร็จงานโดยประมาณ: <span id="end_time_display">11:00</span> น.</small>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="footer-bar">
-        <button type="button" class="btn-submit" onclick="document.getElementById('maidForm').requestSubmit()">ยืนยันจองบริการ</button>
-    </div>
+    <div class="footer-bar"><button type="button" class="btn-submit" onclick="document.getElementById('maidForm').requestSubmit()">ยืนยันการจอง</button></div>
 
     <div class="overlay" id="overlay">
         <i class="fas fa-check-circle" style="font-size: 50px; color: var(--gold);"></i>
         <h2>จองสำเร็จ!</h2>
-        <p>ชำระมัดจำ 200.- บาท เพื่อยืนยันคิว</p>
+        <p>กรุณาชำระมัดจำ 200.- เพื่อยืนยันคิว</p>
         <div class="qr-card"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PROMPTPAY_QR" alt="QR"></div>
         <div style="background:rgba(255,255,255,0.1); padding:15px; border-radius:10px;">กสิกรไทย: 123-x-xxxxx-x<br>บจก. มาสเตอร์เมด อุบล</div><br>
-        <a href="https://line.me/ti/p/@301xqlpj" style="background:#06C755; color:white; padding:12px 30px; border-radius:50px; text-decoration:none; font-weight:700;">ส่งสลิปทาง LINE</a><br>
-        <button style="margin-top:20px; background:none; border:1px solid #666; color:#aaa; padding:8px 20px; border-radius:30px;" onclick="location.reload()">กลับหน้าหลัก</button>
+        <a href="https://line.me/ti/p/@301xqlpj" style="background:#06C755; color:white; padding:15px 30px; border-radius:50px; text-decoration:none; font-weight:700;">ส่งสลิปยืนยันทาง LINE</a>
     </div>
 
     <script>
@@ -155,23 +152,18 @@
             map = new google.maps.Map(document.getElementById("map"), { center: ubon, zoom: 15, mapTypeControl: false });
             marker = new google.maps.Marker({ map: map, draggable: true, position: ubon });
             
-            // Google Autocomplete Setup
             const input = document.getElementById("pac-input");
             const autocomplete = new google.maps.places.Autocomplete(input);
             autocomplete.bindTo("bounds", map);
-
             autocomplete.addListener("place_changed", () => {
                 const place = autocomplete.getPlace();
                 if (!place.geometry) return;
-                if (place.geometry.viewport) map.fitBounds(place.geometry.viewport);
-                else { map.setCenter(place.geometry.location); map.setZoom(17); }
+                map.setCenter(place.geometry.location);
                 marker.setPosition(place.geometry.location);
                 updateLink(place.geometry.location.lat(), place.geometry.location.lng());
             });
 
-            const updateLink = (lat, lng) => { 
-                document.getElementById("google_maps_link").value = `http://maps.google.com/?q=${lat},${lng}`; 
-            };
+            const updateLink = (lat, lng) => { document.getElementById("google_maps_link").value = `https://www.google.com/maps?q=${lat},${lng}`; };
             updateLink(ubon.lat, ubon.lng);
             map.addListener("click", (e) => { marker.setPosition(e.latLng); updateLink(e.latLng.lat(), e.latLng.lng()); });
         }
@@ -184,9 +176,9 @@
             if (hours === 8 && service !== "Big") price = 1500;
             document.getElementById('total_display').innerText = price.toLocaleString();
             document.getElementById('total_hidden').value = price;
-            const endTime = (start + hours) + ":00";
-            document.getElementById('end_time_display').innerText = endTime;
-            document.getElementById('end_time_hidden').value = endTime;
+            const end = (start + hours);
+            document.getElementById('end_time_display').innerText = (end > 24 ? end-24 : end) + ":00";
+            document.getElementById('end_time_hidden').value = (end > 24 ? end-24 : end) + ":00";
         }
 
         document.getElementById('maidForm').onsubmit = (e) => {
@@ -194,7 +186,6 @@
             document.getElementById('overlay').style.display = 'block';
             fetch(e.target.action, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
         };
-
         google.maps.event.addDomListener(window, 'load', initMap);
         window.onload = () => { calculate(); document.getElementById('book_date').min = new Date().toISOString().split("T")[0]; };
     </script>
