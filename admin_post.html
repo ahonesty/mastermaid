@@ -17,36 +17,24 @@
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #eee; }
         h2 { color: var(--primary); border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-top: 0; display: flex; align-items: center; }
         h2 i { margin-right: 10px; }
-        
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th { background: #f8f9fa; padding: 15px; text-align: left; color: var(--primary); font-weight: 700; border-bottom: 2px solid #eee; }
         td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: top; }
-        
         .pending-row { background: var(--light-gold); transition: 0.3s; }
-        .pending-row:hover { background: #f9f1d2; }
-        
-        .btn { background: var(--primary); color: white; padding: 10px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.3s; }
-        .btn:hover { background: #1a2a4a; transform: translateY(-2px); }
+        .btn { background: var(--primary); color: white; padding: 10px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
         .btn-assign { background: var(--gold); color: var(--primary); }
-        .btn-assign:hover { background: #b8962d; }
-
+        .btn-delete { background: none; border: none; color: #ff4d4d; cursor: pointer; margin-left: 10px; font-size: 18px; }
         select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-family: 'Sarabun'; width: 180px; }
-        .badge { background: var(--primary); color: white; padding: 3px 10px; border-radius: 50px; font-size: 12px; }
-        
-        .special-focus { color: #d63031; font-size: 13px; background: #fff0f0; padding: 5px 10px; border-radius: 8px; margin-top: 5px; display: inline-block; border-left: 3px solid #d63031; }
-
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
-        .modal-content { background: white; margin: 2% auto; padding: 30px; border-radius: 25px; width: 90%; max-width: 1000px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .close-modal { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #999; }
-        
-        #calendar { margin-top: 20px; }
+        .modal-content { background: white; margin: 2% auto; padding: 30px; border-radius: 25px; width: 90%; max-width: 1000px; position: relative; }
+        .close-modal { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="card">
         <h2><i class="fas fa-bell"></i> จองใหม่ (รอจัดสรรงาน)</h2>
-        <table id="pendingTable">
+        <table>
             <thead>
                 <tr>
                     <th>วัน/ช่วงเวลา</th>
@@ -96,54 +84,29 @@
             const list = document.getElementById('maidList');
             list.innerHTML = ''; 
             maidOptions = '<option value="">-- เลือกแม่บ้าน --</option>';
-            
             for(let id in maids) {
                 maidOptions += `<option value="${id}">${maids[id].name}</option>`;
-                list.innerHTML += `
-                    <tr>
-                        <td><b>${maids[id].name}</b></td>
-                        <td><span class="badge">${maids[id].status || 'พร้อมงาน'}</span></td>
-                        <td><button class="btn" onclick="openProfile('${id}', '${maids[id].name}')"><i class="fas fa-calendar-alt"></i> ดูปฏิทินงาน</button></td>
-                    </tr>`;
+                list.innerHTML += `<tr><td><b>${maids[id].name}</b></td><td><span style="color:green;">● Available</span></td><td><button class="btn" onclick="openProfile('${id}', '${maids[id].name}')">ดูปฏิทินงาน</button></td></tr>`;
             }
         });
 
-        // 2. ดึงรายการจองที่รอจัดสรร
+        // 2. ดึงรายการจอง (Pending)
         db.ref('job_history').on('value', (snap) => {
             const jobs = snap.val();
             const list = document.getElementById('pendingList');
             list.innerHTML = '';
-            
-            if (!jobs) {
-                list.innerHTML = '<tr><td colspan="4" style="text-align:center;">ไม่มีงานค้างจัดสรร</td></tr>';
-                return;
-            }
-
             for(let key in jobs) {
                 const j = jobs[key];
                 if(j.maid_id === "Pending") {
                     list.innerHTML += `
                         <tr class="pending-row">
-                            <td>
-                                📅 ${j.date}<br>
-                                🕒 <b>${j.end_time || (j.start_time + ':00')}</b>
-                            </td>
-                            <td>
-                                👤 <b>${j.name}</b> (${j.phone})<br>
-                                <small>🏠 ${j.home_type} | 🛏️ ${j.home_size} | 📏 ${j.area_sqm} ตร.ม.</small><br>
-                                ${j.special_focus ? `<div class="special-focus">✨ เน้น: ${j.special_focus}</div>` : ''}
-                            </td>
-                            <td>
-                                <a href="${j.google_maps_link}" target="_blank" style="text-decoration:none; color:#4285F4;">
-                                    <i class="fas fa-map-marker-alt"></i> เปิดแผนที่
-                                </a>
-                            </td>
+                            <td>📅 ${j.date}<br>🕒 <b>${j.end_time || (j.start_time + ':00')}</b></td>
+                            <td>👤 <b>${j.name}</b> (${j.phone})<br><small>🏠 ${j.home_type} | 🛏️ ${j.home_size}</small></td>
+                            <td><a href="${j.google_maps_link}" target="_blank" style="color:#4285F4; text-decoration:none;"><i class="fas fa-map-marker-alt"></i> แผนที่</a></td>
                             <td>
                                 <select id="sel_${key}">${maidOptions}</select> 
                                 <button class="btn btn-assign" onclick="assign('${key}')">ยืนยัน</button>
-                                <button onclick="deleteJob('${key}')" style="background:none; border:none; color:#ff4d4d; cursor:pointer; margin-left:10px;" title="ลบรายการนี้">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <button class="btn-delete" onclick="deleteJob('${key}')" title="ลบรายการ"><i class="fas fa-trash-alt"></i></button>
                             </td>
                         </tr>`;
                 }
@@ -152,19 +115,13 @@
 
         function assign(key) {
             const mId = document.getElementById('sel_'+key).value;
-            if(!mId) return alert("กรุณาเลือกแม่บ้านก่อนกดยืนยันครับ");
-            if(confirm("ยืนยันการจัดงานให้แม่บ้านท่านนี้ใช่หรือไม่?")) {
-                db.ref('job_history/'+key).update({ maid_id: mId })
-                .then(() => alert("จัดสรรงานสำเร็จ!"))
-                .catch(err => alert("เกิดข้อผิดพลาด: " + err));
-            }
+            if(!mId) return alert("เลือกแม่บ้านก่อน");
+            if(confirm("จัดงานให้แม่บ้านท่านนี้?")) db.ref('job_history/'+key).update({ maid_id: mId });
         }
 
         function deleteJob(key) {
-            if(confirm("⚠️ คุณต้องการลบรายการจองนี้ใช่หรือไม่?\n(ข้อมูลจะหายถาวรจากระบบ)")) {
-                db.ref('job_history/' + key).remove()
-                .then(() => alert("ลบรายการสำเร็จแล้ว"))
-                .catch(err => alert("เกิดข้อผิดพลาด: " + err));
+            if(confirm("⚠️ ลบรายการนี้ถาวร?")) {
+                db.ref('job_history/' + key).remove().then(() => alert("ลบสำเร็จ"));
             }
         }
 
@@ -175,17 +132,10 @@
                 const jobs = snap.val() || {};
                 let evs = [];
                 for(let k in jobs) {
-                    evs.push({ 
-                        title: jobs[k].name + " (" + jobs[k].home_type + ")", 
-                        start: jobs[k].date + "T" + jobs[k].start_time.toString().padStart(2,'0') + ":00:00",
-                        backgroundColor: '#D4AF37',
-                        borderColor: '#D4AF37'
-                    });
+                    evs.push({ title: jobs[k].name, start: jobs[k].date + "T" + jobs[k].start_time.toString().padStart(2,'0') + ":00:00" });
                 }
                 if(calendar) calendar.destroy();
-                calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-                    initialView: 'dayGridMonth', locale: 'th', events: evs
-                });
+                calendar = new FullCalendar.Calendar(document.getElementById('calendar'), { initialView: 'dayGridMonth', events: evs });
                 calendar.render();
             });
         }
