@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid Thailand | จองแม่บ้านพรีเมียม</title>
+    <title>Master Maid Thailand | จองแม่บ้านออนไลน์</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
@@ -14,27 +14,26 @@
 
     <style>
         :root { --primary: #0A1931; --gold: #D4AF37; --gold-dark: #B8962D; --bg: #F4F7F6; }
-        body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #1A1A1A; padding-bottom: 100px; overflow-x: hidden; }
-        nav { background: #fff; padding: 15px 5%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); color: #1A1A1A; padding-bottom: 100px; }
+        nav { background: #fff; padding: 15px 5%; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
         .logo-img { height: 55px; }
-        .hero { background: linear-gradient(rgba(10, 25, 49, 0.8), rgba(10, 25, 49, 0.8)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1920'); background-size: cover; background-position: center; height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; padding: 0 20px; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 50px; margin-top: -80px; }
-        .card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
-        .card-body { padding: 25px; }
-        .booking-box { background: #fff; border-radius: 30px; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); }
-        .section-title { border-left: 5px solid var(--gold); padding-left: 15px; margin: 30px 0 20px; color: var(--primary); font-size: 20px; font-weight: 700; }
-        input, select, textarea { width: 100%; padding: 16px; margin-top: 10px; border: 1px solid #eee; border-radius: 12px; font-family: 'Sarabun'; box-sizing: border-box; font-size: 15px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        #map { height: 400px; border-radius: 20px; border: 2px solid #eee; margin-top: 15px; }
-        #pac-input { width: 90%; left: 5% !important; top: 15px !important; padding: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: none; }
-        .summary-box { background: var(--primary); color: #fff; border-radius: 20px; padding: 30px; margin-top: 30px; text-align: center; }
-        .total-price-display { color: var(--gold); font-size: 36px; font-weight: 700; margin-top: 5px; }
-        .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; padding: 15px; box-shadow: 0 -5px 20px rgba(0,0,0,0.08); text-align: center; z-index: 1001; }
-        .submit-btn { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--primary); padding: 18px 60px; border: none; border-radius: 50px; font-size: 18px; font-weight: 800; cursor: pointer; width: 95%; max-width: 450px; }
-        .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10, 25, 49, 0.98); z-index: 2000; color:#fff; text-align:center; padding-top:15vh; }
-        .line-btn { display: inline-flex; align-items: center; background: #06C755; color: white !important; text-decoration: none; padding: 15px 30px; border-radius: 12px; font-weight: 700; margin-top: 20px; }
+        .hero { background: linear-gradient(rgba(10, 25, 49, 0.8), rgba(10, 25, 49, 0.8)), url('https://images.unsplash.com/photo-1581578731548-c64695cc6958?q=80&w=1920'); background-size: cover; background-position: center; padding: 60px 20px; text-align: center; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 15px; }
+        .booking-box { background: #fff; border-radius: 20px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-top: 20px; }
+        .section-title { border-left: 5px solid var(--gold); padding-left: 15px; margin: 25px 0 15px; font-weight: 700; color: var(--primary); font-size: 18px; }
+        input, select, textarea { width: 100%; padding: 14px; margin-top: 8px; border: 1.5px solid #eee; border-radius: 12px; box-sizing: border-box; font-family: 'Sarabun'; font-size: 15px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        #map { height: 350px; border-radius: 12px; border: 1px solid #ddd; margin-top: 10px; }
+        .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; padding: 15px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); text-align: center; z-index: 999; }
+        .btn-submit { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); border: none; padding: 16px 50px; border-radius: 50px; color: var(--primary); font-weight: 800; font-size: 18px; cursor: pointer; width: 95%; max-width: 450px; }
+        
+        /* Overlay จองสำเร็จ */
+        .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,25,49,0.98); z-index: 2000; color:#fff; text-align:center; padding: 5vh 20px; overflow-y: auto; }
+        .qr-code { width: 200px; height: 200px; background: white; margin: 20px auto; padding: 10px; border-radius: 10px; }
+        .qr-code img { width: 100%; }
+        .bank-info { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; display: inline-block; margin: 15px 0; font-size: 16px; line-height: 1.6; }
+        .line-btn { background: #06C755; color: white !important; text-decoration: none; padding: 12px 30px; border-radius: 50px; display: inline-block; font-weight: 700; margin: 10px; }
+        .back-btn { background: transparent; color: #aaa; border: 1px solid #555; padding: 8px 20px; border-radius: 50px; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -42,48 +41,48 @@
     <nav><img src="logo.png" alt="Master Maid" class="logo-img"></nav>
 
     <div class="hero">
-        <h1>บริการแม่บ้านพรีเมียม อุบลฯ</h1>
-        <p>ส่งต่อความสะอาดด้วยใจ จัดการงานจองได้แบบ Real-time</p>
+        <h1>จองแม่บ้านออนไลน์ อุบลฯ</h1>
+        <p>สะอาด มั่นใจ ตรวจสอบตำแหน่งแม่บ้านได้แบบ Real-time</p>
     </div>
 
     <div class="container">
-        <div class="card-grid">
-            <div class="card"><img src="https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?q=80&w=1000"><div class="card-body"><h3>ทั่วไป</h3><p>550.- / 2 ชม.</p></div></div>
-            <div class="card"><img src="https://images.pexels.com/photos/4099467/pexels-photo-4099467.jpeg?auto=compress&w=1260"><div class="card-body"><h3>Deep Clean</h3><p>เริ่มต้น 2,000.-</p></div></div>
-        </div>
-
         <div class="booking-box">
             <form id="maidForm" action="https://hook.us2.make.com/u4ddkucyj2gbd9gj14om5cdtu3qjnzxx" method="POST">
                 
-                <div class="section-title">1. ข้อมูลติดต่อ</div>
+                <div class="section-title">1. ข้อมูลติดต่อและที่พัก</div>
                 <div class="grid-2">
                     <input type="text" name="name" placeholder="ชื่อ-นามสกุล" required>
                     <input type="tel" name="phone" id="phone" placeholder="เบอร์โทรศัพท์" required>
                 </div>
+                <select name="home_type" required>
+                    <option value="House">บ้านเดี่ยว</option>
+                    <option value="Condo">คอนโด/หอพัก</option>
+                    <option value="Townhome">ทาวน์โฮม</option>
+                    <option value="Office">สำนักงาน</option>
+                </select>
 
-                <div class="section-title">2. ปักหมุดบ้าน</div>
-                <div style="position: relative;">
-                    <input id="pac-input" type="text" placeholder="🔍 ค้นหาหมู่บ้าน หรือสถานที่...">
-                    <div id="map"></div>
-                </div>
+                <div class="section-title">2. ปักหมุดที่อยู่</div>
+                <div id="map"></div>
                 <input type="hidden" name="google_maps_link" id="google_maps_link">
-                <textarea name="address_detail" rows="2" placeholder="ที่อยู่ละเอียด" required></textarea>
+                <label style="display:block; margin-top:15px; font-weight:600;">รายละเอียดที่อยู่ (บ้านเลขที่/ซอย/จุดสังเกต):</label>
+                <textarea name="address_detail" rows="3" placeholder="ตัวอย่าง: บ้านเลขที่ 123/45 ซอย 7 หมู่บ้านพฤกษา บ้านสีขาวรั้วไม้" required></textarea>
 
-                <div class="section-title">3. เลือกวันและเวลา</div>
+                <div class="section-title">3. วันและเวลาบริการ</div>
                 <div class="grid-2">
                     <select name="service_type" id="service_type" onchange="calculate()">
-                        <option value="General">ทำความสะอาดทั่วไป</option>
-                        <option value="Big">Deep / Big Cleaning</option>
+                        <option value="General">ทั่วไป</option>
+                        <option value="Big">Deep / Big Clean</option>
                     </select>
                     <input type="date" name="date" id="book_date" required>
                 </div>
                 <div class="grid-2">
                     <select name="start_time" id="start_time" onchange="calculate()">
-                        <option value="09">09:00 น.</option>
+                        <option value="9">09:00 น.</option>
                         <option value="13">13:00 น.</option>
                     </select>
                     <select name="duration" id="duration" onchange="calculate()">
                         <option value="2">2 ชม.</option>
+                        <option value="3">3 ชม.</option>
                         <option value="4">4 ชม.</option>
                         <option value="8">8 ชม.</option>
                     </select>
@@ -91,74 +90,76 @@
 
                 <input type="hidden" name="maid_id" value="Pending">
                 <input type="hidden" name="total_price" id="total_hidden">
-
-                <div class="summary-box">
-                    <div class="total-price-display">ยอดรวม: <span id="total_display">550</span>.- บาท</div>
+                <div style="background: var(--primary); color: white; padding: 20px; border-radius: 12px; margin-top: 20px; text-align: center;">
+                    ยอดรวม: <span id="total_display" style="font-size: 24px; color: var(--gold); font-weight: 800;">550</span>.- บาท
                 </div>
             </form>
         </div>
     </div>
 
     <div class="footer-bar">
-        <button type="button" class="submit-btn" onclick="document.getElementById('maidForm').requestSubmit()">จองตอนนี้</button>
+        <button type="button" class="btn-submit" onclick="document.getElementById('maidForm').requestSubmit()">ยืนยันการจอง</button>
     </div>
 
     <div class="overlay" id="overlay">
-        <i class="fas fa-check-circle" style="font-size: 70px; color: var(--gold);"></i>
-        <h2>จองสำเร็จ!</h2>
+        <i class="fas fa-check-circle" style="font-size: 50px; color: var(--gold);"></i>
+        <h2 style="margin: 10px 0;">จองบริการสำเร็จ!</h2>
+        <p>กรุณาชำระยอดมัดจำ 200.- บาท เพื่อยืนยันคิวงาน</p>
+
+        <div class="qr-code">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=00020101021129370016A000000677010111011300668888888885802TH53037645406200.006304ABCD" alt="QR Payment">
+        </div>
+
+        <div class="bank-info">
+            <b>ธนาคารกสิกรไทย (K-Bank)</b><br>
+            เลขบัญชี: 123-x-xxxxx-x<br>
+            ชื่อบัญชี: บจก. มาสเตอร์เมด อุบล
+        </div>
+        
+        <br>
         <a href="https://line.me/ti/p/@301xqlpj" class="line-btn"><i class="fab fa-line"></i> แจ้งสลิปทาง LINE</a>
+        <br>
+        <button class="back-btn" onclick="location.reload()">กลับหน้าหลัก</button>
     </div>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
-
         let map, marker;
+
         function initMap() {
             const ubon = { lat: 15.2294, lng: 104.8564 };
-            map = new google.maps.Map(document.getElementById("map"), { center: ubon, zoom: 15 });
+            map = new google.maps.Map(document.getElementById("map"), { center: ubon, zoom: 15, mapTypeControl: false });
             marker = new google.maps.Marker({ map: map, draggable: true, position: ubon });
-            
-            const updateLink = (lat, lng) => {
-                document.getElementById("google_maps_link").value = `https://www.google.com/maps?q=${lat},${lng}`;
-            };
-            
             updateLink(ubon.lat, ubon.lng);
             map.addListener("click", (e) => { marker.setPosition(e.latLng); updateLink(e.latLng.lat(), e.latLng.lng()); });
-            
-            const input = document.getElementById("pac-input");
-            const autocomplete = new google.maps.places.Autocomplete(input);
-            autocomplete.addListener("place_changed", () => {
-                const place = autocomplete.getPlace();
-                if (!place.geometry) return;
-                map.setCenter(place.geometry.location);
-                marker.setPosition(place.geometry.location);
-                updateLink(place.geometry.location.lat(), place.geometry.location.lng());
-            });
+            marker.addListener("dragend", (e) => { updateLink(e.latLng.lat(), e.latLng.lng()); });
+        }
+
+        function updateLink(lat, lng) { 
+            document.getElementById("google_maps_link").value = `http://maps.google.com/?q=${lat},${lng}`; 
         }
 
         function calculate() {
             const service = document.getElementById('service_type').value;
             const hours = parseInt(document.getElementById('duration').value);
             let price = (service === "Big") ? 2000 : (hours === 2 ? 550 : 800 + (hours-3)*200);
+            if (hours === 8 && service !== "Big") price = 1500;
             document.getElementById('total_display').innerText = price.toLocaleString();
             document.getElementById('total_hidden').value = price;
         }
 
-        document.getElementById('maidForm').onsubmit = function(e) {
+        document.getElementById('maidForm').onsubmit = (e) => {
             e.preventDefault();
             document.getElementById('overlay').style.display = 'block';
-            
-            // 🚀 ส่งข้อมูลเข้า Make.com
-            fetch(this.action, {
-                method: 'POST',
-                body: new FormData(this),
-                mode: 'no-cors'
-            });
+            fetch(e.target.action, { method: 'POST', body: new FormData(e.target), mode: 'no-cors' });
         };
 
         google.maps.event.addDomListener(window, 'load', initMap);
-        window.onload = calculate;
+        window.onload = () => {
+            calculate();
+            document.getElementById('book_date').min = new Date().toISOString().split("T")[0];
+        };
     </script>
 </body>
 </html>
