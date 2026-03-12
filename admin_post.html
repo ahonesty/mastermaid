@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid Admin | รายละเอียดตารางงาน</title>
+    <title>Master Maid Admin | ระบบจัดการตารางงาน</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
@@ -16,59 +16,49 @@
     <style>
         :root { --primary: #0A1931; --gold: #D4AF37; --bg: #f4f7f6; }
         body { font-family: 'Sarabun', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        
-        .admin-container { max-width: 1300px; margin: 0 auto; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
         /* Table Styles */
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8f9fa; padding: 12px; text-align: left; color: var(--primary); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; }
         td { padding: 12px; border-bottom: 1px solid #eee; }
-        .maid-name { color: var(--primary); font-weight: 700; cursor: pointer; text-decoration: underline; }
-        .maid-name:hover { color: var(--gold); }
+        .maid-link { color: var(--primary); font-weight: 700; cursor: pointer; text-decoration: underline; }
 
-        /* Modal / Pop-up Styles */
-        .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); overflow-y: auto; }
-        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 20px; width: 85%; max-width: 1000px; position: relative; }
-        .close { position: absolute; right: 25px; top: 20px; font-size: 28px; cursor: pointer; }
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: white; margin: 2% auto; padding: 25px; border-radius: 20px; width: 90%; max-width: 1100px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .close { position: absolute; right: 20px; top: 15px; font-size: 25px; cursor: pointer; }
 
-        /* Stats in Modal */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
-        .stat-box { background: var(--primary); color: white; padding: 20px; border-radius: 12px; text-align: center; }
-        .stat-box span { display: block; font-size: 24px; font-weight: 700; color: var(--gold); }
+        /* Stats */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-item { background: var(--primary); color: white; padding: 15px; border-radius: 10px; text-align: center; }
+        .stat-item b { display: block; font-size: 20px; color: var(--gold); }
 
-        #calendar { margin-top: 20px; max-height: 600px; }
-        
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; }
-        .bg-gold { background: var(--gold); color: var(--primary); }
+        .btn-action { padding: 5px 10px; border-radius: 5px; cursor: pointer; border: 1px solid #ddd; background: #fff; }
+        .status-badge { padding: 3px 8px; border-radius: 5px; font-size: 12px; font-weight: 600; }
     </style>
 </head>
 <body>
 
 <div class="admin-container">
     <div class="card">
-        <h2><i class="fas fa-calendar-alt"></i> จัดการแม่บ้านและตารางงานละเอียด</h2>
-        <p>คำแนะนำ: คลิกที่ <b>"ชื่อแม่บ้าน"</b> เพื่อดูประวัติการรับงานและตารางงานในปฏิทิน</p>
+        <h2><i class="fas fa-tasks"></i> ระบบจัดการแม่บ้านและตารางงาน</h2>
+        <div style="background: #e3f2fd; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+            <i class="fas fa-info-circle"></i> คลิกที่ <b>ชื่อแม่บ้าน</b> เพื่อดูปฏิทินงานและชั่วโมงทำงานรวม
+        </div>
         
         <table>
             <thead>
                 <tr>
-                    <th>รหัส/ชื่อแม่บ้าน</th>
-                    <th>พื้นที่รับงาน</th>
-                    <th>ชั่วโมงรวม (เดือนนี้)</th>
-                    <th>งานวันนี้</th>
+                    <th>แม่บ้าน</th>
                     <th>สถานะ</th>
+                    <th>งานเช้า</th>
+                    <th>งานบ่าย</th>
+                    <th>จัดการ</th>
                 </tr>
             </thead>
-            <tbody id="maidList">
-                <tr>
-                    <td><span class="maid-name" onclick="openMaidProfile('maid_01', 'พี่สมใจ หวังดี')">maid_01: พี่สมใจ หวังดี</span></td>
-                    <td>อำเภอเมือง</td>
-                    <td>48 ชม.</td>
-                    <td><span class="badge bg-gold">09:00 - 12:00 (บ้านคุณเอ)</span></td>
-                    <td>ว่าง</td>
-                </tr>
-            </tbody>
+            <tbody id="maidListBody">
+                </tbody>
         </table>
     </div>
 </div>
@@ -76,25 +66,25 @@
 <div id="maidModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
-        <h2 id="modalMaidName" style="color: var(--primary);">ตารางงานแม่บ้าน</h2>
+        <h2 id="modalTitle">รายละเอียดแม่บ้าน</h2>
         
-        <div class="stats-grid">
-            <div class="stat-box">งานทั้งหมดเดือนนี้ <span id="totalJobs">12 งาน</span></div>
-            <div class="stat-box">เวลาทำงานรวม <span id="totalHours">48 ชม.</span></div>
-            <div class="stat-box">คะแนนรีวิว <span>4.9/5.0</span></div>
+        <div class="stats-row">
+            <div class="stat-item">ชั่วโมงงานรวม<b id="statTotalHours">0 ชม.</b></div>
+            <div class="stat-item">งานเดือนนี้<b id="statTotalJobs">0 งาน</b></div>
+            <div class="stat-item">สถานะ<b id="statStatus">-</b></div>
         </div>
 
-        <div id="calendar"></div>
+        <div id='calendar'></div>
 
-        <div id="jobDetails" style="margin-top: 25px; border-top: 2px solid #eee; padding-top: 20px;">
-            <h3>รายละเอียดงานที่เลือก</h3>
-            <div id="detailContent" style="color: #666;">กรุณาคลิกที่ชื่อกิจกรรมในปฏิทินเพื่อดูรายละเอียด</div>
+        <div id="jobPreview" style="margin-top:20px; padding:15px; background:#f9f9f9; border-radius:10px; display:none;">
+            <h4 style="margin-top:0">รายละเอียดงาน</h4>
+            <div id="jobDetailText"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // Firebase Setup (คงเดิม)
+    // 1. ตั้งค่า Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
         databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -105,51 +95,90 @@
 
     let calendar;
 
+    // 2. โหลดรายชื่อแม่บ้าน
+    db.ref('maids').on('value', (snapshot) => {
+        const maids = snapshot.val();
+        const tbody = document.getElementById('maidListBody');
+        tbody.innerHTML = '';
+
+        for (let id in maids) {
+            const m = maids[id];
+            tbody.innerHTML += `
+                <tr>
+                    <td><span class="maid-link" onclick="openMaidProfile('${id}', '${m.name}')">${m.name}</span></td>
+                    <td><span class="status-badge" style="background:${m.status === 'Available' ? '#cbf3f0':'#ffe5ec'}">${m.status}</span></td>
+                    <td><button class="btn-action ${m.blocks?.morning ? 'active':''}" onclick="toggleBlock('${id}','morning',${!m.blocks?.morning})">
+                        ${m.blocks?.morning ? '🚫 บล็อกอยู่' : '✅ ว่าง'}
+                    </button></td>
+                    <td><button class="btn-action ${m.blocks?.afternoon ? 'active':''}" onclick="toggleBlock('${id}','afternoon',${!m.blocks?.afternoon})">
+                        ${m.blocks?.afternoon ? '🚫 บล็อกอยู่' : '✅ ว่าง'}
+                    </button></td>
+                    <td><button onclick="updateStatus('${id}', 'Available')">ปลดสถานะ</button></td>
+                </tr>
+            `;
+        }
+    });
+
+    // 3. เปิดโปรไฟล์แม่บ้าน (ปฏิทิน + สถิติ)
     function openMaidProfile(maidId, maidName) {
         document.getElementById('maidModal').style.display = 'block';
-        document.getElementById('modalMaidName').innerText = "ตารางงาน: " + maidName;
+        document.getElementById('modalTitle').innerText = "ตารางงาน: " + maidName;
         
-        // เริ่มต้นสร้างปฏิทิน
-        const calendarEl = document.getElementById('calendar');
-        calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'th',
-            headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
-            events: [
-                // ตัวอย่างข้อมูลงานที่ดึงมาจาก Database
-                { title: 'คุณเอ (ทั่วไป 3 ชม.)', start: '2025-05-10T09:00:00', end: '2025-05-10T12:00:00', extendedProps: { customer: 'คุณสมศักดิ์', location: 'หมู่บ้านพฤกษา', note: 'เน้นล้างห้องน้ำ' } },
-                { title: 'คุณบี (Big Clean)', start: '2025-05-12T10:00:00', end: '2025-05-12T18:00:00', color: '#D4AF37' }
-            ],
-            eventClick: function(info) {
-                showJobDetail(info.event);
+        // ดึงข้อมูลงานจาก Firebase/bookings (ที่กรองตามชื่อแม่บ้าน)
+        db.ref('bookings').orderByChild('maid_id').equalTo(maidId).once('value', (snapshot) => {
+            const jobs = snapshot.val() || {};
+            let events = [];
+            let totalHrs = 0;
+
+            for(let key in jobs) {
+                const j = jobs[key];
+                events.push({
+                    title: j.name + " (" + j.service_type + ")",
+                    start: j.date + "T" + j.start_time + ":00:00",
+                    end: j.date + "T" + (parseInt(j.start_time) + parseInt(j.duration)) + ":00:00",
+                    extendedProps: { customer: j.name, phone: j.phone, detail: j.details, price: j.total_price }
+                });
+                totalHrs += parseInt(j.duration);
             }
+
+            document.getElementById('statTotalHours').innerText = totalHrs + " ชม.";
+            document.getElementById('statTotalJobs').innerText = Object.keys(jobs).length + " งาน";
+
+            // สร้างปฏิทิน
+            const calendarEl = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'th',
+                events: events,
+                eventClick: function(info) {
+                    const p = info.event.extendedProps;
+                    document.getElementById('jobPreview').style.display = 'block';
+                    document.getElementById('jobDetailText').innerHTML = `
+                        <b>ลูกค้า:</b> ${p.customer} | <b>โทร:</b> ${p.phone}<br>
+                        <b>วันเวลา:</b> ${info.event.start.toLocaleString()}<br>
+                        <b>รายละเอียด:</b> ${p.detail || '-'}<br>
+                        <b>ยอดเงิน:</b> ${p.price} บาท
+                    `;
+                }
+            });
+            calendar.render();
         });
-        calendar.render();
     }
 
-    function showJobDetail(event) {
-        const props = event.extendedProps;
-        const html = `
-            <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 5px solid var(--gold);">
-                <p><b>ลูกค้า:</b> ${event.title}</p>
-                <p><b>วัน/เวลา:</b> ${event.start.toLocaleString('th-TH')}</p>
-                <p><b>สถานที่:</b> ${props.location || 'ไม่ได้ระบุ'}</p>
-                <p><b>หมายเหตุ:</b> ${props.note || '-'}</p>
-            </div>
-        `;
-        document.getElementById('detailContent').innerHTML = html;
+    // ฟังก์ชันช่วยจัดการสถานะ
+    function toggleBlock(id, time, val) {
+        let up = {}; up[`blocks/${time}`] = val;
+        db.ref('maids/' + id).update(up);
+    }
+
+    function updateStatus(id, stat) {
+        db.ref('maids/' + id).update({ status: stat });
     }
 
     function closeModal() {
         document.getElementById('maidModal').style.display = 'none';
         if(calendar) calendar.destroy();
     }
-
-    // ปิด Modal เมื่อคลิกข้างนอก
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('maidModal')) closeModal();
-    }
 </script>
-
 </body>
 </html>
