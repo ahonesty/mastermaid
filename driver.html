@@ -3,242 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Panel | Master Maid</title>
+    <title>Staff Tracking | Master Maid</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places&language=th"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #D4AF37; --dark: #0A1931; --navy: #1A2F4F; --green: #28a745; --red: #dc3545; }
-        body { font-family: 'Sarabun', sans-serif; background: var(--dark); color: white; text-align: center; padding: 15px; margin: 0; }
-        .card { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 25px; border: 1px solid var(--gold); max-width: 420px; margin: auto; backdrop-filter: blur(10px); position: relative; }
+        :root { --primary: #0A1931; --gold: #D4AF37; --bg: #F4F7F6; }
+        body { font-family: 'Sarabun', sans-serif; background: var(--bg); margin: 0; padding: 0; text-align: center; }
+        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 450px; margin: 20px auto; border-top: 6px solid var(--gold); }
         
-        .logout-btn { position: absolute; top: 15px; right: 15px; color: #ff6b6b; border: 1px solid var(--red); padding: 5px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; background: none; }
+        #loginScreen { margin-top: 15vh; }
+        .input-box { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1.5px solid #eee; font-size: 18px; box-sizing: border-box; text-align: center; }
         
-        @keyframes pulse-gold {
-            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
-        }
-        .personal-job-card { border: 3px solid var(--gold); background: rgba(212, 175, 55, 0.2) !important; animation: pulse-gold 2s infinite; margin-bottom: 20px; }
-
-        .login-input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--gold); background: var(--navy); color: white; font-size: 20px; text-align: center; box-sizing: border-box; }
-        .btn { width: 100%; padding: 16px; border-radius: 12px; font-weight: bold; margin: 10px 0; border: none; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .job-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid var(--gold); margin-top: 15px; text-align: left; }
-        .checklist-area { background: var(--navy); padding: 15px; border-radius: 12px; margin-top: 15px; text-align: left; }
-        .check-item { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-        .check-item input { width: 22px; height: 22px; accent-color: var(--gold); }
+        .btn { width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; margin-top: 10px; transition: 0.3s; }
+        .btn-gold { background: var(--gold); color: var(--primary); }
+        .btn-navy { background: var(--primary); color: white; }
         
-        #timer { font-size: 40px; font-weight: bold; color: var(--gold); margin: 20px 0; }
-        .status-bar { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-weight: bold; }
+        #map { width: 100%; height: 350px; border-radius: 20px; margin-top: 15px; border: 2px solid #ddd; }
+        .status-tag { padding: 10px; border-radius: 10px; font-weight: bold; margin-bottom: 15px; }
+        
+        #workMode { display:none; }
+        .info-box { text-align: left; background: #f9f9f9; padding: 15px; border-radius: 15px; margin-top: 10px; border-left: 5px solid var(--gold); }
     </style>
 </head>
 <body>
 
-<div id="loginScreen" class="card" style="margin-top: 20vh;">
-    <h2 style="color: var(--gold);">MASTER MAID</h2>
-    <p>ระบุรหัสผ่านพนักงาน 10 ท่าน</p>
-    <input type="password" id="passCode" class="login-input" placeholder="รหัสผ่าน 4 หลัก" maxlength="4">
-    <button class="btn" style="background: var(--gold); color: var(--dark);" onclick="handleLogin()">เข้าสู่ระบบ</button>
+<div id="loginScreen" class="card">
+    <h2 style="color: var(--primary);">MASTER MAID</h2>
+    <p>ระบุรหัสพนักงานของคุณ</p>
+    <input type="password" id="passCode" class="input-box" placeholder="รหัส 4 หลัก" maxlength="4">
+    <button class="btn btn-gold" onclick="handleLogin()">เข้าสู่ระบบ</button>
 </div>
 
-<div id="mainDashboard" style="display:none;">
-    <div class="card">
-        <button class="logout-btn" onclick="handleLogout()">Logout 🚪</button>
-        <h3 id="welcomeMsg" style="color: var(--gold); margin-top: 25px;"></h3>
-        
-        <div id="statusIndicator" class="status-bar" style="background: #333; color: #888;">🔴 ปิดระบบ (Offline)</div>
-        <button id="toggleBtn" class="btn" style="background: #555; color: white;" onclick="toggleStatus()">คลิกเพื่อเปิดระบบ (Online)</button>
-        
-        <hr style="border: 0.1px solid #444; margin: 20px 0;">
-        <div id="personalArea"></div> <div id="publicArea"></div>
-    </div>
+<div id="mainDashboard" style="display:none;" class="card">
+    <h3 id="welcomeMsg" style="color: var(--primary);"></h3>
+    <div id="statusIndicator" class="status-tag" style="background: #eee; color: #888;">🔴 ปิดระบบ (Offline)</div>
+    <button id="toggleBtn" class="btn btn-navy" onclick="toggleOnline()">คลิกเพื่อเปิดระบบ (Online)</button>
+    
+    <div id="jobArea" style="margin-top: 20px;">
+        </div>
 </div>
 
-<div id="workMode" style="display:none;" class="card">
-    <div id="timer">00:00:00</div>
-    <h4 id="workCust" style="color: var(--gold);"></h4>
-    <div class="checklist-area">
-        <label class="check-item"><input type="checkbox" class="task"> กวาดและถูพื้นทุกห้อง</label>
-        <label class="check-item"><input type="checkbox" class="task"> เช็ดกระจกและระเบียง</label>
-        <label class="check-item"><input type="checkbox" class="task"> ล้างห้องน้ำและสุขภัณฑ์</label>
-        <label class="check-item"><input type="checkbox" class="task"> เก็บขยะทิ้งทั้งหมด</label>
+<div id="workMode" class="card">
+    <div id="statusIndicatorWork" class="status-tag" style="background: rgba(212,175,55,0.2); color: var(--gold);">🚕 กำลังเดินทางไปหาลูกค้า</div>
+    <div id="map"></div>
+    
+    <div class="info-box">
+        <b>📍 ข้อมูลลูกค้า:</b><br>
+        <span id="custDetail">กำลังโหลด...</span>
     </div>
-    <button id="arriveBtn" class="btn" style="background: var(--gold); color: var(--dark);" onclick="startWorkTimer()">📍 ถึงที่หมาย / เริ่มงาน</button>
-    <button id="finishBtn" class="btn" style="background: var(--red); color: white; display: none;" onclick="finishJob()">🏁 จบงานและส่งรายงาน</button>
+
+    <button id="arriveBtn" class="btn btn-gold" onclick="startWork()">📍 ถึงที่หมาย / เริ่มงาน</button>
+    <button id="finishBtn" class="btn btn-navy" style="display:none;" onclick="finishJob()">🏁 จบงานและส่งรายงาน</button>
 </div>
 
 <script>
-    // --- ตั้งค่า Firebase ---
+    // --- 1. Firebase Config ---
     const firebaseConfig = { 
         apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
-        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app", 
-        projectId: "mastermaid-ubon" 
+        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app" 
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    const webhook = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23";
 
-    // รายชื่อแม่บ้าน 10 ท่านและรหัสผ่าน
     const staffDB = {
         "1111": "พี่เอ (MM01)", "2222": "พี่บี (MM02)", "3333": "พี่ซี (MM03)", "4444": "พี่ดี (MM04)",
         "5555": "พี่อี (MM05)", "6666": "พี่เอฟ (MM06)", "7777": "พี่กิ๊ก (MM07)", "8888": "พี่แก้ว (MM08)",
         "9999": "พี่เกด (MM09)", "1010": "พี่ก้อย (MM10)"
     };
 
-    let selectedMaid = "", isOnline = false, activeJob = null, timerInt, seconds = 0;
+    let selectedMaid = "", isOnline = false, map, maidMarker, directionsService, directionsRenderer;
 
-    window.onload = function() {
-        const savedMaid = localStorage.getItem("mastermaid_staff");
-        const savedStatus = localStorage.getItem("mastermaid_online");
-        if (savedMaid) {
-            selectedMaid = savedMaid;
-            if (savedStatus === "true") isOnline = true;
-            showDashboard();
-        }
-    };
-
+    // --- 2. ระบบ Login ---
     function handleLogin() {
         const code = document.getElementById('passCode').value;
         if (staffDB[code]) {
             selectedMaid = staffDB[code];
-            localStorage.setItem("mastermaid_staff", selectedMaid);
-            showDashboard();
-        } else { alert("❌ รหัสผิด!"); }
+            document.getElementById('loginScreen').style.display = "none";
+            document.getElementById('mainDashboard').style.display = "block";
+            document.getElementById('welcomeMsg').innerText = "สวัสดี, " + selectedMaid;
+            initMap();
+            listenForJobs();
+        } else { alert("รหัสผ่านไม่ถูกต้อง"); }
     }
 
-    function showDashboard() {
-        document.getElementById('loginScreen').style.display = "none";
-        document.getElementById('mainDashboard').style.display = "block";
-        document.getElementById('welcomeMsg').innerText = "สวัสดี, " + selectedMaid;
-        updateStatusUI(isOnline);
-        loadPublicJobs();
-        listenForCommands();
+    // --- 3. ระบบแผนที่ & นำทาง ---
+    function initMap() {
+        const ubon = { lat: 15.2294, lng: 104.8564 };
+        directionsService = new google.maps.DirectionService();
+        directionsRenderer = new google.maps.DirectionsRenderer({
+            suppressMarkers: true,
+            polylineOptions: { strokeColor: "#0A1931", strokeWeight: 6 } // เส้นทางน้ำเงินเข้ม
+        });
+
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: ubon, zoom: 15, mapTypeControl: false
+        });
+        directionsRenderer.setMap(map);
+
+        // สร้างหมุดแม่บ้าน (น้ำเงินเข้ม + ชื่อบนหัว)
+        maidMarker = new google.maps.Marker({
+            position: ubon,
+            map: map,
+            label: { text: selectedMaid, color: "#0A1931", fontWeight: "bold", fontSize: "14px" },
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                fillColor: "#0A1931", fillOpacity: 1, strokeColor: "#fff", strokeWeight: 2, scale: 10
+            }
+        });
+
+        // ติดตามตำแหน่ง Real-time
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition((pos) => {
+                const myPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                maidMarker.setPosition(myPos);
+                // ส่งพิกัดไป Firebase ให้หน้า map.html เห็น
+                db.ref('maids_location/' + selectedMaid).set({
+                    name: selectedMaid, lat: myPos.lat, lng: myPos.lng, lastUpdate: Date.now()
+                });
+            });
+        }
     }
 
-    function toggleStatus() {
+    // --- 4. ระบบรับงาน & ลากเส้นทาง ---
+    function listenForJobs() {
+        // ดึงงานกองกลางและงานด่วน
+        db.ref('personal_jobs/' + selectedMaid).on('value', snap => {
+            const data = snap.val();
+            if(data && data.status === "waiting") {
+                document.getElementById('jobArea').innerHTML = `
+                    <div class="info-box">
+                        <b>📢 มีงานด่วนเข้า!</b><br>ลูกค้า: ${data.customer}
+                        <button class="btn btn-gold" onclick="acceptJob('${data.customer}', '${data.location_url}')">รับงานนี้</button>
+                    </div>`;
+            }
+        });
+    }
+
+    function acceptJob(custName, locUrl) {
+        document.getElementById('mainDashboard').style.display = "none";
+        document.getElementById('workMode').style.display = "block";
+        document.getElementById('custDetail').innerText = custName;
+
+        // แยก Lat, Lng จาก URL เพื่อลากเส้น
+        const coords = locUrl.match(/0{([\d.]+)},([\d.]+)/);
+        if (coords) {
+            const dest = { lat: parseFloat(coords[1]), lng: parseFloat(coords[2]) };
+            drawRoute(dest);
+        }
+        
+        // อัปเดตสถานะไปที่หน้า Admin
+        db.ref('maid_status/' + selectedMaid).set({
+            status: "working", job_title: custName, startTime: Date.now()
+        });
+    }
+
+    function drawRoute(dest) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const start = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                directionsService.route({
+                    origin: start, destination: dest, travelMode: 'DRIVING'
+                }, (res, status) => {
+                    if (status === 'OK') {
+                        directionsRenderer.setDirections(res);
+                        // ปักหมุดบ้านลูกค้า (สีทอง)
+                        new google.maps.Marker({
+                            position: dest, map: map, icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                        });
+                    }
+                });
+            });
+        }
+    }
+
+    function toggleOnline() {
         isOnline = !isOnline;
-        localStorage.setItem("mastermaid_online", isOnline);
-        updateStatusUI(isOnline);
+        const btn = document.getElementById('toggleBtn');
+        const tag = document.getElementById('statusIndicator');
+        btn.innerText = isOnline ? "ปิดระบบ (Go Offline)" : "เปิดระบบ (Go Online)";
+        tag.innerText = isOnline ? "🟢 พร้อมรับงาน (Online)" : "🔴 ปิดระบบ (Offline)";
+        tag.style.background = isOnline ? "rgba(40,167,69,0.1)" : "#eee";
+        tag.style.color = isOnline ? "green" : "#888";
         db.ref('maid_status/' + selectedMaid).set(isOnline ? "available" : "offline");
     }
 
-    function updateStatusUI(online) {
-        const btn = document.getElementById('toggleBtn');
-        const indicator = document.getElementById('statusIndicator');
-        btn.innerText = online ? "🟢 ออนไลน์ (พร้อมรับงาน)" : "คลิกเพื่อเปิดระบบ (Online)";
-        btn.style.background = online ? "var(--green)" : "#555";
-        indicator.innerText = online ? "🟢 พร้อมรับงาน (Online)" : "🔴 ปิดระบบ (Offline)";
-        indicator.style.background = online ? "rgba(40,167,69,0.2)" : "#333";
-        indicator.style.color = online ? "var(--green)" : "#888";
-    }
-
-    function listenForCommands() {
-        db.ref('personal_jobs/' + selectedMaid).on('value', snap => {
-            const data = snap.val();
-            if (!data) return;
-
-            // 1. คำสั่งจาก CEO: สั่งเปิดระบบ
-            if (data.action === "force_online") {
-                db.ref('personal_jobs/' + selectedMaid).remove();
-                isOnline = true;
-                localStorage.setItem("mastermaid_online", "true");
-                updateStatusUI(true);
-                db.ref('maid_status/' + selectedMaid).set("available");
-                alert("CEO ได้สั่งเปิดระบบ Online ให้คุณแล้ว");
-            }
-
-            // 2. คำสั่งจาก CEO: สั่งปิดระบบ
-            if (data.action === "force_reload") {
-                db.ref('personal_jobs/' + selectedMaid).remove();
-                alert("ระบบถูกสั่งปิดโดย CEO");
-                handleLogout();
-            }
-
-            // 3. งานด่วนเด้งเข้าเจาะจงคน
-            if (data.status === "waiting") {
-                document.getElementById('personalArea').innerHTML = `
-                <div class="job-box personal-job-card">
-                    <h4 style="margin:0; color:var(--gold);">📢 งานด่วนเฉพาะคุณ!</h4>
-                    <p>ลูกค้า: <b>${data.customer}</b></p>
-                    <button class="btn" style="background:var(--gold); color:var(--dark);" onclick="acceptJob('${selectedMaid}', 'personal')">✅ รับงานด่วน</button>
-                </div>`;
-            } else { document.getElementById('personalArea').innerHTML = ""; }
-        });
-    }
-
-    function loadPublicJobs() {
-        db.ref('available_jobs').on('value', snap => {
-            const jobs = snap.val();
-            const area = document.getElementById('publicArea');
-            area.innerHTML = "<h4>📋 งานกองกลาง:</h4>";
-            for (let id in jobs) if (jobs[id].status === "available") {
-                area.innerHTML += `<div class="job-box" style="opacity: ${isOnline ? 1 : 0.4}; pointer-events: ${isOnline ? 'auto' : 'none'};">
-                    <b>👤 ${jobs[id].title}</b><br><small>💰 ${jobs[id].price}.-</small>
-                    <button class="btn" style="background:var(--gold); margin-top:10px; padding:10px;" onclick="acceptJob('${id}', 'public')">รับงาน</button>
-                </div>`;
-            }
-        });
-    }
-
-    function acceptJob(id, type) {
-        const path = type === 'personal' ? 'personal_jobs/' + id : 'available_jobs/' + id;
-        db.ref(path).once('value', snap => {
-            const data = snap.val();
-            if(!data) return;
-            
-            activeJob = type === 'personal' ? { title: data.customer, price: "ตามตกลง" } : data;
-            db.ref(path).remove();
-
-            // ส่งข้อมูล "ชื่อลูกค้า" ไปแสดงในหน้า Admin ทันที
-            db.ref('maid_status/' + selectedMaid).set({
-                status: "working",
-                job_title: activeJob.title,
-                startTime: Date.now()
-            });
-
-            document.getElementById('mainDashboard').style.display = "none";
-            document.getElementById('workMode').style.display = "block";
-            document.getElementById('workCust').innerText = "ลูกค้า: " + activeJob.title;
-        });
-    }
-
-    function startWorkTimer() {
+    function startWork() {
         document.getElementById('arriveBtn').style.display = "none";
         document.getElementById('finishBtn').style.display = "block";
-        timerInt = setInterval(() => {
-            seconds++;
-            let h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-            let m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-            let s = (seconds % 60).toString().padStart(2, '0');
-            document.getElementById('timer').innerText = `${h}:${m}:${s}`;
-        }, 1000);
+        document.getElementById('statusIndicatorWork').innerText = "🧹 กำลังทำความสะอาด...";
     }
 
     function finishJob() {
-        const done = Array.from(document.querySelectorAll('.task')).every(t => t.checked);
-        if(!done) return alert("❌ ติ๊กเช็คลิสต์ให้ครบทุกช่อง!");
-        
-        const report = { 
-            maid_name: selectedMaid, 
-            customer: activeJob.title, 
-            price: activeJob.price, 
-            duration: document.getElementById('timer').innerText, 
-            finished_at: new Date().toLocaleTimeString('th-TH') 
-        };
-
-        fetch(webhook, { method: 'POST', body: JSON.stringify(report) }).then(() => {
-            alert("🏁 จบงานสำเร็จ!");
-            // เคลียร์สถานะงานออกเมื่อจบงาน
-            db.ref('maid_status/' + selectedMaid).set("available");
-            location.reload();
-        });
-    }
-
-    function handleLogout() {
-        db.ref('maid_status/' + selectedMaid).set("offline");
-        localStorage.clear();
+        alert("ส่งงานสำเร็จ!");
+        db.ref('maid_status/' + selectedMaid).set("available");
         location.reload();
     }
 </script>
