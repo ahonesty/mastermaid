@@ -3,49 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEO Panel | Master Maid</title>
+    <title>Master Maid | CEO Dashboard</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #D4AF37; --dark: #0A1931; --navy: #1A2F4F; --green: #28a745; --red: #dc3545; }
-        body { font-family: 'Sarabun', sans-serif; background: var(--dark); color: white; padding: 20px; margin: 0; }
-        .container { max-width: 900px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        :root { --gold: #D4AF37; --dark: #0A1931; --navy: #1A2F4F; --green: #28a745; --blue: #3498db; --gray: #888; }
+        body { font-family: 'Sarabun', sans-serif; background: var(--dark); color: white; margin: 0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
         
-        .card { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; border: 1px solid var(--gold); backdrop-filter: blur(10px); }
-        h2, h3 { color: var(--gold); margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .grid-container { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1200px; margin: auto; }
+        .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid var(--gold); backdrop-filter: blur(10px); }
         
-        /* สไตล์ฟอร์มส่งงาน */
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid var(--gold); background: var(--navy); color: white; box-sizing: border-box; font-size: 16px; }
+        /* สไตล์ฟอร์ม */
+        h3 { color: var(--gold); margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid var(--gold); background: var(--navy); color: white; font-size: 16px; box-sizing: border-box; }
         .btn-send { width: 100%; background: var(--gold); color: var(--dark); padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.3s; }
-        .btn-send:hover { background: #f1c40f; transform: scale(1.02); }
+        .btn-send:hover { background: #f1c40f; transform: translateY(-2px); }
 
-        /* สไตล์สถานะแม่บ้าน */
-        .staff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .staff-item { background: var(--navy); padding: 12px; border-radius: 12px; border: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
-        .dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; }
-        
+        /* สไตล์ตารางสถานะแม่บ้าน */
+        .staff-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .staff-card { background: var(--navy); padding: 15px; border-radius: 12px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; }
+
         /* รายการงาน */
-        .job-list { margin-top: 20px; max-height: 400px; overflow-y: auto; }
-        .job-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid var(--gold); font-size: 14px; }
-        
-        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+        .job-item { background: rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--gold); }
+        .price-tag { background: var(--green); color: white; padding: 2px 8px; border-radius: 5px; font-size: 12px; float: right; }
+
+        @media (max-width: 800px) { .grid-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <h1 style="text-align:center; color: var(--gold); letter-spacing: 2px;">👑 MASTER MAID CEO CONTROL</h1>
+    <div class="header">
+        <h1>👑 Master Maid CEO Control</h1>
+    </div>
 
-    <div class="container">
+    <div class="grid-container">
         
         <div class="card">
-            <h2>📢 ส่งงานด่วน (เจาะจงตัว)</h2>
-            <p style="font-size: 13px; color: #aaa;">งานจะเด้งไปที่หน้าจอแม่บ้านทันทีพร้อมเสียงเตือน</p>
-            
-            <label>เลือกแม่บ้าน:</label>
-            <select id="assignTo">
+            <h3>🚀 จ่ายงานด่วน (สะกิดรายคน)</h3>
+            <label>เลือกแม่บ้านที่ต้องการส่งงานให้:</label>
+            <select id="targetMaid">
                 <option value="พี่เอ (MM01)">พี่เอ (MM01)</option>
                 <option value="พี่บี (MM02)">พี่บี (MM02)</option>
                 <option value="พี่ซี (MM03)">พี่ซี (MM03)</option>
@@ -54,113 +55,5 @@
                 <option value="พี่เอฟ (MM06)">พี่เอฟ (MM06)</option>
             </select>
             
-            <label>ชื่อลูกค้า / รายละเอียดงาน:</label>
-            <input type="text" id="custName" placeholder="เช่น คุณสมชาย (หมู่บ้านศุภาลัย)">
-            
-            <button class="btn-send" onclick="sendPersonalJob()">🚀 ส่งงานให้แม่บ้านเดี๋ยวนี้</button>
-        </div>
-
-        <div class="card">
-            <h2>👷 สถานะทีมแม่บ้าน</h2>
-            <div id="staffStatusArea" class="staff-grid">
-                <p>กำลังโหลดข้อมูลพนักงาน...</p>
-            </div>
-        </div>
-
-        <div class="card" style="grid-column: span 2;">
-            <h3>📋 งานที่รอกดรับ (Public Jobs)</h3>
-            <div id="publicJobArea" class="job-list">
-                <p style="color: #666;">ไม่มีงานค้างในขณะนี้</p>
-            </div>
-        </div>
-
-    </div>
-
-<script>
-    // --- 1. ตั้งค่า Firebase ---
-    const firebaseConfig = { 
-        apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
-        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app", 
-        projectId: "mastermaid-ubon" 
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // --- 2. ฟังก์ชันส่งงานด่วน ---
-    function sendPersonalJob() {
-        const maid = document.getElementById('assignTo').value;
-        const customer = document.getElementById('custName').value.trim();
-        
-        if(!customer) {
-            alert("❌ กรุณาระบุชื่อลูกค้าหรือรายละเอียดงานก่อนส่งครับ");
-            return;
-        }
-
-        db.ref('personal_jobs/' + maid).set({
-            customer: customer,
-            status: "waiting",
-            timestamp: Date.now()
-        }).then(() => {
-            alert("✅ ส่งงานด่วนให้ " + maid + " เรียบร้อย! งานจะไปเด้งกะพริบบนหน้าจอเขาครับ");
-            document.getElementById('custName').value = "";
-        });
-    }
-
-    // --- 3. ดักฟังสถานะพนักงาน (Real-time) ---
-    const staffList = ["พี่เอ (MM01)", "พี่บี (MM02)", "พี่ซี (MM03)", "พี่ดี (MM04)", "พี่อี (MM05)", "พี่เอฟ (MM06)"];
-    
-    db.ref('maid_status').on('value', snap => {
-        const statuses = snap.val() || {};
-        const area = document.getElementById('staffStatusArea');
-        area.innerHTML = "";
-        
-        staffList.forEach(name => {
-            const status = statuses[name] || "offline";
-            let color = "#888"; // offline
-            let text = "Offline";
-
-            if(status === "available") { color = "var(--green)"; text = "ว่าง (Online)"; }
-            else if(status === "working") { color = "var(--gold)"; text = "กำลังทำงาน"; }
-            else if(status === "traveling") { color = "#3498db"; text = "กำลังเดินทาง"; }
-
-            area.innerHTML += `
-                <div class="staff-item">
-                    <div style="text-align:left;">
-                        <b style="font-size:14px;">${name}</b><br>
-                        <small style="color:${color}">${text}</small>
-                    </div>
-                    <span class="dot" style="background-color:${color}"></span>
-                </div>
-            `;
-        });
-    });
-
-    // --- 4. ดักฟังงานกองกลาง ---
-    db.ref('available_jobs').on('value', snap => {
-        const jobs = snap.val();
-        const area = document.getElementById('publicJobArea');
-        area.innerHTML = "";
-        
-        if(!jobs) {
-            area.innerHTML = "<p style='color: #666;'>📭 ไม่มีงานค้างในระบบ</p>";
-            return;
-        }
-
-        for (let id in jobs) {
-            if(jobs[id].status === "available") {
-                area.innerHTML += `
-                    <div class="job-item">
-                        <span style="float:right; color:var(--gold); font-weight:bold;">${jobs[id].price} บาท</span>
-                        <b>👤 ลูกค้า: ${jobs[id].title}</b><br>
-                        🏠 ${jobs[id].property_type} (${jobs[id].room_details})<br>
-                        📅 วันที่: ${jobs[id].booking_date} | ⏰ เวลา: ${jobs[id].booking_time} - ${jobs[id].end_time_plan}<br>
-                        📍 ${jobs[id].detail}
-                    </div>
-                `;
-            }
-        }
-    });
-</script>
-
-</body>
-</html>
+            <label>รายละเอียดลูกค้า/งาน:</label>
+            <input type="text" id="jobDesc" placeholder="เช่น คุณเอ (คอนโด A
