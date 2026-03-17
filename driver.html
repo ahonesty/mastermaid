@@ -14,19 +14,19 @@
         body { font-family: 'Sarabun', sans-serif; background: var(--dark); color: white; text-align: center; padding: 15px; margin: 0; }
         .card { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 25px; border: 1px solid var(--gold); max-width: 420px; margin: auto; backdrop-filter: blur(10px); position: relative; }
         
-        .logout-btn { position: absolute; top: 15px; right: 15px; background: rgba(220, 53, 69, 0.2); color: #ff6b6b; border: 1px solid var(--red); padding: 5px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+        /* สไตล์ปุ่ม Logout */
+        .logout-btn { position: absolute; top: 15px; right: 15px; background: rgba(220, 53, 69, 0.2); color: #ff6b6b; border: 1px solid var(--red); padding: 5px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.3s; }
         
-        /* Animation สำหรับงานด่วนที่เด้งเข้ามา */
+        /* Animation งานด่วนกะพริบ */
         @keyframes pulse-gold {
             0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
             70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
             100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
         }
-        .personal-job-card { border: 3px solid var(--gold); background: rgba(212, 175, 55, 0.2) !important; animation: pulse-gold 2s infinite; }
+        .personal-job-card { border: 3px solid var(--gold); background: rgba(212, 175, 55, 0.2) !important; animation: pulse-gold 2s infinite; margin-bottom: 20px; }
 
-        #loginScreen { display: flex; flex-direction: column; justify-content: center; min-height: 80vh; }
+        /* สไตล์ทั่วไป */
         .login-input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--gold); background: var(--navy); color: white; font-size: 20px; text-align: center; box-sizing: border-box; }
-        
         .btn { width: 100%; padding: 16px; border-radius: 12px; font-weight: bold; margin: 10px 0; border: none; cursor: pointer; font-size: 16px; transition: 0.3s; }
         .job-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid var(--gold); margin-top: 15px; text-align: left; }
         .checklist-area { background: var(--navy); padding: 15px; border-radius: 12px; margin-top: 15px; text-align: left; }
@@ -34,12 +34,12 @@
         .check-item input { width: 22px; height: 22px; accent-color: var(--gold); }
         
         #timer { font-size: 40px; font-weight: bold; color: var(--gold); margin: 20px 0; }
-        .status-bar { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-weight: bold; }
+        .status-bar { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-weight: bold; transition: 0.3s; }
     </style>
 </head>
 <body>
 
-<div id="loginScreen" class="card">
+<div id="loginScreen" class="card" style="margin-top: 20vh;">
     <h2 style="color: var(--gold);">MASTER MAID</h2>
     <p>ใส่รหัสผ่านเพื่อเข้าใช้งาน</p>
     <input type="password" id="passCode" class="login-input" placeholder="รหัส 4 หลัก" maxlength="4">
@@ -56,15 +56,12 @@
         
         <hr style="border: 0.1px solid #444; margin: 20px 0;">
 
-        <div id="personalArea"></div>
-
-        <div id="publicArea"></div>
-    </div>
+        <div id="personalArea"></div> <div id="publicArea"></div>   </div>
 </div>
 
 <div id="workMode" style="display:none;" class="card">
     <div id="timer">00:00:00</div>
-    <h4 id="activeCustomer" style="color: var(--gold);"></h4>
+    <h4 id="workCust" style="color: var(--gold);"></h4>
     
     <div class="checklist-area">
         <label class="check-item"><input type="checkbox" class="task"> กวาดและถูพื้นทุกห้อง</label>
@@ -94,14 +91,16 @@
 
     let selectedMaid = "";
     let isOnline = false;
-    let currentJob = null;
+    let activeJob = null;
     let timerInt, seconds = 0;
 
-    // ตรวจสอบการรีเฟรชหน้าจอ
+    // --- ตรวจสอบสถานะและ Session เมื่อโหลดหน้า ---
     window.onload = function() {
-        const saved = localStorage.getItem("maid_session");
-        if (saved) {
-            selectedMaid = saved;
+        const savedMaid = localStorage.getItem("mastermaid_staff");
+        const savedStatus = localStorage.getItem("mastermaid_online");
+        if (savedMaid) {
+            selectedMaid = savedMaid;
+            if (savedStatus === "true") isOnline = true;
             showDashboard();
         }
     };
@@ -110,7 +109,7 @@
         const code = document.getElementById('passCode').value;
         if (staffDB[code]) {
             selectedMaid = staffDB[code];
-            localStorage.setItem("maid_session", selectedMaid);
+            localStorage.setItem("mastermaid_staff", selectedMaid);
             showDashboard();
         } else { alert("❌ รหัสผิด!"); }
     }
@@ -119,46 +118,46 @@
         document.getElementById('loginScreen').style.display = "none";
         document.getElementById('mainDashboard').style.display = "block";
         document.getElementById('welcomeMsg').innerText = "สวัสดี, " + selectedMaid;
+        updateStatusUI(isOnline);
         loadPublicJobs();
-        listenForPersonalJob(); // เริ่มดักฟังงานด่วนเด้งเข้า
+        listenForPersonalJob();
     }
 
     function handleLogout() {
         if (confirm("Logout?")) {
-            if (isOnline) toggleStatus();
-            localStorage.removeItem("maid_session");
+            db.ref('maid_status/' + selectedMaid).set("offline");
+            localStorage.clear();
             location.reload();
         }
     }
 
     function toggleStatus() {
         isOnline = !isOnline;
-        const btn = document.getElementById('toggleBtn');
-        const indicator = document.getElementById('statusIndicator');
-        
-        btn.innerText = isOnline ? "🟢 ออนไลน์ (พร้อมรับงาน)" : "คลิกเพื่อเปิดระบบ (Online)";
-        btn.style.background = isOnline ? "var(--green)" : "#555";
-        indicator.innerText = isOnline ? "🟢 พร้อมรับงาน (Online)" : "🔴 ปิดระบบ (Offline)";
-        indicator.style.background = isOnline ? "rgba(40,167,69,0.2)" : "#333";
-        indicator.style.color = isOnline ? "var(--green)" : "#888";
-        
+        localStorage.setItem("mastermaid_online", isOnline);
+        updateStatusUI(isOnline);
         db.ref('maid_status/' + selectedMaid).set(isOnline ? "available" : "offline");
     }
 
-    // --- ระบบงานด่วนเด้งเข้าหาตัว ---
+    function updateStatusUI(online) {
+        const btn = document.getElementById('toggleBtn');
+        const indicator = document.getElementById('statusIndicator');
+        btn.innerText = online ? "🟢 ออนไลน์ (พร้อมรับงาน)" : "คลิกเพื่อเปิดระบบ (Online)";
+        btn.style.background = online ? "var(--green)" : "#555";
+        indicator.innerText = online ? "🟢 พร้อมรับงาน (Online)" : "🔴 ปิดระบบ (Offline)";
+        indicator.style.background = online ? "rgba(40,167,69,0.2)" : "#333";
+        indicator.style.color = online ? "var(--green)" : "#888";
+    }
+
     function listenForPersonalJob() {
         db.ref('personal_jobs/' + selectedMaid).on('value', snap => {
             const job = snap.val();
             const area = document.getElementById('personalArea');
             if (job && job.status === "waiting") {
-                area.innerHTML = `
-                <div class="job-box personal-job-card">
+                area.innerHTML = `<div class="job-box personal-job-card">
                     <h4 style="margin:0; color:var(--gold);">📢 งานด่วนเฉพาะคุณ!</h4>
                     <p>ลูกค้า: <b>${job.customer}</b></p>
-                    <button class="btn" style="background:var(--gold); color:var(--dark);" onclick="acceptPersonal()">✅ รับงานด่วน</button>
+                    <button class="btn" style="background:var(--gold); color:var(--dark);" onclick="acceptJob('${selectedMaid}', 'personal')">✅ รับงานด่วน</button>
                 </div>`;
-                // เล่นเสียงแจ้งเตือนสั้นๆ
-                try { new AudioContext().createOscillator().start(); } catch(e){}
             } else { area.innerHTML = ""; }
         });
     }
@@ -168,42 +167,33 @@
             const jobs = snap.val();
             const area = document.getElementById('publicArea');
             area.innerHTML = "<h4>📋 งานกองกลาง:</h4>";
-            if(!jobs) { area.innerHTML += "<p style='color:#666;'>ไม่มีงานค้าง</p>"; return; }
             for (let id in jobs) {
                 if (jobs[id].status === "available") {
-                    area.innerHTML += `
-                    <div class="job-box" style="opacity: ${isOnline ? 1 : 0.4}; pointer-events: ${isOnline ? 'auto' : 'none'};">
+                    area.innerHTML += `<div class="job-box" style="opacity: ${isOnline ? 1 : 0.4}; pointer-events: ${isOnline ? 'auto' : 'none'};">
                         <b>👤 ${jobs[id].title}</b><br>
-                        <small>🏠 ${jobs[id].property_type} | 💰 ${jobs[id].price}.-</small>
-                        <button class="btn" style="background:var(--gold); margin-top:10px; padding:10px; font-size:14px;" onclick="acceptPublic('${id}')">รับงานกองกลาง</button>
+                        <small>⏰ ${jobs[id].booking_time} | 💰 ${jobs[id].price}.-</small>
+                        <button class="btn" style="background:var(--gold); margin-top:10px; padding:10px; font-size:14px;" onclick="acceptJob('${id}', 'public')">รับงานกองกลาง</button>
                     </div>`;
                 }
             }
         });
     }
 
-    function acceptPersonal() {
-        db.ref('personal_jobs/' + selectedMaid).once('value', snap => {
+    function acceptJob(id, type) {
+        if (!isOnline && type === 'public') return alert("กรุณา Online ก่อนรับงาน!");
+        const path = type === 'personal' ? 'personal_jobs/' + id : 'available_jobs/' + id;
+        db.ref(path).once('value', snap => {
             const data = snap.val();
-            currentJob = { title: data.customer, price: "ตามตกลง", room_details: "-" };
-            db.ref('personal_jobs/' + selectedMaid).remove();
-            startWorkMode();
+            activeJob = type === 'personal' ? { title: data.customer, price: "ตามตกลง" } : data;
+            db.ref(path).remove();
+            startWorkLayout();
         });
     }
 
-    function acceptPublic(id) {
-        if (!isOnline) return alert("โปรด Online ก่อนรับงาน!");
-        db.ref('available_jobs/' + id).once('value', snap => {
-            currentJob = snap.val();
-            db.ref('available_jobs/' + id).remove();
-            startWorkMode();
-        });
-    }
-
-    function startWorkMode() {
+    function startWorkLayout() {
         document.getElementById('mainDashboard').style.display = "none";
         document.getElementById('workMode').style.display = "block";
-        document.getElementById('activeCustomer').innerText = "ลูกค้า: " + currentJob.title;
+        document.getElementById('workCust').innerText = "ลูกค้า: " + activeJob.title;
         db.ref('maid_status/' + selectedMaid).set("working");
     }
 
@@ -220,18 +210,9 @@
     }
 
     function finishJob() {
-        const tasks = document.querySelectorAll('.task');
-        let done = true; tasks.forEach(t => { if(!t.checked) done = false; });
-        if(!done) return alert("❌ โปรดติ๊กเช็คลิสต์ให้ครบ!");
-        
-        const report = {
-            maid_name: selectedMaid,
-            customer: currentJob.title,
-            price: currentJob.price,
-            duration: document.getElementById('timer').innerText,
-            finished_at: new Date().toLocaleTimeString('th-TH')
-        };
-
+        const done = Array.from(document.querySelectorAll('.task')).every(t => t.checked);
+        if(!done) return alert("❌ ติ๊กเช็คลิสต์ให้ครบทุกช่อง!");
+        const report = { maid_name: selectedMaid, customer: activeJob.title, price: activeJob.price, duration: document.getElementById('timer').innerText, finished_at: new Date().toLocaleTimeString('th-TH') };
         fetch(webhook, { method: 'POST', body: JSON.stringify(report) }).then(() => {
             alert("🏁 จบงานสำเร็จ!");
             db.ref('maid_status/' + selectedMaid).set("available");
@@ -239,6 +220,5 @@
         });
     }
 </script>
-
 </body>
 </html>
