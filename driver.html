@@ -14,13 +14,10 @@
         :root { --primary: #0A1931; --gold: #D4AF37; --bg: #F4F7F6; }
         body { font-family: 'Sarabun', sans-serif; background: var(--bg); margin: 0; padding: 0; text-align: center; }
         .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 450px; margin: 20px auto; border-top: 6px solid var(--gold); position: relative; }
-        
         .logout-btn { position: absolute; top: 15px; right: 15px; background: none; border: 1px solid #ff4d4d; color: #ff4d4d; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; }
-        .input-box { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1.5px solid #eee; font-size: 18px; box-sizing: border-box; text-align: center; }
         .btn { width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; margin-top: 10px; transition: 0.3s; }
         .btn-gold { background: var(--gold); color: var(--primary); }
         .btn-navy { background: var(--primary); color: white; }
-        
         #map { width: 100%; height: 350px; border-radius: 20px; margin-top: 15px; border: 2px solid #ddd; }
         .status-tag { padding: 10px; border-radius: 10px; font-weight: bold; margin-bottom: 15px; }
         .info-box { text-align: left; background: #f9f9f9; padding: 15px; border-radius: 15px; margin-top: 10px; border-left: 5px solid var(--gold); }
@@ -31,7 +28,7 @@
 <div id="loginScreen" class="card" style="margin-top: 15vh;">
     <h2 style="color: var(--primary);">MASTER MAID</h2>
     <p>ระบุรหัสพนักงานของคุณ</p>
-    <input type="password" id="passCode" class="input-box" placeholder="รหัส 4 หลัก" maxlength="4">
+    <input type="password" id="passCode" style="width:100%; padding:15px; border-radius:12px; border:1px solid #eee; text-align:center; font-size:20px;" placeholder="รหัส 4 หลัก" maxlength="4">
     <button class="btn btn-gold" onclick="handleLogin()">เข้าสู่ระบบ</button>
 </div>
 
@@ -40,7 +37,6 @@
     <h3 id="welcomeMsg" style="color: var(--primary); margin-top: 30px;"></h3>
     <div id="statusIndicator" class="status-tag">🔴 ปิดระบบ (Offline)</div>
     <button id="toggleBtn" class="btn" onclick="toggleOnline()">เปิดระบบ (Online)</button>
-    
     <div id="jobArea" style="margin-top: 20px;"></div>
 </div>
 
@@ -63,11 +59,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const staffDB = {
-        "1111": "พี่เอ (MM01)", "2222": "พี่บี (MM02)", "3333": "พี่ซี (MM03)", "4444": "พี่ดี (MM04)",
-        "5555": "พี่อี (MM05)", "6666": "พี่เอฟ (MM06)", "7777": "พี่กิ๊ก (MM07)", "8888": "พี่แก้ว (MM08)",
-        "9999": "พี่เกด (MM09)", "1010": "พี่ก้อย (MM10)"
-    };
+    const staffDB = { "1111": "พี่เอ (MM01)", "2222": "พี่บี (MM02)", "3333": "พี่ซี (MM03)", "4444": "พี่ดี (MM04)", "5555": "พี่อี (MM05)", "6666": "พี่เอฟ (MM06)", "7777": "พี่กิ๊ก (MM07)", "8888": "พี่แก้ว (MM08)", "9999": "พี่เกด (MM09)", "1010": "พี่ก้อย (MM10)" };
 
     let selectedMaid = localStorage.getItem('maid_name') || "";
     let isOnline = localStorage.getItem('maid_isOnline') === 'true';
@@ -94,24 +86,6 @@
         listenForAdminCommands();
     }
 
-    // --- รับคำสั่งจาก Admin ---
-    function listenForAdminCommands() {
-        db.ref('personal_jobs/' + selectedMaid).on('value', snap => {
-            const data = snap.val();
-            if (data && data.action === "force_online") {
-                isOnline = true;
-                localStorage.setItem('maid_isOnline', 'true');
-                updateUI();
-                db.ref('maid_status/' + selectedMaid).set("available");
-                db.ref('personal_jobs/' + selectedMaid).remove();
-            }
-            if (data && data.action === "force_reload") {
-                db.ref('personal_jobs/' + selectedMaid).remove();
-                handleLogout();
-            }
-        });
-    }
-
     function toggleOnline() {
         isOnline = !isOnline;
         localStorage.setItem('maid_isOnline', isOnline);
@@ -132,115 +106,96 @@
     function initMap() {
         const ubon = { lat: 15.2294, lng: 104.8564 };
         directionsService = new google.maps.DirectionsService();
-        directionsRenderer = new google.maps.DirectionsRenderer({
-            suppressMarkers: true,
-            polylineOptions: { strokeColor: "#0A1931", strokeWeight: 6 }
-        });
-
-        map = new google.maps.Map(document.getElementById("map"), {
-            center: ubon, zoom: 15, mapTypeControl: false
-        });
+        directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true, polylineOptions: { strokeColor: "#0A1931", strokeWeight: 6 } });
+        map = new google.maps.Map(document.getElementById("map"), { center: ubon, zoom: 15, mapTypeControl: false });
         directionsRenderer.setMap(map);
-
-        maidMarker = new google.maps.Marker({
-            position: ubon, map: map,
-            label: { text: selectedMaid, color: "#0A1931", fontWeight: "bold", fontSize: "14px" },
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                fillColor: "#0A1931", fillOpacity: 1, strokeColor: "#fff", strokeWeight: 2, scale: 10
-            }
-        });
+        maidMarker = new google.maps.Marker({ position: ubon, map: map, label: { text: selectedMaid, color: "#0A1931", fontWeight: "bold", fontSize: "14px" }, icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: "#0A1931", fillOpacity: 1, strokeColor: "#fff", strokeWeight: 2, scale: 10 } });
 
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition((pos) => {
                 const myPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                 maidMarker.setPosition(myPos);
                 if(isOnline) {
-                    db.ref('maids_location/' + selectedMaid).set({
-                        name: selectedMaid, lat: myPos.lat, lng: myPos.lng, lastUpdate: Date.now()
-                    });
+                    const locRef = db.ref('maids_location/' + selectedMaid);
+                    locRef.set({ name: selectedMaid, lat: myPos.lat, lng: myPos.lng, lastUpdate: Date.now() });
+                    locRef.onDisconnect().remove();
                 }
             });
         }
     }
 
-    // --- ดึงงานด่วนจาก Admin (available_jobs กองกลาง) ---
     function listenForJobs() {
         db.ref('available_jobs').on('value', snap => {
             const jobs = snap.val();
             let html = "";
             for (let id in jobs) {
                 if (jobs[id].status === "available") {
-                    html += `
-                        <div class="info-box" style="margin-bottom:10px;">
-                            <b>📢 งานใหม่เข้า!</b><br>
-                            ลูกค้า: ${jobs[id].title}<br>
-                            <button class="btn btn-gold" onclick="acceptJob('${id}', '${jobs[id].title}', '${jobs[id].location_url}')">รับงานนี้</button>
-                        </div>`;
+                    html += `<div class="info-box"><b>📢 งานใหม่เข้า!</b><br>ลูกค้า: ${jobs[id].title}<br><button class="btn btn-gold" onclick="acceptJob('${id}', '${jobs[id].title}', '${jobs[id].location_url}')">รับงานนี้</button></div>`;
                 }
             }
             document.getElementById('jobArea').innerHTML = html;
         });
     }
 
-    // --- ฟังก์ชันรับงาน (งานหายจากกองกลางทันที) ---
+    function listenForAdminCommands() {
+        db.ref('personal_jobs/' + selectedMaid).on('value', snap => {
+            const data = snap.val();
+            if (data && data.action === "force_online") { isOnline = true; localStorage.setItem('maid_isOnline', 'true'); updateUI(); db.ref('maid_status/' + selectedMaid).set("available"); db.ref('personal_jobs/' + selectedMaid).remove(); }
+            if (data && data.action === "force_reload") { db.ref('personal_jobs/' + selectedMaid).remove(); handleLogout(); }
+        });
+    }
+
     function acceptJob(jobId, custName, locUrl) {
-        // 1. อัปเดตสถานะงานใน Firebase ทันที งานจะหายจากแผนที่และหน้าจองลูกค้า
-        db.ref('available_jobs/' + jobId).update({
-            status: "taken",
-            acceptedBy: selectedMaid,
-            acceptedAt: Date.now()
-        }).then(() => {
-            // 2. เปลี่ยน UI เป็นโหมดทำงาน
+        // ✨ บันทึกรหัสงานลงเครื่องทันทีที่รับงาน
+        localStorage.setItem('current_working_job_id', jobId);
+
+        db.ref('available_jobs/' + jobId).update({ status: "taken", acceptedBy: selectedMaid, acceptedAt: Date.now() }).then(() => {
             document.getElementById('mainDashboard').style.display = "none";
             document.getElementById('workMode').style.display = "block";
             document.getElementById('custDetail').innerText = custName;
-
-            // 3. ลากเส้นนำทาง
-            const coords = locUrl.match(/0{([\d.]+)},([\d.]+)/);
-            if (coords) {
-                const dest = { lat: parseFloat(coords[1]), lng: parseFloat(coords[2]) };
-                drawRoute(dest);
-            }
-
-            // 4. อัปเดตสถานะแม่บ้าน
+            const coords = locUrl.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
+            if (coords) drawRoute({ lat: parseFloat(coords[1]), lng: parseFloat(coords[2]) });
             db.ref('maid_status/' + selectedMaid).set({ status: "working", current_job: jobId });
-        }).catch(err => alert("งานนี้ถูกรับไปแล้ว!"));
+        });
     }
 
     function drawRoute(dest) {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((pos) => {
-                const start = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                directionsService.route({
-                    origin: start, destination: dest, travelMode: 'DRIVING'
-                }, (res, status) => {
-                    if (status === 'OK') {
-                        directionsRenderer.setDirections(res);
-                        new google.maps.Marker({ position: dest, map: map, icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' });
-                    }
-                });
+        navigator.geolocation.getCurrentPosition((pos) => {
+            directionsService.route({ origin: { lat: pos.coords.latitude, lng: pos.coords.longitude }, destination: dest, travelMode: 'DRIVING' }, (res, status) => {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(res);
+                    new google.maps.Marker({ position: dest, map: map, icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' });
+                }
             });
-        }
+        });
     }
 
     function startWork() {
         document.getElementById('arriveBtn').style.display = "none";
         document.getElementById('finishBtn').style.display = "block";
-        document.getElementById('statusIndicatorWork').innerText = "🧹 กำลังทำงาน...";
+        document.getElementById('statusIndicatorWork').innerText = "🧹 กำลังทำความสะอาด...";
     }
 
     function finishJob() {
-        alert("ส่งงานสำเร็จ!");
-        db.ref('maid_status/' + selectedMaid).set("available");
-        location.reload();
+        const jobId = localStorage.getItem('current_working_job_id');
+        if (!jobId) { alert("เกิดข้อผิดพลาด: ไม่พบรหัสงาน"); return; }
+
+        if (confirm("คุณทำความสะอาดเสร็จเรียบร้อยและต้องการจบงานใช่หรือไม่?")) {
+            // ✨ 1. อัปเดตงานเป็น completed เพื่อให้ Admin History สรุปเงิน
+            db.ref('available_jobs/' + jobId).update({ 
+                status: "completed", 
+                finishedAt: Date.now() 
+            }).then(() => {
+                // 2. เคลียร์สถานะแม่บ้านและล้างรหัสงานในเครื่อง
+                db.ref('maid_status/' + selectedMaid).set("available");
+                localStorage.removeItem('current_working_job_id');
+                alert("ส่งงานสำเร็จ! ยอดเงินถูกบันทึกลงระบบประวัติแล้ว");
+                location.reload();
+            });
+        }
     }
 
-    function handleLogout() {
-        db.ref('maid_status/' + selectedMaid).set("offline");
-        localStorage.clear();
-        location.reload();
-    }
+    function handleLogout() { db.ref('maid_status/' + selectedMaid).set("offline"); localStorage.clear(); location.reload(); }
 </script>
 </body>
 </html>
