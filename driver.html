@@ -83,11 +83,18 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const webhook = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23";
-
-    const staffDB = {
-        "1111": "พี่เอ (MM01)", "2222": "พี่บี (MM02)", "3333": "พี่ซี (MM03)",
-        "4444": "พี่ดี (MM04)", "5555": "พี่อี (MM05)", "6666": "พี่เอฟ (MM06)"
-    };
+const staffDB = {
+    "1111": "พี่เอ (MM01)",
+    "2222": "พี่บี (MM02)",
+    "3333": "พี่ซี (MM03)",
+    "4444": "พี่ดี (MM04)",
+    "5555": "พี่อี (MM05)",
+    "6666": "พี่เอฟ (MM06)",
+    "7777": "พี่กิ๊ก (MM07)",
+    "8888": "พี่แก้ว (MM08)",
+    "9999": "พี่เกด (MM09)",
+    "1010": "พี่ก้อย (MM10)"
+};
 
     let selectedMaid = "";
     let isOnline = false;
