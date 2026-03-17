@@ -8,37 +8,58 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&language=th"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         :root { --primary: #0A1931; --gold: #D4AF37; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Sarabun', sans-serif; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Sarabun', sans-serif; overflow: hidden; }
         #map { width: 100%; height: 100vh; }
         
+        /* แผงควบคุมฝั่งซ้าย (Legend) */
         .control-panel {
             position: absolute; top: 20px; left: 20px;
-            background: white; padding: 20px; border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 10;
-            width: 280px; border-top: 6px solid var(--gold);
+            background: white; padding: 15px; border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 10;
+            width: 220px; border-top: 5px solid var(--gold);
         }
-        .status-item { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 14px; }
-        .indicator { width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
-        h2 { margin: 0 0 15px 0; color: var(--primary); font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+
+        /* แถบรายชื่อฝั่งขวา (Maid Sidebar) */
+        .maid-sidebar {
+            position: absolute; top: 20px; right: 20px;
+            background: white; width: 260px; max-height: 85vh;
+            border-radius: 20px; box-shadow: -5px 5px 20px rgba(0,0,0,0.15);
+            z-index: 10; overflow-y: auto; border-top: 5px solid var(--primary);
+        }
+        .sidebar-header { padding: 15px; background: var(--primary); color: white; border-radius: 15px 15px 0 0; sticky; top: 0; }
+        .maid-item { 
+            display: flex; align-items: center; padding: 12px 15px; 
+            border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s;
+        }
+        .maid-item:hover { background: #f8f9fa; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 12px; }
+        .online { background: #28a745; box-shadow: 0 0 5px #28a745; }
+        .offline { background: #ccc; }
+        .maid-info { flex-grow: 1; font-size: 14px; color: var(--primary); font-weight: 500; }
+
+        h2, h3 { margin: 0; font-size: 16px; }
     </style>
 </head>
 <body>
 
     <div class="control-panel">
-        <h2>🛰️ ระบบติดตาม Real-time</h2>
-        <div class="status-item">
-            <div class="indicator" style="background: #0A1931;"></div> 
-            <span>แม่บ้าน (น้ำเงินเข้ม + ชื่อ)</span>
+        <h2>🛰️ Tracking Control</h2>
+        <p style="font-size: 11px; color: #666;">คลิกชื่อแม่บ้านทางขวา เพื่อดูพิกัด</p>
+        <div style="font-size: 13px; margin-top:10px;">
+            🔵 แม่บ้าน | 🟡 งานจอง
         </div>
-        <div class="status-item">
-            <div class="indicator" style="background: #D4AF37;"></div> 
-            <span>งานที่รอรับ (สีทอง)</span>
+    </div>
+
+    <div class="maid-sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-users"></i> รายชื่อพนักงาน (10)</h3>
         </div>
-        <div id="activeCount" style="margin-top: 15px; font-size: 12px; color: #666;">
-            กำลังโหลดข้อมูลพนักงาน...
-        </div>
+        <div id="maidList">
+            </div>
     </div>
 
     <div id="map"></div>
@@ -51,89 +72,105 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    const allMaids = [
+        "พี่เอ (MM01)", "พี่บี (MM02)", "พี่ซี (MM03)", "พี่ดี (MM04)", "พี่อี (MM05)",
+        "พี่เอฟ (MM06)", "พี่กิ๊ก (MM07)", "พี่แก้ว (MM08)", "พี่เกด (MM09)", "พี่ก้อย (MM10)"
+    ];
+
     let map;
-    let maidMarkers = {}; // เก็บหมุดแม่บ้าน
-    let jobMarkers = {};  // เก็บหมุดงานลูกค้า
+    let maidMarkers = {}; 
+    let jobMarkers = {};
 
     function initMap() {
         const ubon = { lat: 15.2294, lng: 104.8564 };
         map = new google.maps.Map(document.getElementById("map"), {
-            center: ubon,
-            zoom: 13,
-            mapTypeControl: false,
-            styles: [
-                { "featureType": "poi", "stylers": [{ "visibility": "off" }] } // ปิดสถานที่ทั่วไปเพื่อให้เห็นหมุดชัด
-            ]
+            center: ubon, zoom: 13, mapTypeControl: false,
+            styles: [{ "featureType": "poi", "stylers": [{ "visibility": "off" }] }]
         });
 
-        // --- 1. ติดตามพิกัดแม่บ้าน 10 คน ---
+        renderMaidList(); // สร้างแถบชื่อแม่บ้านรอไว้
+        syncData(); // เชื่อมต่อ Firebase
+    }
+
+    function renderMaidList() {
+        const listDiv = document.getElementById('maidList');
+        listDiv.innerHTML = allMaids.map(name => `
+            <div class="maid-item" id="item-${name}" onclick="focusMaid('${name}')">
+                <div class="status-dot offline" id="dot-${name}"></div>
+                <div class="maid-info">${name}</div>
+                <i class="fas fa-chevron-right" style="color:#ccc; font-size:12px;"></i>
+            </div>
+        `).join('');
+    }
+
+    function syncData() {
+        // 1. อัปเดตพิกัดแม่บ้านและสถานะไฟเขียว/เทา
         db.ref('maids_location').on('value', (snap) => {
-            const data = snap.val();
-            if(!data) return;
+            const locations = snap.val() || {};
             
-            let onlineCount = 0;
-            for(let id in data) {
-                onlineCount++;
-                const pos = { lat: data[id].lat, lng: data[id].lng };
-                
-                if(maidMarkers[id]) {
-                    maidMarkers[id].setPosition(pos);
+            // รีเซ็ตไฟเป็นเทาก่อน
+            allMaids.forEach(name => {
+                document.getElementById(`dot-${name}`).className = "status-dot offline";
+            });
+
+            for(let id in locations) {
+                const pos = { lat: locations[id].lat, lng: locations[id].lng };
+                const name = locations[id].name;
+
+                // เปลี่ยนไฟเป็นสีเขียวถ้ามีการส่งพิกัดมา
+                if(document.getElementById(`dot-${name}`)) {
+                    document.getElementById(`dot-${name}`).className = "status-dot online";
+                }
+
+                if(maidMarkers[name]) {
+                    maidMarkers[name].setPosition(pos);
                 } else {
-                    maidMarkers[id] = new google.maps.Marker({
-                        position: pos,
-                        map: map,
-                        label: {
-                            text: data[id].name, // ชื่อบนหัวหมุด
-                            color: "#0A1931",
-                            fontWeight: "bold",
-                            fontSize: "12px"
-                        },
+                    maidMarkers[name] = new google.maps.Marker({
+                        position: pos, map: map,
+                        label: { text: name, color: "#0A1931", fontWeight: "bold", fontSize: "11px" },
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
-                            fillColor: "#0A1931", // สีน้ำเงินเข้มตาม driver.html
-                            fillOpacity: 1,
-                            strokeColor: "#FFFFFF",
-                            strokeWeight: 2,
-                            scale: 8
+                            fillColor: "#0A1931", fillOpacity: 1, strokeColor: "#fff", strokeWeight: 2, scale: 7
                         }
                     });
                 }
             }
-            document.getElementById('activeCount').innerText = `พนักงานออนไลน์ขณะนี้: ${onlineCount} ท่าน`;
         });
 
-        // --- 2. แสดงพิกัดงานจองใหม่ (หมุดสีทอง) ---
+        // 2. แสดงพิกัดงานลูกค้า (หมุดสีทอง)
         db.ref('available_jobs').on('value', (snap) => {
             const jobs = snap.val();
-            // ล้างหมุดงานเก่า
             for(let id in jobMarkers) jobMarkers[id].setMap(null);
             jobMarkers = {};
-
             if(!jobs) return;
             for(let id in jobs) {
                 if(jobs[id].status === "available") {
-                    // ดึงพิกัดจาก URL (0{lat},lng)
                     const coords = jobs[id].location_url.match(/0{([\d.]+)},([\d.]+)/);
                     if(coords) {
                         const pos = { lat: parseFloat(coords[1]), lng: parseFloat(coords[2]) };
                         jobMarkers[id] = new google.maps.Marker({
-                            position: pos,
-                            map: map,
-                            icon: {
-                                url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png", // หมุดสีทอง/แดง
-                                scaledSize: new google.maps.Size(35, 35)
-                            },
-                            animation: google.maps.Animation.DROP
+                            position: pos, map: map,
+                            icon: { url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png", scaledSize: new google.maps.Size(35, 35) }
                         });
-
-                        const info = new google.maps.InfoWindow({
-                            content: `<div style="padding:5px;"><b>คุณ ${jobs[id].title}</b><br>โทร: ${jobs[id].phone}<br>${jobs[id].booking_time} น.</div>`
-                        });
-                        jobMarkers[id].addListener("click", () => info.open(map, jobMarkers[id]));
                     }
                 }
             }
         });
+    }
+
+    // ฟังก์ชันคลิกชื่อแล้วพาไปดู
+    window.focusMaid = function(name) {
+        if (maidMarkers[name]) {
+            const pos = maidMarkers[name].getPosition();
+            map.setZoom(17); // ซูมเข้าไปใกล้ๆ
+            map.panTo(pos); // เลื่อนแผนไปหา
+            
+            // ทำการ Bounce หมุดเบาๆ เพื่อให้รู้ว่าคนไหน
+            maidMarkers[name].setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(() => maidMarkers[name].setAnimation(null), 2100);
+        } else {
+            alert(name + " ยังไม่ได้ Online หรือยังไม่มีพิกัดส่งเข้ามา");
+        }
     }
 
     google.maps.event.addDomListener(window, 'load', initMap);
