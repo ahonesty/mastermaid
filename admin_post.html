@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid | CEO Dashboard</title>
+    <title>CEO Dashboard | Master Maid</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
@@ -14,26 +14,30 @@
         body { font-family: 'Sarabun', sans-serif; background: var(--dark); color: white; margin: 0; padding: 20px; }
         .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid var(--gold); padding-bottom: 15px; }
         
-        .grid-container { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1200px; margin: auto; }
+        .grid-container { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1300px; margin: auto; }
         .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid var(--gold); backdrop-filter: blur(10px); }
         
-        h3 { color: var(--gold); margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        h3 { color: var(--gold); margin-top: 0; display: flex; align-items: center; gap: 10px; font-size: 22px; }
         input, select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--gold); background: var(--navy); color: white; font-size: 16px; box-sizing: border-box; }
         
         .btn-send { width: 100%; background: var(--gold); color: var(--dark); padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.3s; }
         .btn-send:hover { background: #f1c40f; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(212,175,55,0.3); }
 
-        /* สไตล์ตารางสถานะแม่บ้าน */
-        .staff-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
-        .staff-card { background: var(--navy); padding: 15px; border-radius: 12px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .status-dot { width: 12px; height: 12px; border-radius: 50%; margin-bottom: 5px; margin-left: auto; }
+        /* สไตล์ตารางสถานะแม่บ้านและงานที่รับ */
+        .staff-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 15px; }
+        .staff-card { background: var(--navy); padding: 18px; border-radius: 15px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: flex-start; min-height: 100px; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 5px; }
         
-        /* ปุ่มควบคุมระยะไกล */
-        .btn-remote { padding: 4px 10px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; border: 1px solid transparent; }
+        /* ปุ่ม Remote */
+        .btn-group { display: flex; gap: 5px; margin-top: 10px; }
+        .btn-remote { padding: 5px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; border: 1px solid transparent; }
         .btn-on { background: rgba(40, 167, 69, 0.1); color: var(--green); border-color: var(--green); }
         .btn-on:hover { background: var(--green); color: white; }
         .btn-off { background: rgba(220, 53, 69, 0.1); color: #ff6b6b; border-color: var(--red); }
         .btn-off:hover { background: var(--red); color: white; }
+
+        /* งานที่กำลังทำ (Active Job Tag) */
+        .active-job { display: block; background: rgba(212,175,55,0.15); color: var(--gold); padding: 4px 8px; border-radius: 6px; font-size: 11px; margin-top: 8px; border: 1px dashed var(--gold); }
 
         /* งานกองกลาง */
         .job-item { background: rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 5px solid var(--gold); position: relative; }
@@ -46,14 +50,14 @@
 
     <div class="header">
         <h1>👑 Master Maid CEO Control</h1>
-        <p style="color: var(--gold); margin: 0;">ระบบจัดการแม่บ้าน 10 ท่าน และควบคุมสถานะระยะไกล</p>
+        <p style="color: var(--gold); margin: 0;">ระบบติดตามงานและควบคุมพนักงาน Real-time</p>
     </div>
 
     <div class="grid-container">
         
         <div class="card">
-            <h3>🚀 จ่ายงานด่วนเจาะจงคน</h3>
-            <label>เลือกแม่บ้าน:</label>
+            <h3>🚀 จ่ายงานด่วน (สะกิดรายคน)</h3>
+            <label>เลือกแม่บ้านที่ว่าง:</label>
             <select id="targetMaid">
                 <option value="พี่เอ (MM01)">พี่เอ (MM01)</option>
                 <option value="พี่บี (MM02)">พี่บี (MM02)</option>
@@ -66,30 +70,24 @@
                 <option value="พี่เกด (MM09)">พี่เกด (MM09)</option>
                 <option value="พี่ก้อย (MM10)">พี่ก้อย (MM10)</option>
             </select>
-            
-            <label>รายละเอียดลูกค้า/สถานที่:</label>
-            <input type="text" id="jobDesc" placeholder="ระบุชื่อลูกค้าและสถานที่">
-            
+            <input type="text" id="jobDesc" placeholder="ชื่อลูกค้า - สถานที่">
             <button class="btn-send" onclick="assignJob()">🚀 ส่งงานเดี๋ยวนี้</button>
         </div>
 
         <div class="card">
-            <h3>👷 สถานะทีมงาน (Real-time)</h3>
+            <h3>👷 ติดตามทีมงาน (10 ท่าน)</h3>
             <div id="staffStatusArea" class="staff-list">
                 </div>
         </div>
 
         <div class="card" style="grid-column: span 1.5;">
-            <h3>📋 งานรอกดรับ (Public Jobs)</h3>
-            <div id="publicJobArea">
-                <p style="color: #666; text-align: center;">ไม่มีงานค้างในระบบ</p>
-            </div>
+            <h3>📋 งานจองใหม่ที่รอกดรับ</h3>
+            <div id="publicJobArea"></div>
         </div>
-
     </div>
 
 <script>
-    // --- 1. ตั้งค่า Firebase ---
+    // --- 1. Firebase Config ---
     const firebaseConfig = { 
         apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
         databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app", 
@@ -98,52 +96,37 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const allStaff = [
-        "พี่เอ (MM01)", "พี่บี (MM02)", "พี่ซี (MM03)", "พี่ดี (MM04)", "พี่อี (MM05)", 
-        "พี่เอฟ (MM06)", "พี่กิ๊ก (MM07)", "พี่แก้ว (MM08)", "พี่เกด (MM09)", "พี่ก้อย (MM10)"
-    ];
+    const allStaff = ["พี่เอ (MM01)", "พี่บี (MM02)", "พี่ซี (MM03)", "พี่ดี (MM04)", "พี่อี (MM05)", "พี่เอฟ (MM06)", "พี่กิ๊ก (MM07)", "พี่แก้ว (MM08)", "พี่เกด (MM09)", "พี่ก้อย (MM10)"];
 
-    // --- 2. ฟังก์ชันจ่ายงานด่วน ---
+    // --- 2. ฟังก์ชันจ่ายงาน ---
     function assignJob() {
-        const maidName = document.getElementById('targetMaid').value;
+        const maid = document.getElementById('targetMaid').value;
         const detail = document.getElementById('jobDesc').value;
-        if(!detail) return alert("❌ กรุณากรอกรายละเอียดงาน");
-
-        db.ref('personal_jobs/' + maidName).set({
-            customer: detail,
-            status: "waiting",
-            postedAt: Date.now()
-        }).then(() => {
-            alert("✅ ส่งงานด่วนให้ " + maidName + " แล้ว!");
-            document.getElementById('jobDesc').value = "";
-        });
+        if(!detail) return alert("❌ ระบุรายละเอียดงาน");
+        db.ref('personal_jobs/' + maid).set({ customer: detail, status: "waiting", postedAt: Date.now() })
+        .then(() => { alert("ส่งงานเรียบร้อย"); document.getElementById('jobDesc').value = ""; });
     }
 
-    // --- 3. ฟังก์ชันสั่งการระยะไกล (Remote Control) ---
-    function remoteToggle(maidName, action) {
+    // --- 3. ฟังก์ชัน Remote Control ---
+    function remoteToggle(name, action) {
         const statusText = action === 'on' ? "available" : "offline";
-        const confirmMsg = action === 'on' ? `สั่งเปิดระบบ Online ให้ ${maidName}?` : `สั่งระงับ/ปิดระบบ ของ ${maidName}?`;
-
-        if(confirm(confirmMsg)) {
-            // อัปเดตสถานะใน Firebase
-            db.ref('maid_status/' + maidName).set(statusText);
-            // ส่งสัญญาณไปยังเครื่องแม่บ้าน
-            db.ref('personal_jobs/' + maidName).set({
-                action: action === 'on' ? "force_online" : "force_reload",
-                timestamp: Date.now()
-            });
-            alert(`ดำเนินการเรียบร้อย`);
+        if(confirm(`ยืนยันการสั่ง ${action === 'on' ? 'เปิด' : 'ปิด'} ระบบของ ${name}?`)) {
+            db.ref('maid_status/' + name).set(statusText);
+            db.ref('personal_jobs/' + name).set({ action: action === 'on' ? "force_online" : "force_reload", timestamp: Date.now() });
         }
     }
 
-    // --- 4. ดักฟังสถานะแม่บ้าน (Real-time) ---
+    // --- 4. ดักฟังสถานะและติดตามงาน (Real-time Tracking) ---
     db.ref('maid_status').on('value', snap => {
         const statuses = snap.val() || {};
         const area = document.getElementById('staffStatusArea');
         area.innerHTML = "";
         
         allStaff.forEach(name => {
-            const currentStatus = statuses[name] || "offline";
+            const data = statuses[name];
+            const currentStatus = typeof data === 'object' ? data.status : (data || "offline");
+            const jobTitle = data && data.job_title ? data.job_title : "";
+            
             let color = "var(--gray)";
             let label = "Offline";
 
@@ -153,47 +136,36 @@
 
             area.innerHTML += `
                 <div class="staff-card">
-                    <div style="text-align:left;">
-                        <b style="font-size:13px;">${name}</b><br>
+                    <div style="text-align:left; flex:1;">
+                        <b style="font-size:14px;">${name}</b><br>
                         <small style="color:${color}">${label}</small>
-                    </div>
-                    <div style="text-align:right;">
-                        <div class="status-dot" style="background:${color}"></div>
-                        <div style="display:flex; gap:5px; margin-top:5px;">
+                        ${jobTitle ? `<span class="active-job">📍 ${jobTitle}</span>` : ""}
+                        <div class="btn-group">
                             ${currentStatus === 'offline' ? 
                                 `<button class="btn-remote btn-on" onclick="remoteToggle('${name}', 'on')">เปิด</button>` : 
                                 `<button class="btn-remote btn-off" onclick="remoteToggle('${name}', 'off')">ระงับ</button>`
                             }
                         </div>
                     </div>
+                    <div class="status-dot" style="background:${color}"></div>
                 </div>
             `;
         });
     });
 
-    // --- 5. ดักฟังงานกองกลาง ---
+    // --- 5. งานกองกลาง ---
     db.ref('available_jobs').on('value', snap => {
         const jobs = snap.val();
         const area = document.getElementById('publicJobArea');
         area.innerHTML = "";
-        if(!jobs) {
-            area.innerHTML = "<p style='color: #888; text-align: center;'>📭 ไม่มีงานค้างในขณะนี้</p>";
-            return;
-        }
+        if(!jobs) { area.innerHTML = "<p style='color:#888; text-align:center;'>ไม่มีงานค้าง</p>"; return; }
         for (let id in jobs) {
             if(jobs[id].status === "available") {
-                area.innerHTML += `
-                    <div class="job-item">
-                        <span class="price-tag">${jobs[id].price} บาท</span>
-                        <b style="color:var(--gold); font-size:18px;">👤 คุณ${jobs[id].title}</b><br>
-                        🏠 ${jobs[id].property_type} | ⏰ ${jobs[id].booking_time}<br>
-                        📍 สถานที่: ${jobs[id].detail}
-                    </div>
-                `;
+                area.innerHTML += `<div class="job-item"><span class="price-tag">${jobs[id].price}.-</span>
+                <b>👤 คุณ${jobs[id].title}</b><br><small>🏠 ${jobs[id].property_type} | ⏰ ${jobs[id].booking_time}</small></div>`;
             }
         }
     });
 </script>
-
 </body>
 </html>
