@@ -38,8 +38,8 @@
 
 <div id="loginScreen" class="card" style="margin-top: 20vh;">
     <h2 style="color: var(--gold);">MASTER MAID</h2>
-    <p>ใส่รหัสผ่านเพื่อเข้าใช้งาน</p>
-    <input type="password" id="passCode" class="login-input" placeholder="รหัสผ่าน" maxlength="4">
+    <p>ระบุรหัสผ่านพนักงาน 10 ท่าน</p>
+    <input type="password" id="passCode" class="login-input" placeholder="รหัสผ่าน 4 หลัก" maxlength="4">
     <button class="btn" style="background: var(--gold); color: var(--dark);" onclick="handleLogin()">เข้าสู่ระบบ</button>
 </div>
 
@@ -70,7 +70,7 @@
 </div>
 
 <script>
-    // --- 1. ตั้งค่า Firebase ---
+    // --- ตั้งค่า Firebase ---
     const firebaseConfig = { 
         apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
         databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app", 
@@ -80,7 +80,7 @@
     const db = firebase.database();
     const webhook = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23";
 
-    // รายชื่อแม่บ้าน 10 ท่าน
+    // รายชื่อแม่บ้าน 10 ท่านและรหัสผ่าน
     const staffDB = {
         "1111": "พี่เอ (MM01)", "2222": "พี่บี (MM02)", "3333": "พี่ซี (MM03)", "4444": "พี่ดี (MM04)",
         "5555": "พี่อี (MM05)", "6666": "พี่เอฟ (MM06)", "7777": "พี่กิ๊ก (MM07)", "8888": "พี่แก้ว (MM08)",
@@ -89,7 +89,6 @@
 
     let selectedMaid = "", isOnline = false, activeJob = null, timerInt, seconds = 0;
 
-    // ตรวจสอบ Session เมื่อเปิดหน้าจอ
     window.onload = function() {
         const savedMaid = localStorage.getItem("mastermaid_staff");
         const savedStatus = localStorage.getItem("mastermaid_online");
@@ -115,7 +114,7 @@
         document.getElementById('welcomeMsg').innerText = "สวัสดี, " + selectedMaid;
         updateStatusUI(isOnline);
         loadPublicJobs();
-        listenForCommands(); // ดักฟังงานด่วนและคำสั่งจาก CEO
+        listenForCommands();
     }
 
     function toggleStatus() {
@@ -135,30 +134,29 @@
         indicator.style.color = online ? "var(--green)" : "#888";
     }
 
-    // --- ระบบดักฟังคำสั่ง Remote จาก CEO ---
     function listenForCommands() {
         db.ref('personal_jobs/' + selectedMaid).on('value', snap => {
             const data = snap.val();
             if (!data) return;
 
-            // 1. คำสั่งสั่งเปิดระบบจาก CEO
+            // 1. คำสั่งจาก CEO: สั่งเปิดระบบ
             if (data.action === "force_online") {
                 db.ref('personal_jobs/' + selectedMaid).remove();
                 isOnline = true;
                 localStorage.setItem("mastermaid_online", "true");
                 updateStatusUI(true);
+                db.ref('maid_status/' + selectedMaid).set("available");
                 alert("CEO ได้สั่งเปิดระบบ Online ให้คุณแล้ว");
             }
 
-            // 2. คำสั่งสั่งปิดระบบ/ระงับงาน
+            // 2. คำสั่งจาก CEO: สั่งปิดระบบ
             if (data.action === "force_reload") {
                 db.ref('personal_jobs/' + selectedMaid).remove();
-                alert("ระบบถูกสั่งปิดโดย CEO กรุณาล็อกอินใหม่");
+                alert("ระบบถูกสั่งปิดโดย CEO");
                 handleLogout();
-                return;
             }
 
-            // 3. งานด่วนเด้งเข้า
+            // 3. งานด่วนเด้งเข้าเจาะจงคน
             if (data.status === "waiting") {
                 document.getElementById('personalArea').innerHTML = `
                 <div class="job-box personal-job-card">
@@ -188,12 +186,21 @@
         const path = type === 'personal' ? 'personal_jobs/' + id : 'available_jobs/' + id;
         db.ref(path).once('value', snap => {
             const data = snap.val();
+            if(!data) return;
+            
             activeJob = type === 'personal' ? { title: data.customer, price: "ตามตกลง" } : data;
             db.ref(path).remove();
+
+            // ส่งข้อมูล "ชื่อลูกค้า" ไปแสดงในหน้า Admin ทันที
+            db.ref('maid_status/' + selectedMaid).set({
+                status: "working",
+                job_title: activeJob.title,
+                startTime: Date.now()
+            });
+
             document.getElementById('mainDashboard').style.display = "none";
             document.getElementById('workMode').style.display = "block";
             document.getElementById('workCust').innerText = "ลูกค้า: " + activeJob.title;
-            db.ref('maid_status/' + selectedMaid).set("working");
         });
     }
 
@@ -212,9 +219,18 @@
     function finishJob() {
         const done = Array.from(document.querySelectorAll('.task')).every(t => t.checked);
         if(!done) return alert("❌ ติ๊กเช็คลิสต์ให้ครบทุกช่อง!");
-        const report = { maid_name: selectedMaid, customer: activeJob.title, price: activeJob.price, duration: document.getElementById('timer').innerText, finished_at: new Date().toLocaleTimeString('th-TH') };
+        
+        const report = { 
+            maid_name: selectedMaid, 
+            customer: activeJob.title, 
+            price: activeJob.price, 
+            duration: document.getElementById('timer').innerText, 
+            finished_at: new Date().toLocaleTimeString('th-TH') 
+        };
+
         fetch(webhook, { method: 'POST', body: JSON.stringify(report) }).then(() => {
             alert("🏁 จบงานสำเร็จ!");
+            // เคลียร์สถานะงานออกเมื่อจบงาน
             db.ref('maid_status/' + selectedMaid).set("available");
             location.reload();
         });
