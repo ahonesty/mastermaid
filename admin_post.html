@@ -3,168 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid | ประวัติการทำงาน</title>
+    <title>CEO Dashboard | Master Maid</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0A1931; --gold: #D4AF37; --gold-light: #F9F1D7; --bg: #F4F7F6; }
-        body { font-family: 'Sarabun', sans-serif; background: var(--bg); margin: 0; color: #333; }
+        :root { --gold: #D4AF37; --dark: #0A1931; --navy: #1A2F4F; --green: #28a745; --blue: #3498db; --red: #dc3545; --gray: #888; }
+        body { font-family: 'Sarabun', sans-serif; background: var(--dark); color: white; margin: 0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid var(--gold); padding-bottom: 15px; }
         
-        .nav-admin { background: var(--primary); padding: 15px 5%; color: white; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .nav-admin h2 { margin: 0; font-size: 20px; color: var(--gold); }
-        .btn-back { color: white; text-decoration: none; font-size: 14px; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 10px; transition: 0.3s; }
-        .btn-back:hover { background: rgba(255,255,255,0.1); }
-
-        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
-
-        /* Stats Cards */
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: center; border-bottom: 5px solid var(--gold); }
-        .stat-card i { font-size: 30px; color: var(--gold); margin-bottom: 10px; }
-        .stat-card h4 { margin: 5px 0; color: #666; font-size: 14px; }
-        .stat-card .val { font-size: 28px; font-weight: 700; color: var(--primary); }
-
-        /* Table Style */
-        .table-container { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; }
-        thead { background: #f8f9fa; border-bottom: 2px solid #eee; }
-        th { padding: 20px; text-align: left; font-size: 14px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
-        td { padding: 20px; border-bottom: 1px solid #f0f0f0; font-size: 15px; vertical-align: middle; }
-        tr:last-child td { border-bottom: none; }
-        tr:hover { background: #fafafa; }
-
-        /* Badges */
-        .badge { padding: 6px 12px; border-radius: 50px; font-size: 12px; font-weight: 600; }
-        .badge-success { background: #E2F6ED; color: #2ecc71; } /* เสร็จสิ้น */
-        .badge-info { background: #E1F5FE; color: #03A9F4; }    /* รับงานแล้ว */
+        .grid-container { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1300px; margin: auto; }
+        .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid var(--gold); backdrop-filter: blur(10px); }
         
-        .maid-name { font-weight: 700; color: var(--primary); }
-        .job-price { color: var(--gold-dark); font-weight: 700; }
+        h3 { color: var(--gold); margin-top: 0; display: flex; align-items: center; gap: 10px; font-size: 22px; }
+        input, select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--gold); background: var(--navy); color: white; font-size: 16px; box-sizing: border-box; }
         
-        @media (max-width: 768px) {
-            th:nth-child(4), td:nth-child(4) { display: none; } /* ซ่อนประเภทงานในมือถือ */
-        }
+        .btn-send { width: 100%; background: var(--gold); color: var(--dark); padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.3s; }
+        .btn-send:hover { background: #f1c40f; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(212,175,55,0.3); }
+
+        /* สไตล์ตารางสถานะแม่บ้านและงานที่รับ */
+        .staff-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 15px; }
+        .staff-card { background: var(--navy); padding: 18px; border-radius: 15px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: flex-start; min-height: 100px; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 5px; }
+        
+        /* ปุ่ม Remote */
+        .btn-group { display: flex; gap: 5px; margin-top: 10px; }
+        .btn-remote { padding: 5px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; border: 1px solid transparent; }
+        .btn-on { background: rgba(40, 167, 69, 0.1); color: var(--green); border-color: var(--green); }
+        .btn-on:hover { background: var(--green); color: white; }
+        .btn-off { background: rgba(220, 53, 69, 0.1); color: #ff6b6b; border-color: var(--red); }
+        .btn-off:hover { background: var(--red); color: white; }
+
+        /* งานที่กำลังทำ (Active Job Tag) */
+        .active-job { display: block; background: rgba(212,175,55,0.15); color: var(--gold); padding: 4px 8px; border-radius: 6px; font-size: 11px; margin-top: 8px; border: 1px dashed var(--gold); }
+
+        /* งานกองกลาง */
+        .job-item { background: rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 5px solid var(--gold); position: relative; }
+        .price-tag { background: var(--green); color: white; padding: 4px 10px; border-radius: 8px; font-size: 14px; font-weight: bold; position: absolute; top: 15px; right: 15px; }
+
+        @media (max-width: 900px) { .grid-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <div class="nav-admin">
-        <h2>MASTER MAID HISTORY</h2>
-        <a href="admin_post.html" class="btn-back"><i class="fas fa-home"></i> กลับหน้าจัดการ</a>
+    <div class="header">
+        <h1>👑 Master Maid CEO Control</h1>
+        <p style="color: var(--gold); margin: 0;">ระบบติดตามงานและควบคุมพนักงาน Real-time</p>
     </div>
 
-    <div class="container">
-        <div class="stats-row">
-            <div class="stat-card">
-                <i class="fas fa-check-double"></i>
-                <h4>งานที่จบแล้ว</h4>
-                <div class="val" id="countDone">0</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-wallet"></i>
-                <h4>รายได้สะสม (บาท)</h4>
-                <div class="val" id="totalRev">0</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-users"></i>
-                <h4>แม่บ้านที่ทำงานล่าสุด</h4>
-                <div class="val" id="lastMaid">-</div>
-            </div>
+    <div class="grid-container">
+        
+        <div class="card">
+            <h3>🚀 จ่ายงานด่วน (สะกิดรายคน)</h3>
+            <label>เลือกแม่บ้านที่ว่าง:</label>
+            <select id="targetMaid">
+                <option value="พี่เอ (MM01)">พี่เอ (MM01)</option>
+                <option value="พี่บี (MM02)">พี่บี (MM02)</option>
+                <option value="พี่ซี (MM03)">พี่ซี (MM03)</option>
+                <option value="พี่ดี (MM04)">พี่ดี (MM04)</option>
+                <option value="พี่อี (MM05)">พี่อี (MM05)</option>
+                <option value="พี่เอฟ (MM06)">พี่เอฟ (MM06)</option>
+                <option value="พี่กิ๊ก (MM07)">พี่กิ๊ก (MM07)</option>
+                <option value="พี่แก้ว (MM08)">พี่แก้ว (MM08)</option>
+                <option value="พี่เกด (MM09)">พี่เกด (MM09)</option>
+                <option value="พี่ก้อย (MM10)">พี่ก้อย (MM10)</option>
+            </select>
+            <input type="text" id="jobDesc" placeholder="ชื่อลูกค้า - สถานที่">
+            <button class="btn-send" onclick="assignJob()">🚀 ส่งงานเดี๋ยวนี้</button>
         </div>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>วันที่ / เวลา</th>
-                        <th>ลูกค้า</th>
-                        <th>พนักงานผู้รับงาน</th>
-                        <th>ประเภทที่พัก</th>
-                        <th>ค่าบริการ</th>
-                        <th>สถานะ</th>
-                    </tr>
-                </thead>
-                <tbody id="historyList">
-                    </tbody>
-            </table>
+        <div class="card">
+            <h3>👷 ติดตามทีมงาน (10 ท่าน)</h3>
+            <div id="staffStatusArea" class="staff-list">
+                </div>
+        </div>
+
+        <div class="card" style="grid-column: span 1.5;">
+            <h3>📋 งานจองใหม่ที่รอกดรับ</h3>
+            <div id="publicJobArea"></div>
         </div>
     </div>
 
 <script>
-    // --- Firebase Configuration ---
+    // --- 1. Firebase Config ---
     const firebaseConfig = { 
         apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
-        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app" 
+        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app", 
+        projectId: "mastermaid-ubon" 
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function fetchHistory() {
-        // ดึงข้อมูลจาก available_jobs (เฉพาะงานที่ถูกรับไปแล้ว status != available)
-        db.ref('available_jobs').on('value', (snapshot) => {
-            const data = snapshot.val();
-            const list = document.getElementById('historyList');
-            list.innerHTML = "";
-            
-            let doneCount = 0;
-            let revenue = 0;
-            let lastMaidName = "-";
+    const allStaff = ["พี่เอ (MM01)", "พี่บี (MM02)", "พี่ซี (MM03)", "พี่ดี (MM04)", "พี่อี (MM05)", "พี่เอฟ (MM06)", "พี่กิ๊ก (MM07)", "พี่แก้ว (MM08)", "พี่เกด (MM09)", "พี่ก้อย (MM10)"];
 
-            if (!data) return;
-
-            // แปลงเป็น Array และเรียงลำดับตามเวลาล่าสุด
-            const jobs = Object.keys(data)
-                .map(key => ({ id: key, ...data[key] }))
-                .filter(j => j.status !== "available") // เอาเฉพาะงานที่มีคนรับแล้ว
-                .sort((a, b) => (b.postedAt || 0) - (a.postedAt || 0));
-
-            jobs.forEach(job => {
-                const isDone = job.status === "completed" || job.status === "finished";
-                if (isDone) {
-                    doneCount++;
-                    revenue += parseInt(job.price || 0);
-                }
-                lastMaidName = job.acceptedBy || job.maid_name || "-";
-
-                const dateStr = job.booking_date || "ไม่ระบุวันที่";
-                const timeStr = job.booking_time || "";
-                
-                const row = `
-                    <tr>
-                        <td>
-                            <div style="font-weight:600;">${dateStr}</div>
-                            <small style="color:#888;">${timeStr} น.</small>
-                        </td>
-                        <td>
-                            <div style="font-weight:600;">คุณ ${job.title}</div>
-                            <small>${job.phone || ''}</small>
-                        </td>
-                        <td class="maid-name"><i class="fas fa-user-circle"></i> ${lastMaidName}</td>
-                        <td><small>${job.property_type || '-'}</small></td>
-                        <td class="job-price">${parseInt(job.price || 0).toLocaleString()}.-</td>
-                        <td>
-                            <span class="badge ${isDone ? 'badge-success' : 'badge-info'}">
-                                ${isDone ? '<i class="fas fa-check"></i> สำเร็จ' : '<i class="fas fa-clock"></i> กำลังทำ'}
-                            </span>
-                        </td>
-                    </tr>
-                `;
-                list.innerHTML += row;
-            });
-
-            // อัปเดตตัวเลข Stats
-            document.getElementById('countDone').innerText = doneCount;
-            document.getElementById('totalRev').innerText = revenue.toLocaleString();
-            document.getElementById('lastMaid').innerText = lastMaidName;
-        });
+    // --- 2. ฟังก์ชันจ่ายงาน ---
+    function assignJob() {
+        const maid = document.getElementById('targetMaid').value;
+        const detail = document.getElementById('jobDesc').value;
+        if(!detail) return alert("❌ ระบุรายละเอียดงาน");
+        db.ref('personal_jobs/' + maid).set({ customer: detail, status: "waiting", postedAt: Date.now() })
+        .then(() => { alert("ส่งงานเรียบร้อย"); document.getElementById('jobDesc').value = ""; });
     }
 
-    window.onload = fetchHistory;
+    // --- 3. ฟังก์ชัน Remote Control ---
+    function remoteToggle(name, action) {
+        const statusText = action === 'on' ? "available" : "offline";
+        if(confirm(`ยืนยันการสั่ง ${action === 'on' ? 'เปิด' : 'ปิด'} ระบบของ ${name}?`)) {
+            db.ref('maid_status/' + name).set(statusText);
+            db.ref('personal_jobs/' + name).set({ action: action === 'on' ? "force_online" : "force_reload", timestamp: Date.now() });
+        }
+    }
+
+    // --- 4. ดักฟังสถานะและติดตามงาน (Real-time Tracking) ---
+    db.ref('maid_status').on('value', snap => {
+        const statuses = snap.val() || {};
+        const area = document.getElementById('staffStatusArea');
+        area.innerHTML = "";
+        
+        allStaff.forEach(name => {
+            const data = statuses[name];
+            const currentStatus = typeof data === 'object' ? data.status : (data || "offline");
+            const jobTitle = data && data.job_title ? data.job_title : "";
+            
+            let color = "var(--gray)";
+            let label = "Offline";
+
+            if(currentStatus === "available") { color = "var(--green)"; label = "ว่าง (Online)"; }
+            else if(currentStatus === "working") { color = "var(--gold)"; label = "กำลังทำงาน"; }
+            else if(currentStatus === "traveling") { color = "var(--blue)"; label = "เดินทาง"; }
+
+            area.innerHTML += `
+                <div class="staff-card">
+                    <div style="text-align:left; flex:1;">
+                        <b style="font-size:14px;">${name}</b><br>
+                        <small style="color:${color}">${label}</small>
+                        ${jobTitle ? `<span class="active-job">📍 ${jobTitle}</span>` : ""}
+                        <div class="btn-group">
+                            ${currentStatus === 'offline' ? 
+                                `<button class="btn-remote btn-on" onclick="remoteToggle('${name}', 'on')">เปิด</button>` : 
+                                `<button class="btn-remote btn-off" onclick="remoteToggle('${name}', 'off')">ระงับ</button>`
+                            }
+                        </div>
+                    </div>
+                    <div class="status-dot" style="background:${color}"></div>
+                </div>
+            `;
+        });
+    });
+
+    // --- 5. งานกองกลาง ---
+    db.ref('available_jobs').on('value', snap => {
+        const jobs = snap.val();
+        const area = document.getElementById('publicJobArea');
+        area.innerHTML = "";
+        if(!jobs) { area.innerHTML = "<p style='color:#888; text-align:center;'>ไม่มีงานค้าง</p>"; return; }
+        for (let id in jobs) {
+            if(jobs[id].status === "available") {
+                area.innerHTML += `<div class="job-item"><span class="price-tag">${jobs[id].price}.-</span>
+                <b>👤 คุณ${jobs[id].title}</b><br><small>🏠 ${jobs[id].property_type} | ⏰ ${jobs[id].booking_time}</small></div>`;
+            }
+        }
+    });
 </script>
 </body>
 </html>
