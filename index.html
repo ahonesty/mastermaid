@@ -3,87 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid | จองบริการ</title>
+    <title>Master Maid | จองบริการทำความสะอาด</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&language=th"></script>
     
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* คืนค่า CSS ตกแต่งเดิมของคุณ */
-        :root { --gold: #D4AF37; --dark: #0A1931; }
+        :root { --gold: #D4AF37; --dark: #0A1931; --navy: #1A2F4F; }
         body { font-family: 'Sarabun', sans-serif; background: #f0f2f5; margin: 0; padding: 15px; }
-        .booking-card { max-width: 500px; margin: auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .header-img { width: 100%; height: 150px; background: var(--dark); display: flex; align-items: center; justify-content: center; color: var(--gold); }
-        .content { padding: 20px; }
         
-        /* สไตล์แผนที่ Google Map */
-        #map { width: 100%; height: 250px; border-radius: 12px; margin: 15px 0; border: 1px solid #ddd; }
+        .booking-card { max-width: 550px; margin: auto; background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
         
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; color: #444; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 10px; box-sizing: border-box; }
+        /* --- 1. ส่วนโลโก้และ Header --- */
+        .header-section { background: var(--dark); padding: 30px; text-align: center; border-bottom: 4px solid var(--gold); }
+        .logo-text { color: var(--gold); font-size: 32px; font-weight: bold; margin: 0; letter-spacing: 2px; }
+        .logo-sub { color: white; font-size: 14px; opacity: 0.8; margin-top: 5px; }
         
-        /* สไตล์แพ็กเกจ */
-        .package-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .package-item { border: 2px solid #eee; padding: 10px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .package-item.active { border-color: var(--gold); background: rgba(212,175,55,0.1); }
+        .content { padding: 25px; }
         
-        .price-display { text-align: center; font-size: 24px; color: var(--gold); font-weight: bold; margin: 20px 0; padding: 10px; background: #fff9e6; border-radius: 10px; }
-        .btn-confirm { width: 100%; background: var(--dark); color: white; padding: 18px; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: var(--dark); font-size: 15px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
+        input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 8px rgba(212,175,55,0.2); }
+
+        /* --- 2. ส่วนเลือกแพ็กเกจ --- */
+        .package-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .package-box { border: 2px solid #eee; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; }
+        .package-box.active { border-color: var(--gold); background: rgba(212,175,55,0.05); }
+        .package-box b { color: var(--dark); display: block; font-size: 18px; }
+        .package-box span { color: var(--gold); font-weight: bold; }
+
+        /* --- 3. ส่วนแผนที่ Google Maps --- */
+        #map { width: 100%; height: 300px; border-radius: 15px; margin-top: 10px; border: 1px solid #ddd; }
+        
+        /* --- 4. ส่วนสรุปราคา --- */
+        .price-summary { background: var(--dark); color: white; padding: 20px; border-radius: 15px; text-align: center; margin-top: 25px; }
+        .price-summary span { font-size: 28px; color: var(--gold); font-weight: bold; }
+        
+        .btn-booking { width: 100%; background: var(--gold); color: var(--dark); padding: 18px; border: none; border-radius: 15px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-booking:hover { background: #c5a02c; transform: translateY(-2px); }
     </style>
 </head>
 <body>
 
 <div class="booking-card">
-    <div class="header-img">
-        <h1>MASTER MAID</h1>
+    <div class="header-section">
+        <h1 class="logo-text">MASTER MAID</h1>
+        <div class="logo-sub">Professional Cleaning Service Ubon Ratchathani</div>
     </div>
     
     <div class="content">
         <div class="form-group">
-            <label>👤 ชื่อลูกค้า:</label>
+            <label>👤 ชื่อ-นามสกุล ผู้จอง:</label>
             <input type="text" id="custName" placeholder="ระบุชื่อของคุณ">
         </div>
 
-        <label>📦 เลือกแพ็กเกจบริการ:</label>
-        <div class="package-grid">
-            <div class="package-item active" onclick="selectPkg(this, 550, 'S')">
-                <b>Size S</b><br><small>คอนโด/หอพัก</small><br><b>550.-</b>
+        <div class="form-group">
+            <label>📞 เบอร์โทรศัพท์ติดต่อ:</label>
+            <input type="tel" id="custPhone" placeholder="08x-xxxxxxx">
+        </div>
+
+        <label>📦 เลือกแพ็กเกจที่ต้องการ:</label>
+        <div class="package-container">
+            <div class="package-box active" onclick="setPkg(this, 550, 'Size S (คอนโด/หอพัก)')">
+                <b>Size S</b>
+                <small>คอนโด/หอพัก</small><br>
+                <span>550.-</span>
             </div>
-            <div class="package-item" onclick="selectPkg(this, 750, 'M')">
-                <b>Size M</b><br><small>ทาวน์โฮม</small><br><b>750.-</b>
+            <div class="package-box" onclick="setPkg(this, 750, 'Size M (ทาวน์โฮม)')">
+                <b>Size M</b>
+                <small>ทาวน์โฮม</small><br>
+                <span>750.-</span>
             </div>
-            <div class="package-item" onclick="selectPkg(this, 1200, 'L')">
-                <b>Size L</b><br><small>บ้านเดี่ยว</small><br><b>1,200.-</b>
+            <div class="package-box" onclick="setPkg(this, 1200, 'Size L (บ้านเดี่ยว)')">
+                <b>Size L</b>
+                <small>บ้านเดี่ยว</small><br>
+                <span>1,200.-</span>
             </div>
-            <div class="package-item" onclick="selectPkg(this, 0, 'Custom')">
-                <b>กำหนดเอง</b><br><small>ตามตกลง</small><br><b>-</b>
+            <div class="package-box" onclick="setPkg(this, 0, 'Custom (ตามตกลง)')">
+                <b>Custom</b>
+                <small>แจ้งรายละเอียด</small><br>
+                <span>ตามตกลง</span>
             </div>
         </div>
 
         <div class="form-group">
-            <label>📍 ค้นหาสถานที่ & ปักหมุด:</label>
-            <input type="text" id="custLoc" placeholder="พิมพ์ที่อยู่/โครงการ...">
-            <div id="map"></div> </div>
+            <label>📐 พื้นที่บ้าน (ตารางเมตร):</label>
+            <input type="number" id="houseArea" placeholder="ระบุตารางเมตร เช่น 120">
+        </div>
 
         <div class="form-group">
-            <label>📅 วันที่และเวลา:</label>
+            <label>📅 วันที่และเวลาที่ต้องการ:</label>
             <div style="display:flex; gap:10px;">
                 <input type="date" id="serviceDate" style="flex:2;">
                 <input type="time" id="startTime" value="09:00" style="flex:1;">
             </div>
         </div>
 
-        <div class="price-display">
-            ราคา: <span id="displayPrice">550</span> บาท
+        <div class="form-group">
+            <label>📍 ค้นหาและระบุตำแหน่งที่ตั้ง:</label>
+            <input type="text" id="custLoc" placeholder="พิมพ์ชื่อโครงการ/ที่อยู่ เพื่อค้นหา...">
+            <div id="map"></div>
         </div>
 
-        <button class="btn-confirm" onclick="confirmBooking()">ยืนยันการจอง</button>
+        <div class="price-summary">
+            ราคาประมาณการ: <span id="displayPrice">550</span> บาท
+        </div>
+
+        <button class="btn-booking" onclick="confirmBooking()">ยืนยันการจองบริการ</button>
     </div>
 </div>
 
 <script>
+    // --- ตั้งค่า Firebase ---
     const firebaseConfig = { 
         apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
         databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app", 
@@ -93,18 +127,26 @@
     const db = firebase.database();
 
     let currentPrice = 550;
-    let selectedPkgName = "Size S";
+    let selectedPkgName = "Size S (คอนโด/หอพัก)";
     let map, marker, autocomplete;
-    let selectedLat = 15.244, selectedLng = 104.847; // พิกัดอุบลฯ เริ่มต้น
+    let selectedLat = 15.244, selectedLng = 104.847; // ค่าเริ่มต้นอุบลฯ
 
-    // --- ระบบ Google Maps เดิม ---
+    // --- ระบบ Google Maps ---
     function initMap() {
+        const center = { lat: selectedLat, lng: selectedLng };
         map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: selectedLat, lng: selectedLng },
+            center: center,
             zoom: 15,
-            mapTypeControl: false
+            mapTypeControl: false,
+            streetViewControl: false
         });
-        marker = new google.maps.Marker({ map: map, draggable: true });
+        
+        marker = new google.maps.Marker({
+            position: center,
+            map: map,
+            draggable: true,
+            title: "ตำแหน่งบ้านของคุณ"
+        });
 
         const input = document.getElementById('custLoc');
         autocomplete = new google.maps.places.Autocomplete(input);
@@ -118,24 +160,39 @@
                 selectedLng = place.geometry.location.lng();
             }
         });
+
+        // เมื่อลากหมุด ให้เก็บพิกัดใหม่
+        marker.addListener("dragend", (event) => {
+            selectedLat = event.latLng.lat();
+            selectedLng = event.latLng.lng();
+        });
     }
 
     // ฟังก์ชันเลือกแพ็กเกจ
-    function selectPkg(el, price, name) {
-        document.querySelectorAll('.package-item').forEach(i => i.classList.remove('active'));
+    function setPkg(el, price, name) {
+        document.querySelectorAll('.package-box').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
         currentPrice = price;
         selectedPkgName = name;
         document.getElementById('displayPrice').innerText = price > 0 ? price : "ตามตกลง";
     }
 
+    // ส่งข้อมูลไป Firebase
     function confirmBooking() {
         const name = document.getElementById('custName').value;
+        const phone = document.getElementById('custPhone').value;
+        const area = document.getElementById('houseArea').value;
         const address = document.getElementById('custLoc').value;
-        if (!name || !address) return alert("กรุณาระบุชื่อและสถานที่ครับ");
+
+        if (!name || !phone || !address) {
+            alert("กรุณากรอกข้อมูลส่วนตัวและสถานที่ให้ครบถ้วนครับ");
+            return;
+        }
 
         db.ref('available_jobs').push({
             title: name,
+            phone: phone,
+            house_area: area + " ตร.ม.",
             property_type: selectedPkgName,
             booking_date: document.getElementById('serviceDate').value,
             booking_time: document.getElementById('startTime').value,
@@ -145,7 +202,7 @@
             status: "available",
             postedAt: Date.now()
         }).then(() => {
-            alert("จองสำเร็จ! ข้อมูลถูกส่งไปยังระบบแม่บ้านแล้ว");
+            alert("จองสำเร็จ! เจ้าหน้าที่จะติดต่อกลับโดยเร็วที่สุด");
             location.reload();
         });
     }
