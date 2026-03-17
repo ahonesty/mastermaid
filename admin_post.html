@@ -12,52 +12,175 @@
     <style>
         :root { --gold: #D4AF37; --dark: #0A1931; --navy: #1A2F4F; --green: #28a745; --blue: #3498db; --gray: #888; }
         body { font-family: 'Sarabun', sans-serif; background: var(--dark); color: white; margin: 0; padding: 20px; }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
+        .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid var(--gold); padding-bottom: 15px; }
         
         .grid-container { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1200px; margin: auto; }
         .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid var(--gold); backdrop-filter: blur(10px); }
         
-        /* สไตล์ฟอร์ม */
-        h3 { color: var(--gold); margin-top: 0; display: flex; align-items: center; gap: 10px; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid var(--gold); background: var(--navy); color: white; font-size: 16px; box-sizing: border-box; }
-        .btn-send { width: 100%; background: var(--gold); color: var(--dark); padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.3s; }
-        .btn-send:hover { background: #f1c40f; transform: translateY(-2px); }
+        h3 { color: var(--gold); margin-top: 0; display: flex; align-items: center; gap: 10px; font-size: 20px; }
+        label { font-size: 14px; color: #ccc; }
+        input, select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--gold); background: var(--navy); color: white; font-size: 16px; box-sizing: border-box; }
+        
+        .btn-send { width: 100%; background: var(--gold); color: var(--dark); padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.3s; margin-top: 10px; }
+        .btn-send:hover { background: #f1c40f; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(212,175,55,0.3); }
 
         /* สไตล์ตารางสถานะแม่บ้าน */
-        .staff-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .staff-card { background: var(--navy); padding: 15px; border-radius: 12px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .status-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .staff-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+        .staff-card { background: var(--navy); padding: 12px; border-radius: 12px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
 
         /* รายการงาน */
-        .job-item { background: rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--gold); }
-        .price-tag { background: var(--green); color: white; padding: 2px 8px; border-radius: 5px; font-size: 12px; float: right; }
+        .job-item { background: rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 5px solid var(--gold); position: relative; }
+        .price-tag { background: var(--green); color: white; padding: 4px 10px; border-radius: 8px; font-size: 14px; font-weight: bold; position: absolute; top: 15px; right: 15px; }
+        
+        .badge-new { background: var(--red); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; vertical-align: middle; margin-left: 5px; }
 
-        @media (max-width: 800px) { .grid-container { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .grid-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1>👑 Master Maid CEO Control</h1>
+        <p style="color: var(--gold); margin: 0;">ระบบจัดการแม่บ้าน 10 ท่าน และควบคุมงานกองกลาง</p>
     </div>
 
     <div class="grid-container">
         
         <div class="card">
             <h3>🚀 จ่ายงานด่วน (สะกิดรายคน)</h3>
-            <label>เลือกแม่บ้านที่ต้องการส่งงานให้:</label>
-           <select id="assignTo">
-    <option value="พี่เอ (MM01)">พี่เอ (MM01)</option>
-    <option value="พี่บี (MM02)">พี่บี (MM02)</option>
-    <option value="พี่ซี (MM03)">พี่ซี (MM03)</option>
-    <option value="พี่ดี (MM04)">พี่ดี (MM04)</option>
-    <option value="พี่อี (MM05)">พี่อี (MM05)</option>
-    <option value="พี่เอฟ (MM06)">พี่เอฟ (MM06)</option>
-    <option value="พี่กิ๊ก (MM07)">พี่กิ๊ก (MM07)</option>
-    <option value="พี่แก้ว (MM08)">พี่แก้ว (MM08)</option>
-    <option value="พี่เกด (MM09)">พี่เกด (MM09)</option>
-    <option value="พี่ก้อย (MM10)">พี่ก้อย (MM10)</option>
-</select>
+            <label>เลือกแม่บ้าน:</label>
+            <select id="targetMaid">
+                <option value="พี่เอ (MM01)">พี่เอ (MM01)</option>
+                <option value="พี่บี (MM02)">พี่บี (MM02)</option>
+                <option value="พี่ซี (MM03)">พี่ซี (MM03)</option>
+                <option value="พี่ดี (MM04)">พี่ดี (MM04)</option>
+                <option value="พี่อี (MM05)">พี่อี (MM05)</option>
+                <option value="พี่เอฟ (MM06)">พี่เอฟ (MM06)</option>
+                <option value="พี่กิ๊ก (MM07)">พี่กิ๊ก (MM07)</option>
+                <option value="พี่แก้ว (MM08)">พี่แก้ว (MM08)</option>
+                <option value="พี่เกด (MM09)">พี่เกด (MM09)</option>
+                <option value="พี่ก้อย (MM10)">พี่ก้อย (MM10)</option>
+            </select>
             
-            <label>รายละเอียดลูกค้า/งาน:</label>
-            <input type="text" id="jobDesc" placeholder="เช่น คุณเอ (คอนโด A
+            <label>รายละเอียดลูกค้า/สถานที่:</label>
+            <input type="text" id="jobDesc" placeholder="ชื่อลูกค้า - สถานที่ (เช่น คุณแก้ว ม.สุนทรพรรณ)">
+            
+            <button class="btn-send" onclick="assignJob()">🚀 ส่งงานเดี๋ยวนี้</button>
+            <p style="font-size: 12px; color: #888; margin-top: 15px; text-align: center;">
+                *เมื่องานถูกส่ง กล่องงานจะกะพริบที่หน้าจอแม่บ้านทันที
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>👷 สถานะทีมงาน (Real-time)</h3>
+            <div id="staffStatusArea" class="staff-list">
+                </div>
+        </div>
+
+        <div class="card" style="grid-column: span 1.5; min-height: 300px;">
+            <h3>📋 รายการงานรอกดรับ (Public Jobs) <span id="jobCount" class="badge-new">0</span></h3>
+            <div id="publicJobArea">
+                <p style="color: #666; text-align: center; margin-top: 50px;">กำลังตรวจสอบงานใหม่...</p>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    // --- 1. ตั้งค่า Firebase ---
+    const firebaseConfig = { 
+        apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
+        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app", 
+        projectId: "mastermaid-ubon" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // รายชื่อพนักงานทั้งหมด 10 ท่าน
+    const allStaff = [
+        "พี่เอ (MM01)", "พี่บี (MM02)", "พี่ซี (MM03)", "พี่ดี (MM04)", "พี่อี (MM05)", 
+        "พี่เอฟ (MM06)", "พี่กิ๊ก (MM07)", "พี่แก้ว (MM08)", "พี่เกด (MM09)", "พี่ก้อย (MM10)"
+    ];
+
+    // --- 2. ฟังก์ชันจ่ายงานด่วน ---
+    function assignJob() {
+        const maidName = document.getElementById('targetMaid').value;
+        const detail = document.getElementById('jobDesc').value;
+
+        if(!detail) {
+            alert("❌ กรุณากรอกรายละเอียดงานก่อนครับ");
+            return;
+        }
+
+        db.ref('personal_jobs/' + maidName).set({
+            customer: detail,
+            status: "waiting",
+            postedAt: Date.now()
+        }).then(() => {
+            alert("✅ ส่งงานด่วนให้ " + maidName + " สำเร็จ!");
+            document.getElementById('jobDesc').value = "";
+        });
+    }
+
+    // --- 3. ตรวจสอบสถานะแม่บ้าน (Real-time) ---
+    db.ref('maid_status').on('value', snap => {
+        const statuses = snap.val() || {};
+        const area = document.getElementById('staffStatusArea');
+        area.innerHTML = "";
+        
+        allStaff.forEach(name => {
+            const currentStatus = statuses[name] || "offline";
+            let color = "var(--gray)";
+            let label = "Offline";
+
+            if(currentStatus === "available") { color = "var(--green)"; label = "ว่าง (Online)"; }
+            else if(currentStatus === "working") { color = "var(--gold)"; label = "กำลังทำงาน"; }
+            else if(currentStatus === "traveling") { color = "var(--blue)"; label = "กำลังเดินทาง"; }
+
+            area.innerHTML += `
+                <div class="staff-card">
+                    <div style="text-align:left;">
+                        <b style="font-size:13px;">${name}</b><br>
+                        <small style="color:${color}">${label}</small>
+                    </div>
+                    <div class="status-dot" style="background:${color}"></div>
+                </div>
+            `;
+        });
+    });
+
+    // --- 4. ตรวจสอบงานกองกลาง ---
+    db.ref('available_jobs').on('value', snap => {
+        const jobs = snap.val();
+        const area = document.getElementById('publicJobArea');
+        const countBadge = document.getElementById('jobCount');
+        area.innerHTML = "";
+        
+        if(!jobs) {
+            area.innerHTML = "<p style='color: #888; text-align: center; margin-top: 30px;'>📭 ยังไม่มีงานกองกลางค้างในขณะนี้</p>";
+            countBadge.innerText = "0";
+            return;
+        }
+
+        let count = 0;
+        for (let id in jobs) {
+            if(jobs[id].status === "available") {
+                count++;
+                area.innerHTML += `
+                    <div class="job-item">
+                        <span class="price-tag">${jobs[id].price} บาท</span>
+                        <b style="color:var(--gold); font-size:18px;">👤 คุณ${jobs[id].title}</b><br>
+                        🏠 ${jobs[id].property_type} (${jobs[id].room_details})<br>
+                        📅 วันที่นัด: ${jobs[id].booking_date} | ⏰ เวลา: ${jobs[id].booking_time} - ${jobs[id].end_time_plan}<br>
+                        📍 สถานที่: ${jobs[id].detail}
+                    </div>
+                `;
+            }
+        }
+        countBadge.innerText = count;
+    });
+</script>
+
+</body>
+</html>
