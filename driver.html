@@ -3,136 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Maid | ตารางงานแม่บ้าน</title>
+    <title>Staff Panel | Master Maid</title>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #0A1931; --gold: #D4AF37; --bg: #f0f2f5; }
-        body { font-family: 'Sarabun', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
-        header { background: var(--primary); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        :root { --gold: #D4AF37; --dark: #0A1931; --navy: #1A2F4F; }
+        body { font-family: 'Sarabun', sans-serif; background: var(--dark); color: white; text-align: center; padding: 15px; margin: 0; }
+        .card { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 20px; border: 1px solid var(--gold); max-width: 400px; margin: auto; backdrop-filter: blur(10px); }
+        .btn { width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; margin: 10px 0; border: none; cursor: pointer; font-size: 16px; }
+        select { width: 100%; padding: 15px; border-radius: 12px; background: var(--navy); color: white; border: 1px solid var(--gold); font-size: 16px; }
         
-        /* Selector Box */
-        .selector-box { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; font-family: 'Sarabun'; }
-
-        /* Job Card */
-        .job-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 8px solid var(--gold); }
-        .job-date { font-weight: 700; color: var(--primary); font-size: 18px; margin-bottom: 5px; }
-        .job-time { display: inline-block; background: #eef2ff; color: #4338ca; padding: 4px 12px; border-radius: 50px; font-size: 14px; font-weight: 600; margin-bottom: 15px; }
+        .job-box { background: rgba(212,175,55,0.1); padding: 15px; border-radius: 15px; border: 2px solid var(--gold); margin-top: 15px; text-align: left; }
+        .checklist-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 14px; }
+        .checklist-item input { width: 20px; height: 20px; }
         
-        .info-row { display: flex; align-items: flex-start; margin-bottom: 10px; font-size: 15px; color: #444; }
-        .info-row i { width: 25px; color: var(--gold); margin-top: 3px; }
-        .special-box { background: #fff0f0; border-left: 4px solid #d63031; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 14px; color: #333; }
-
-        .btn-gps { display: block; background: #4285F4; color: white; text-align: center; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: 700; margin-top: 15px; transition: 0.3s; }
-        .no-job { text-align: center; padding: 50px 20px; color: #888; }
+        .photo-section { background: #1A2F4F; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed var(--gold); }
+        .photo-label { display: block; font-size: 12px; color: var(--gold); margin-bottom: 5px; }
+        input[type="file"] { font-size: 12px; color: #ccc; }
+        
+        #timer { font-size: 32px; font-weight: bold; color: var(--gold); margin: 15px 0; }
     </style>
 </head>
 <body>
 
-<header>
-    <h2 style="margin:0;"><i class="fas fa-broom"></i> งานของฉัน</h2>
-</header>
+<div class="card">
+    <h3>👷 ระบบแม่บ้าน Master Maid</h3>
+    
+    <select id="maidSelect" onchange="initStaff()">
+        <option value="">-- เลือกชื่อของคุณ --</option>
+        <option value="พี่เอ (MM01)">พี่เอ (MM01)</option>
+        <option value="พี่บี (MM02)">พี่บี (MM02)</option>
+        <option value="พี่ซี (MM03)">พี่ซี (MM03)</option>
+    </select>
 
-<div class="container">
-    <div class="selector-box">
-        <label style="display:block; margin-bottom:8px; font-weight:600;">เลือกชื่อแม่บ้าน:</label>
-        <select id="maidSelector" onchange="loadMaidJobs()">
-            <option value="">-- โปรดเลือกชื่อของคุณ --</option>
-        </select>
+    <button id="statusBtn" class="btn" style="background:#28a745; color:white;" onclick="toggleStatus()">ว่าง (พร้อมรับงาน)</button>
+
+    <div id="personalJob" class="job-box" style="display:none;">
+        <h4 style="margin:0; color:var(--gold);">📢 งานมอบหมายถึงคุณ!</h4>
+        <p id="jobInfo" style="font-size:14px; margin:10px 0;"></p>
+        <button class="btn" style="background:#28a745; color:white;" onclick="acceptJob()">✅ ตกลงรับงานนี้</button>
     </div>
 
-    <div id="jobList">
-        <div class="no-job">
-            <i class="fas fa-calendar-check" style="font-size: 40px; opacity: 0.2; margin-bottom: 10px;"></i>
-            <p>เลือกชื่อเพื่อดูตารางงานที่ได้รับมอบหมาย</p>
+    <div id="publicJobs" style="margin-top:20px; text-align:left;"></div>
+
+    <div id="workingArea" style="display:none; margin-top:20px;">
+        <div id="timer">00:00:00</div>
+        
+        <div class="job-box">
+            <h4 style="margin:0 0 10px 0; color:var(--gold);">📋 รายการที่ต้องทำ:</h4>
+            <div class="checklist-item"><input type="checkbox" id="check1"> กวาดและถูพื้นทุกห้อง</div>
+            <div class="checklist-item"><input type="checkbox" id="check2"> เช็ดกระจกและระเบียง</div>
+            <div class="checklist-item"><input type="checkbox" id="check3"> ล้างห้องน้ำและสุขภัณฑ์</div>
+            <div class="checklist-item"><input type="checkbox" id="check4"> เก็บขยะทิ้งทั้งหมด</div>
         </div>
+
+        <div class="photo-section">
+            <span class="photo-label">📸 รูปก่อนเริ่มงาน:</span>
+            <input type="file" id="photoBefore" accept="image/*" capture="camera">
+            <hr style="border:0.5px solid #333; margin:10px 0;">
+            <span class="photo-label">📸 รูปหลังจบงาน:</span>
+            <input type="file" id="photoAfter" accept="image/*" capture="camera">
+        </div>
+
+        <button id="arriveBtn" class="btn" style="background:var(--gold); color:var(--dark);" onclick="arrive()">📍 ถึงที่หมาย / เริ่มงาน</button>
+        <button id="finishBtn" class="btn" style="background:#dc3545; color:white; display:none;" onclick="finish()">🏁 จบงานและส่งรายงาน</button>
     </div>
 </div>
 
 <script>
     const firebaseConfig = { 
         apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
-        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app" 
+        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app", 
+        projectId: "mastermaid-ubon" 
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    const webhook = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23";
 
-    // 1. ดึงรายชื่อแม่บ้านมาใส่ใน Dropdown
-    db.ref('maid_status').on('value', (snapshot) => {
-        const maids = snapshot.val();
-        const selector = document.getElementById('maidSelector');
-        const currentValue = selector.value;
-        selector.innerHTML = '<option value="">-- โปรดเลือกชื่อของคุณ --</option>';
-        for (let id in maids) {
-            let option = document.createElement('option');
-            option.value = id;
-            option.textContent = maids[id].name;
-            selector.appendChild(option);
-        }
-        selector.value = currentValue;
-    });
+    let selectedMaid, currentJob, timerSec = 0, timerInt;
 
-    // 2. โหลดงานเฉพาะของแม่บ้านที่เลือก
-    function loadMaidJobs() {
-        const maidId = document.getElementById('maidSelector').value;
-        const jobListDiv = document.getElementById('jobList');
-
-        if (!maidId) return;
-
-        db.ref('job_history').orderByChild('maid_id').equalTo(maidId).on('value', (snapshot) => {
-            const jobs = snapshot.val();
-            jobListDiv.innerHTML = '';
-
-            if (!jobs) {
-                jobListDiv.innerHTML = '<div class="no-job"><p>ยังไม่มีงานจัดสรรให้คุณในขณะนี้</p></div>';
-                return;
+    function initStaff() {
+        selectedMaid = document.getElementById('maidSelect').value;
+        if(!selectedMaid) return;
+        
+        // ตรวจสอบงานส่วนตัว
+        db.ref('personal_jobs/'+selectedMaid).on('value', snap => {
+            const job = snap.val();
+            if(job && job.status === "waiting") {
+                currentJob = job;
+                document.getElementById('jobInfo').innerText = "ลูกค้า: " + job.customer;
+                document.getElementById('personalJob').style.display = "block";
+            } else {
+                document.getElementById('personalJob').style.display = "none";
             }
+        });
+        loadPublicJobs();
+    }
 
-            // เรียงลำดับวันที่ล่าสุดขึ้นก่อน
-            const sortedKeys = Object.keys(jobs).sort((a, b) => new Date(jobs[b].date) - new Date(jobs[a].date));
+    function loadPublicJobs() {
+        db.ref('available_jobs').on('value', snap => {
+            const jobs = snap.val();
+            const area = document.getElementById('publicJobs');
+            area.innerHTML = "<h4>📋 งานกองกลาง:</h4>";
+            for(let id in jobs) {
+                area.innerHTML += `<div class="job-box" style="border: 1px solid #555;">
+                    <b>👤 ${jobs[id].title}</b><br>
+                    🏠 ${jobs[id].property_type} (${jobs[id].room_details})<br>
+                    ⏰ ${jobs[id].booking_time} - ${jobs[id].end_time_plan}<br>
+                    💰 ราคา: ${jobs[id].price} บาท
+                    <button class="btn" style="background:var(--gold); margin-top:10px;" onclick="acceptPublic('${id}')">กดรับงานนี้</button>
+                </div>`;
+            }
+        });
+    }
 
-            // แก้ไขในส่วน loop ที่สร้างการ์ดงาน (บรรทัดที่ประมาณ 100)
-sortedKeys.forEach(key => {
-    const j = jobs[key];
-    // ตรวจสอบชื่อตัวแปรให้ตรงกับหน้าจอง
-    const jobCard = `
-        <div class="job-card">
-            <div class="job-date">📅 วันที่: ${j.date || '-'}</div>
-            <div class="job-time">🕒 เวลา: ${j.end_time || '-'}</div>
-            
-            <div class="info-row">
-                <i class="fas fa-user"></i>
-                <span><b>ลูกค้า:</b> ${j.name || 'ไม่ระบุ'} (${j.phone || '-'})</span>
-            </div>
-            <div class="info-row">
-                <i class="fas fa-home"></i>
-                <span><b>บ้าน:</b> ${j.home_type || '-'} (${j.home_size || '-'})</span>
-            </div>
-            <div class="info-row">
-                <i class="fas fa-ruler-combined"></i>
-                <span><b>พื้นที่:</b> ${j.area_sqm || '-'} ตร.ม.</span>
-            </div>
-            <div class="info-row">
-                <i class="fas fa-map-marker-alt"></i>
-                <span><b>ที่อยู่:</b> ${j.address_detail || '-'}</span>
-            </div>
+    function acceptJob() {
+        if(confirm("ยืนยันรับงานส่วนตัวนี้?")) {
+            window.currentJobData = { title: currentJob.customer, price: "ตามตกลง", rooms: "-" };
+            db.ref('personal_jobs/'+selectedMaid).remove();
+            startWorkLayout();
+        }
+    }
 
-            ${j.special_focus ? `
-            <div class="special-box">
-                <b>✨ จุดที่ต้องเน้นพิเศษ:</b><br>${j.special_focus}
-            </div>` : ''}
+    function acceptPublic(id) {
+        if(confirm("ยืนยันรับงานกองกลางนี้?")) {
+            db.ref('available_jobs/'+id).once('value', snap => {
+                window.currentJobData = snap.val();
+                db.ref('available_jobs/'+id).remove();
+                startWorkLayout();
+            });
+        }
+    }
 
-            <a href="${j.google_maps_link}" target="_blank" class="btn-gps">
-                <i class="fas fa-location-arrow"></i> เปิดแผนที่นำทาง (GPS)
-            </a>
-        </div>
-    `;
-    jobListDiv.innerHTML += jobCard;
-});
+    function startWorkLayout() {
+        document.getElementById('workingArea').style.display = "block";
+        document.getElementById('statusBtn').disabled = true;
+        db.ref('maid_status/'+selectedMaid).set("traveling");
+    }
+
+    function arrive() {
+        db.ref('maid_status/'+selectedMaid).set("working");
+        document.getElementById('arriveBtn').style.display = "none";
+        document.getElementById('finishBtn').style.display = "block";
+        
+        timerInt = setInterval(() => {
+            timerSec++;
+            let h = Math.floor(timerSec / 3600).toString().padStart(2, '0');
+            let m = Math.floor((timerSec % 3600) / 60).toString().padStart(2, '0');
+            let s = (timerSec % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `${h}:${m}:${s}`;
+        }, 1000);
+    }
+
+    function finish() {
+        // ตรวจเช็คลิสต์ก่อนจบงาน
+        const isReady = document.getElementById('check1').checked && 
+                        document.getElementById('check2').checked && 
+                        document.getElementById('check3').checked && 
+                        document.getElementById('check4').checked;
+        
+        if(!isReady) return alert("❌ กรุณาติ๊กเช็คลิสต์งานให้ครบทุกข้อก่อนส่งงานครับ");
+        
+        if(!confirm("จบงานและส่งรายงานพร้อมรูปภาพใช่หรือไม่?")) return;
+
+        const dur = document.getElementById('timer').innerText;
+        const endTime = new Date().toLocaleTimeString('th-TH');
+
+        // ข้อมูลรายงาน
+        const reportData = {
+            maid_name: selectedMaid,
+            customer: window.currentJobData.title,
+            property_info: window.currentJobData.property_type + " (" + window.currentJobData.room_details + ")",
+            price: window.currentJobData.price,
+            duration: dur,
+            end_time: endTime,
+            status: "Success"
+        };
+
+        db.ref('maid_status/'+selectedMaid).set("available");
+
+        // ส่งเข้า Make.com
+        fetch(webhook, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(reportData)
+        }).then(() => {
+            alert("🏁 จบงานสำเร็จ! ข้อมูลและเช็คลิสต์ถูกส่งไปที่ LINE แล้ว");
+            location.reload();
+        });
+    }
+
+    function toggleStatus() {
+        const btn = document.getElementById('statusBtn');
+        if(btn.innerText.includes("ว่าง")) {
+            btn.innerText = "🔴 ไม่สะดวก (พักงาน)";
+            btn.style.background = "#dc3545";
+            db.ref('maid_status/'+selectedMaid).set("busy");
+        } else {
+            btn.innerText = "🟢 ว่าง (พร้อมรับงาน)";
+            btn.style.background = "#28a745";
+            db.ref('maid_status/'+selectedMaid).set("available");
+        }
     }
 </script>
 
