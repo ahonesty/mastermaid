@@ -1,68 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-    <title>Master Maid | CEO Dashboard</title>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <title>Live Tracking | Master Maid Thailand</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Qqf1Z9KQBuvipDzgIc5laJLz9SiOBH8&libraries=places&language=th"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        #map { height: 100vh; width: 100%; }
-        .maid-label { background: white; border: 2px solid #D4AF37; padding: 2px 5px; border-radius: 5px; font-weight: bold; }
+        :root { --primary: #0A1931; --gold: #D4AF37; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Sarabun', sans-serif; }
+        #map { width: 100%; height: 100vh; }
+        
+        .map-overlay {
+            position: absolute; top: 20px; left: 20px;
+            background: white; padding: 15px; border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 10;
+            max-width: 250px; border-top: 5px solid var(--gold);
+        }
+        .legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
     </style>
 </head>
 <body>
 
+    <div class="map-overlay">
+        <h3 style="margin: 0 0 10px 0; color: var(--primary);">📡 Master Tracking</h3>
+        <div class="legend-item"><div class="dot" style="background: blue;"></div> แม่บ้าน (Online)</div>
+        <div class="legend-item"><div class="dot" style="background: red;"></div> งานจองที่รอกดรับ</div>
+        <hr border="0" style="border-top: 1px solid #eee;">
+        <small style="color: #666;">อัปเดตพิกัดแบบ Real-time</small>
+    </div>
+
     <div id="map"></div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU",
-            databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "mastermaid-ubon",
-            appId: "1:272279135131:web:18a1d12073e601688c773e"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<script>
+    const firebaseConfig = { 
+        apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
+        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-        // ตั้งค่าแผนที่เริ่มต้น (อุบลราชธานี)
-        const map = L.map('map').setView([15.2287, 104.8475], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    let map;
+    let maidMarkers = {}; // เก็บหมุดแม่บ้าน
+    let jobMarkers = {};  // เก็บหมุดบ้านลูกค้า
 
-        // เก็บ Marker ของแม่บ้านแต่ละคนไว้ใน Object
-        const markers = {};
+    function initMap() {
+        const ubon = { lat: 15.2294, lng: 104.8564 };
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: ubon,
+            zoom: 13,
+            mapTypeControl: false,
+            streetViewControl: false
+        });
 
-        // ฟังก์ชันดึงข้อมูลจากโฟลเดอร์ tracking ทั้งหมด
-        db.ref('tracking').on('value', (snapshot) => {
-            const data = snapshot.val();
-            
-            // วนลูปเช็คแม่บ้านทุกคนที่กำลังออนไลน์ (มีพิกัดใน Firebase)
-            for (let maidID in data) {
-                const info = data[maidID];
-                const lat = info.lat;
-                const lng = info.lng;
-
-                if (markers[maidID]) {
-                    // ถ้ามีหมุดอยู่แล้ว ให้เลื่อนตำแหน่ง
-                    markers[maidID].setLatLng([lat, lng]);
+        // --- 1. ดึงพิกัดแม่บ้าน (สีน้ำเงิน) ---
+        db.ref('maids_location').on('value', (snap) => {
+            const data = snap.val();
+            if(!data) return;
+            for(let id in data) {
+                const pos = { lat: data[id].lat, lng: data[id].lng };
+                if(maidMarkers[id]) {
+                    maidMarkers[id].setPosition(pos);
                 } else {
-                    // ถ้ายังไม่มีหมุด ให้สร้างใหม่พร้อมใส่ชื่อแม่บ้าน
-                    markers[maidID] = L.marker([lat, lng]).addTo(map)
-                        .bindTooltip(maidID, { permanent: true, direction: 'top', className: 'maid-label' })
-                        .openTooltip();
-                }
-            }
-
-            // ลบหมุดกรณีที่แม่บ้านกดจบงาน (ข้อมูลใน Firebase หายไป)
-            for (let id in markers) {
-                if (!data || !data[id]) {
-                    map.removeLayer(markers[id]);
-                    delete markers[id];
+                    maidMarkers[id] = new google.maps.Marker({
+                        position: pos, map: map, 
+                        title: data[id].name,
+                        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+                    });
                 }
             }
         });
-    </script>
+
+        // --- 2. ดึงพิกัดบ้านลูกค้าจาก available_jobs (สีแดง) ---
+        db.ref('available_jobs').on('value', (snap) => {
+            const jobs = snap.val();
+            
+            // ล้างหมุดงานจองเก่าก่อนอัปเดตใหม่
+            for(let id in jobMarkers) jobMarkers[id].setMap(null);
+            jobMarkers = {};
+
+            if(!jobs) return;
+            for(let id in jobs) {
+                if(jobs[id].status === "available") {
+                    // ดึงพิกัดจาก URL (ดึงเลข lat, lng ออกมา)
+                    const url = jobs[id].location_url;
+                    const coords = url.match(/0{([\d.]+)},([\d.]+)/);
+                    if(coords) {
+                        const pos = { lat: parseFloat(coords[1]), lng: parseFloat(coords[2]) };
+                        jobMarkers[id] = new google.maps.Marker({
+                            position: pos, map: map,
+                            title: "ลูกค้า: " + jobs[id].title,
+                            icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                        });
+                        
+                        // คลิกดูรายละเอียดงานเบื้องต้น
+                        const info = new google.maps.InfoWindow({ content: `<b>คุณ ${jobs[id].title}</b><br>${jobs[id].property_type}` });
+                        jobMarkers[id].addListener("click", () => info.open(map, jobMarkers[id]));
+                    }
+                }
+            }
+        });
+    }
+
+    google.maps.event.addDomListener(window, 'load', initMap);
+</script>
 </body>
 </html>
