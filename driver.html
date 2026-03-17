@@ -30,7 +30,7 @@
 
 <div id="loginScreen" class="card" style="margin-top: 15vh;">
     <h2 style="color: var(--primary);">MASTER MAID</h2>
-    <p>ระบุรหัสพนักงานของคุณ (10 ท่าน)</p>
+    <p>ระบุรหัสพนักงานของคุณ</p>
     <input type="password" id="passCode" class="input-box" placeholder="รหัส 4 หลัก" maxlength="4">
     <button class="btn btn-gold" onclick="handleLogin()">เข้าสู่ระบบ</button>
 </div>
@@ -56,11 +56,9 @@
 </div>
 
 <script>
-    // --- 1. Firebase Config ---
     const firebaseConfig = { 
         apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
-        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "mastermaid-ubon"
+        databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app" 
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -93,29 +91,22 @@
         updateUI();
         initMap();
         listenForJobs();
-        listenForAdminCommands(); // <--- ระบบรับคำสั่ง Remote จาก CEO
+        listenForAdminCommands();
     }
 
-    // --- 2. ระบบ Remote Control จาก Admin ---
+    // --- รับคำสั่งจาก Admin ---
     function listenForAdminCommands() {
         db.ref('personal_jobs/' + selectedMaid).on('value', snap => {
             const data = snap.val();
-            if (!data) return;
-
-            // สั่งเปิดระบบจากหน้า Admin
-            if (data.action === "force_online") {
+            if (data && data.action === "force_online") {
                 isOnline = true;
                 localStorage.setItem('maid_isOnline', 'true');
                 updateUI();
                 db.ref('maid_status/' + selectedMaid).set("available");
                 db.ref('personal_jobs/' + selectedMaid).remove();
-                alert("CEO สั่งเปิดระบบให้คุณแล้ว 🟢");
             }
-
-            // สั่งระงับ/Logout จากหน้า Admin
-            if (data.action === "force_reload") {
+            if (data && data.action === "force_reload") {
                 db.ref('personal_jobs/' + selectedMaid).remove();
-                alert("CEO สั่งปิดระบบ/ระงับการเข้าถึงชั่วคราว 🔴");
                 handleLogout();
             }
         });
@@ -173,44 +164,64 @@
         }
     }
 
+    // --- ดึงงานด่วนจาก Admin (available_jobs กองกลาง) ---
     function listenForJobs() {
-        db.ref('personal_jobs/' + selectedMaid).on('value', snap => {
-            const data = snap.val();
-            if(data && data.status === "waiting") {
-                document.getElementById('jobArea').innerHTML = `
-                    <div class="info-box">
-                        <b>📢 มีงานด่วนเข้า!</b><br>ลูกค้า: ${data.customer}
-                        <button class="btn btn-gold" onclick="acceptJob('${data.customer}', '${data.location_url}')">รับงานนี้</button>
-                    </div>`;
-            } else if (!data || !data.action) {
-                document.getElementById('jobArea').innerHTML = "";
+        db.ref('available_jobs').on('value', snap => {
+            const jobs = snap.val();
+            let html = "";
+            for (let id in jobs) {
+                if (jobs[id].status === "available") {
+                    html += `
+                        <div class="info-box" style="margin-bottom:10px;">
+                            <b>📢 งานใหม่เข้า!</b><br>
+                            ลูกค้า: ${jobs[id].title}<br>
+                            <button class="btn btn-gold" onclick="acceptJob('${id}', '${jobs[id].title}', '${jobs[id].location_url}')">รับงานนี้</button>
+                        </div>`;
+                }
             }
+            document.getElementById('jobArea').innerHTML = html;
         });
     }
 
-    function acceptJob(custName, locUrl) {
-        document.getElementById('mainDashboard').style.display = "none";
-        document.getElementById('workMode').style.display = "block";
-        document.getElementById('custDetail').innerText = custName;
+    // --- ฟังก์ชันรับงาน (งานหายจากกองกลางทันที) ---
+    function acceptJob(jobId, custName, locUrl) {
+        // 1. อัปเดตสถานะงานใน Firebase ทันที งานจะหายจากแผนที่และหน้าจองลูกค้า
+        db.ref('available_jobs/' + jobId).update({
+            status: "taken",
+            acceptedBy: selectedMaid,
+            acceptedAt: Date.now()
+        }).then(() => {
+            // 2. เปลี่ยน UI เป็นโหมดทำงาน
+            document.getElementById('mainDashboard').style.display = "none";
+            document.getElementById('workMode').style.display = "block";
+            document.getElementById('custDetail').innerText = custName;
 
-        const coords = locUrl.match(/0{([\d.]+)},([\d.]+)/);
-        if (coords) {
-            const dest = { lat: parseFloat(coords[1]), lng: parseFloat(coords[2]) };
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((pos) => {
-                    const start = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    directionsService.route({
-                        origin: start, destination: dest, travelMode: 'DRIVING'
-                    }, (res, status) => {
-                        if (status === 'OK') {
-                            directionsRenderer.setDirections(res);
-                            new google.maps.Marker({ position: dest, map: map, icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' });
-                        }
-                    });
-                });
+            // 3. ลากเส้นนำทาง
+            const coords = locUrl.match(/0{([\d.]+)},([\d.]+)/);
+            if (coords) {
+                const dest = { lat: parseFloat(coords[1]), lng: parseFloat(coords[2]) };
+                drawRoute(dest);
             }
+
+            // 4. อัปเดตสถานะแม่บ้าน
+            db.ref('maid_status/' + selectedMaid).set({ status: "working", current_job: jobId });
+        }).catch(err => alert("งานนี้ถูกรับไปแล้ว!"));
+    }
+
+    function drawRoute(dest) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const start = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                directionsService.route({
+                    origin: start, destination: dest, travelMode: 'DRIVING'
+                }, (res, status) => {
+                    if (status === 'OK') {
+                        directionsRenderer.setDirections(res);
+                        new google.maps.Marker({ position: dest, map: map, icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' });
+                    }
+                });
+            });
         }
-        db.ref('maid_status/' + selectedMaid).set({ status: "working", job_title: custName, startTime: Date.now() });
     }
 
     function startWork() {
