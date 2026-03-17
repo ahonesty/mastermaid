@@ -246,6 +246,22 @@
             location.reload();
         });
     }
+    const messaging = firebase.messaging();
+
+// ขออนุญาตสิทธิ์การแจ้งเตือน
+function requestNotificationPermission() {
+    Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+            console.log('Notification permission granted.');
+            // ดึง Token ของเครื่องแม่บ้านเพื่อเก็บไว้ส่งงานให้ถูกคน
+            messaging.getToken({ vapidKey: 'YOUR_PUBLIC_VAPID_KEY' }).then((currentToken) => {
+                if (currentToken) {
+                    db.ref('staff_tokens/' + selectedMaid).set(currentToken);
+                }
+            });
+        }
+    });
+}
 </script>
 
 </body>
