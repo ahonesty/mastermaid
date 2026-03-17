@@ -24,15 +24,18 @@
         .btn-send:hover { background: #f1c40f; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(212,175,55,0.3); }
 
         /* สไตล์ตารางสถานะแม่บ้าน */
-        .staff-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+        .staff-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
         .staff-card { background: var(--navy); padding: 15px; border-radius: 12px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
         .status-dot { width: 12px; height: 12px; border-radius: 50%; margin-bottom: 5px; margin-left: auto; }
         
-        /* ปุ่มระงับงาน */
-        .btn-off { background: rgba(220, 53, 69, 0.1); color: #ff6b6b; border: 1px solid var(--red); padding: 4px 10px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.3s; }
+        /* ปุ่มควบคุมระยะไกล */
+        .btn-remote { padding: 4px 10px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; border: 1px solid transparent; }
+        .btn-on { background: rgba(40, 167, 69, 0.1); color: var(--green); border-color: var(--green); }
+        .btn-on:hover { background: var(--green); color: white; }
+        .btn-off { background: rgba(220, 53, 69, 0.1); color: #ff6b6b; border-color: var(--red); }
         .btn-off:hover { background: var(--red); color: white; }
 
-        /* รายการงานกองกลาง */
+        /* งานกองกลาง */
         .job-item { background: rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 5px solid var(--gold); position: relative; }
         .price-tag { background: var(--green); color: white; padding: 4px 10px; border-radius: 8px; font-size: 14px; font-weight: bold; position: absolute; top: 15px; right: 15px; }
 
@@ -43,7 +46,7 @@
 
     <div class="header">
         <h1>👑 Master Maid CEO Control</h1>
-        <p style="color: var(--gold); margin: 0;">ระบบจัดการทีมแม่บ้าน 10 ท่าน (Full Control)</p>
+        <p style="color: var(--gold); margin: 0;">ระบบจัดการแม่บ้าน 10 ท่าน และควบคุมสถานะระยะไกล</p>
     </div>
 
     <div class="grid-container">
@@ -65,7 +68,7 @@
             </select>
             
             <label>รายละเอียดลูกค้า/สถานที่:</label>
-            <input type="text" id="jobDesc" placeholder="ชื่อลูกค้า - สถานที่ (เช่น คุณไก่ ม.อุบล)">
+            <input type="text" id="jobDesc" placeholder="ระบุชื่อลูกค้าและสถานที่">
             
             <button class="btn-send" onclick="assignJob()">🚀 ส่งงานเดี๋ยวนี้</button>
         </div>
@@ -104,7 +107,6 @@
     function assignJob() {
         const maidName = document.getElementById('targetMaid').value;
         const detail = document.getElementById('jobDesc').value;
-
         if(!detail) return alert("❌ กรุณากรอกรายละเอียดงาน");
 
         db.ref('personal_jobs/' + maidName).set({
@@ -117,17 +119,20 @@
         });
     }
 
-    // --- 3. ฟังก์ชันสั่งปิดระบบพนักงานจากระยะไกล ---
-    function forceOffline(maidName) {
-        if(confirm(`ยืนยันการสั่งปิดระบบ (Force Offline) ของ ${maidName}?`)) {
-            // สั่งเปลี่ยนสถานะในฐานข้อมูล
-            db.ref('maid_status/' + maidName).set("offline");
-            // ส่งคำสั่งสะกิดให้หน้าจอพนักงานรีโหลด
+    // --- 3. ฟังก์ชันสั่งการระยะไกล (Remote Control) ---
+    function remoteToggle(maidName, action) {
+        const statusText = action === 'on' ? "available" : "offline";
+        const confirmMsg = action === 'on' ? `สั่งเปิดระบบ Online ให้ ${maidName}?` : `สั่งระงับ/ปิดระบบ ของ ${maidName}?`;
+
+        if(confirm(confirmMsg)) {
+            // อัปเดตสถานะใน Firebase
+            db.ref('maid_status/' + maidName).set(statusText);
+            // ส่งสัญญาณไปยังเครื่องแม่บ้าน
             db.ref('personal_jobs/' + maidName).set({
-                action: "force_reload",
+                action: action === 'on' ? "force_online" : "force_reload",
                 timestamp: Date.now()
             });
-            alert(`สั่งระงับงาน ${maidName} เรียบร้อย`);
+            alert(`ดำเนินการเรียบร้อย`);
         }
     }
 
@@ -154,10 +159,12 @@
                     </div>
                     <div style="text-align:right;">
                         <div class="status-dot" style="background:${color}"></div>
-                        ${currentStatus !== 'offline' ? 
-                            `<button class="btn-off" onclick="forceOffline('${name}')">ระงับ</button>` : 
-                            ''
-                        }
+                        <div style="display:flex; gap:5px; margin-top:5px;">
+                            ${currentStatus === 'offline' ? 
+                                `<button class="btn-remote btn-on" onclick="remoteToggle('${name}', 'on')">เปิด</button>` : 
+                                `<button class="btn-remote btn-off" onclick="remoteToggle('${name}', 'off')">ระงับ</button>`
+                            }
+                        </div>
                     </div>
                 </div>
             `;
@@ -169,19 +176,17 @@
         const jobs = snap.val();
         const area = document.getElementById('publicJobArea');
         area.innerHTML = "";
-        
         if(!jobs) {
             area.innerHTML = "<p style='color: #888; text-align: center;'>📭 ไม่มีงานค้างในขณะนี้</p>";
             return;
         }
-
         for (let id in jobs) {
             if(jobs[id].status === "available") {
                 area.innerHTML += `
                     <div class="job-item">
                         <span class="price-tag">${jobs[id].price} บาท</span>
                         <b style="color:var(--gold); font-size:18px;">👤 คุณ${jobs[id].title}</b><br>
-                        🏠 ${jobs[id].property_type} | ⏰ เวลา: ${jobs[id].booking_time}<br>
+                        🏠 ${jobs[id].property_type} | ⏰ ${jobs[id].booking_time}<br>
                         📍 สถานที่: ${jobs[id].detail}
                     </div>
                 `;
