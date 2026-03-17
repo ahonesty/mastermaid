@@ -12,71 +12,70 @@
     <style>
         :root { --gold: #D4AF37; --dark: #0A1931; --navy: #1A2F4F; --green: #28a745; --red: #dc3545; }
         body { font-family: 'Sarabun', sans-serif; background: var(--dark); color: white; text-align: center; padding: 15px; margin: 0; }
-        .card { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 25px; border: 1px solid var(--gold); max-width: 420px; margin: auto; backdrop-filter: blur(10px); }
+        .card { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 25px; border: 1px solid var(--gold); max-width: 420px; margin: auto; backdrop-filter: blur(10px); }
         
+        /* สไตล์หน้า Login */
+        #loginScreen { display: flex; flex-direction: column; justify-content: center; min-height: 80vh; }
+        .login-input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--gold); background: var(--navy); color: white; font-size: 18px; box-sizing: border-box; text-align: center; }
+        
+        /* สไตล์หน้าหลัก */
         .btn { width: 100%; padding: 16px; border-radius: 12px; font-weight: bold; margin: 10px 0; border: none; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        select { width: 100%; padding: 15px; border-radius: 12px; background: var(--navy); color: white; border: 1px solid var(--gold); font-size: 16px; margin-bottom: 10px; }
-        
-        .job-box { background: rgba(212,175,55,0.05); padding: 15px; border-radius: 15px; border: 1.5px solid var(--gold); margin-top: 15px; text-align: left; position: relative; }
-        .job-title { font-size: 18px; color: var(--gold); font-weight: bold; display: block; margin-bottom: 8px; }
-        
-        .checklist-area { background: var(--navy); padding: 15px; border-radius: 12px; margin-top: 15px; text-align: left; border: 1px solid #333; }
-        .check-item { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 15px; }
+        .job-box { background: rgba(212,175,55,0.05); padding: 15px; border-radius: 15px; border: 1.5px solid var(--gold); margin-top: 15px; text-align: left; }
+        .checklist-area { background: var(--navy); padding: 15px; border-radius: 12px; margin-top: 15px; text-align: left; }
+        .check-item { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
         .check-item input { width: 22px; height: 22px; accent-color: var(--gold); }
         
-        .photo-upload { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; margin-top: 10px; border: 1px dashed var(--gold); }
-        .photo-label { font-size: 13px; color: var(--gold); display: block; margin-bottom: 5px; }
-        
-        #timer { font-size: 36px; font-weight: bold; color: var(--gold); margin: 20px 0; text-shadow: 0 0 10px rgba(212,175,55,0.5); }
-        .badge-price { background: var(--green); color: white; padding: 4px 10px; border-radius: 8px; font-size: 14px; float: right; }
+        #timer { font-size: 36px; font-weight: bold; color: var(--gold); margin: 20px 0; }
+        .status-bar { padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2 style="color: var(--gold); margin-bottom: 20px;">👷 Master Maid Staff</h2>
-    
-    <select id="maidSelect" onchange="checkMaidSelection()">
-        <option value="">-- ยืนยันชื่อของคุณก่อนรับงาน --</option>
-        <option value="พี่เอ (MM01)">พี่เอ (MM01)</option>
-        <option value="พี่บี (MM02)">พี่บี (MM02)</option>
-        <option value="พี่ซี (MM03)">พี่ซี (MM03)</option>
-    </select>
+<div id="loginScreen" class="card">
+    <h2 style="color: var(--gold);">MASTER MAID</h2>
+    <p>กรุณาใส่รหัสผ่านเพื่อเข้าใช้งาน</p>
+    <input type="password" id="passCode" class="login-input" placeholder="ใส่รหัสผ่าน 4 หลัก">
+    <button class="btn" style="background: var(--gold); color: var(--dark);" onclick="handleLogin()">เข้าสู่ระบบ</button>
+</div>
 
-    <div id="mainUI">
-        <div id="personalJobArea"></div>
-
-        <div id="publicJobsArea">
-            <p style="color: #888;">กำลังโหลดงานใหม่...</p>
-        </div>
-    </div>
-
-    <div id="workMode" style="display:none;">
-        <div id="timer">00:00:00</div>
+<div id="mainDashboard" style="display:none;">
+    <div class="card">
+        <h3 id="welcomeMsg" style="color: var(--gold); margin-top: 0;"></h3>
         
-        <div class="checklist-area">
-            <h4 style="margin: 0 0 15px 0; color: var(--gold); border-bottom: 1px solid #444; padding-bottom: 5px;">📋 รายการตรวจสอบงาน:</h4>
-            <label class="check-item"><input type="checkbox" class="task"> กวาดและถูพื้นทุกห้อง</label>
-            <label class="check-item"><input type="checkbox" class="task"> เช็ดกระจกและระเบียง</label>
-            <label class="check-item"><input type="checkbox" class="task"> ล้างห้องน้ำและสุขภัณฑ์</label>
-            <label class="check-item"><input type="checkbox" class="task"> เก็บขยะทิ้งทั้งหมด</label>
-        </div>
+        <div id="statusIndicator" class="status-bar" style="background: #333; color: #888;">🔴 ปิดระบบ (Offline)</div>
+        <button id="toggleBtn" class="btn" style="background: #555; color: white;" onclick="toggleStatus()">คลิกเพื่อเปิดระบบ (Online)</button>
+        
+        <hr style="border: 0.1px solid #444; margin: 20px 0;">
 
-        <div class="photo-upload">
-            <span class="photo-label">📸 รูปก่อนเริ่มงาน (Before):</span>
-            <input type="file" accept="image/*" capture="camera">
-            <hr style="border: 0.1px solid #333; margin: 10px 0;">
-            <span class="photo-label">📸 รูปหลังจบงาน (After):</span>
-            <input type="file" accept="image/*" capture="camera">
+        <div id="jobListArea">
+            <div id="personalArea"></div>
+            <div id="publicArea"></div>
         </div>
-
-        <button id="arriveBtn" class="btn" style="background: var(--gold); color: var(--dark);" onclick="startWorking()">📍 ถึงที่หมาย / เริ่มจับเวลา</button>
-        <button id="finishBtn" class="btn" style="background: var(--red); color: white; display: none;" onclick="finishJob()">🏁 จบงานและส่งรายงาน</button>
     </div>
 </div>
 
+<div id="workMode" style="display:none;" class="card">
+    <div id="timer">00:00:00</div>
+    <h4 id="workWith" style="color: var(--gold);"></h4>
+    
+    <div class="checklist-area">
+        <label class="check-item"><input type="checkbox" class="task"> กวาดและถูพื้นทุกห้อง</label>
+        <label class="check-item"><input type="checkbox" class="task"> เช็ดกระจกและระเบียง</label>
+        <label class="check-item"><input type="checkbox" class="task"> ล้างห้องน้ำและสุขภัณฑ์</label>
+        <label class="check-item"><input type="checkbox" class="task"> เก็บขยะทิ้งทั้งหมด</label>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed var(--gold);">
+        <span style="font-size: 12px; color: var(--gold);">📸 ถ่ายรูปก่อน-หลังงาน (ถ้ามี):</span>
+        <input type="file" accept="image/*" capture="camera" style="font-size: 11px; margin-top: 5px;">
+    </div>
+
+    <button id="arriveBtn" class="btn" style="background: var(--gold); color: var(--dark);" onclick="startWorkTimer()">📍 ถึงที่หมาย / เริ่มจับเวลา</button>
+    <button id="finishBtn" class="btn" style="background: var(--red); color: white; display: none;" onclick="finishJob()">🏁 จบงานและส่งรายงาน</button>
+</div>
+
 <script>
-    // --- 1. ตั้งค่า Firebase ---
+    // --- 1. ตั้งค่าพื้นฐาน ---
     const firebaseConfig = { 
         apiKey: "AIzaSyCTWK2HDu1QPn54YJMaTmJ5Xk8MLis3PAU", 
         databaseURL: "https://mastermaid-ubon-default-rtdb.asia-southeast1.firebasedatabase.app", 
@@ -86,91 +85,100 @@
     const db = firebase.database();
     const webhook = "https://hook.us2.make.com/8ic5xqhrsfy8dbfqk6nkdhzaglv4qp23";
 
+    // ข้อมูลพนักงาน (จำลองรหัสผ่าน)
+    const staffDB = {
+        "1111": "พี่เอ (MM01)",
+        "2222": "พี่บี (MM02)",
+        "3333": "พี่ซี (MM03)"
+    };
+
     let selectedMaid = "";
-    let currentActiveJob = null;
-    let timerInterval;
+    let isOnline = false;
+    let activeJob = null;
+    let timerInt;
     let seconds = 0;
 
-    // --- 2. ฟังก์ชันเห็นงานทันที (เริ่มทำงานทันทีที่โหลดหน้าเว็บ) ---
-    function loadJobsImmediately() {
-        // ดึงงานกองกลาง
+    // --- 2. ระบบ Login ---
+    function handleLogin() {
+        const code = document.getElementById('passCode').value;
+        if (staffDB[code]) {
+            selectedMaid = staffDB[code];
+            document.getElementById('loginScreen').style.display = "none";
+            document.getElementById('mainDashboard').style.display = "block";
+            document.getElementById('welcomeMsg').innerText = "สวัสดี, " + selectedMaid;
+            loadJobs();
+        } else {
+            alert("❌ รหัสผ่านไม่ถูกต้อง!");
+        }
+    }
+
+    // --- 3. ระบบสถานะ (Online/Offline) ---
+    function toggleStatus() {
+        const btn = document.getElementById('toggleBtn');
+        const indicator = document.getElementById('statusIndicator');
+        
+        if (!isOnline) {
+            isOnline = true;
+            btn.innerText = "🟢 กำลังออนไลน์ (พร้อมรับงาน)";
+            btn.style.background = "var(--green)";
+            indicator.innerText = "🟢 พร้อมรับงาน (Online)";
+            indicator.style.background = "rgba(40,167,69,0.2)";
+            indicator.style.color = "var(--green)";
+            db.ref('maid_status/' + selectedMaid).set("available");
+        } else {
+            isOnline = false;
+            btn.innerText = "คลิกเพื่อเปิดระบบ (Online)";
+            btn.style.background = "#555";
+            indicator.innerText = "🔴 ปิดระบบ (Offline)";
+            indicator.style.background = "#333";
+            indicator.style.color = "#888";
+            db.ref('maid_status/' + selectedMaid).set("offline");
+        }
+    }
+
+    // --- 4. ระบบงาน ---
+    function loadJobs() {
+        // งานกองกลาง
         db.ref('available_jobs').on('value', snap => {
             const jobs = snap.val();
-            const area = document.getElementById('publicJobsArea');
-            if (!jobs) {
-                area.innerHTML = "<p style='color:#888; margin-top:20px;'>📭 ยังไม่มีงานใหม่ในขณะนี้</p>";
-                return;
-            }
-            area.innerHTML = "<h4 style='text-align:left; margin-left:5px;'>📋 งานกองกลางที่เปิดอยู่:</h4>";
+            const area = document.getElementById('publicArea');
+            area.innerHTML = "<h4>📋 งานกองกลาง:</h4>";
             for (let id in jobs) {
                 if (jobs[id].status === "available") {
                     area.innerHTML += `
-                    <div class="job-box">
-                        <span class="badge-price">${jobs[id].price}.-</span>
-                        <span class="job-title">👤 ${jobs[id].title}</span>
+                    <div class="job-box" style="opacity: ${isOnline ? 1 : 0.4}; pointer-events: ${isOnline ? 'auto' : 'none'};">
+                        <b style="color:var(--gold);">👤 ${jobs[id].title}</b><br>
                         <small>🏠 ${jobs[id].property_type} (${jobs[id].room_details})</small><br>
-                        <small>⏰ ${jobs[id].booking_time} - ${jobs[id].end_time_plan}</small><br>
-                        <small>📍 ${jobs[id].detail}</small>
-                        <button class="btn" style="background:var(--gold); margin-top:12px;" onclick="acceptJobConfirm('${id}', 'public')">กดรับงานนี้</button>
+                        <small>⏰ ${jobs[id].booking_time} | 💰 ${jobs[id].price}.-</small>
+                        <button class="btn" style="background:var(--gold); margin-top:10px; font-size:14px; padding:10px;" onclick="acceptJob('${id}')">กดรับงาน</button>
                     </div>`;
                 }
             }
         });
     }
 
-    // --- 3. ระบบจัดการงาน ---
-    function checkMaidSelection() {
-        selectedMaid = document.getElementById('maidSelect').value;
-        if (selectedMaid) {
-            // โหลดงานส่วนตัวของแม่บ้านคนนั้น
-            db.ref('personal_jobs/' + selectedMaid).on('value', snap => {
-                const job = snap.val();
-                const area = document.getElementById('personalJobArea');
-                if (job && job.status === "waiting") {
-                    area.innerHTML = `
-                    <div class="job-box" style="border: 2px solid #28a745; background: rgba(40,167,69,0.1);">
-                        <span class="job-title" style="color:#28a745;">📢 งานด่วนส่งถึงคุณ!</span>
-                        <b>ลูกค้า: ${job.customer}</b><br>
-                        <button class="btn" style="background:#28a745; color:white; margin-top:10px;" onclick="acceptJobConfirm('${selectedMaid}', 'personal')">✅ ยินดีรับงานนี้</button>
-                    </div>`;
-                } else { area.innerHTML = ""; }
-            });
-        }
+    function acceptJob(id) {
+        if (!isOnline) return alert("❌ โปรดเปิดระบบ Online ก่อนรับงาน!");
+        if (!confirm("คุณพร้อมเริ่มงานนี้ใช่หรือไม่?")) return;
+
+        db.ref('available_jobs/' + id).once('value', snap => {
+            activeJob = snap.val();
+            db.ref('available_jobs/' + id).remove();
+            startWorkMode();
+        });
     }
 
-    function acceptJobConfirm(id, type) {
-        if (!selectedMaid) return alert("❌ กรุณาเลือกชื่อของคุณก่อนรับงานครับ!");
-        if (!confirm("คุณพร้อมรับงานนี้ใช่หรือไม่?")) return;
-
-        if (type === 'public') {
-            db.ref('available_jobs/' + id).once('value', snap => {
-                currentActiveJob = snap.val();
-                db.ref('available_jobs/' + id).remove();
-                switchToWorkMode();
-            });
-        } else {
-            db.ref('personal_jobs/' + id).once('value', snap => {
-                const data = snap.val();
-                currentActiveJob = { title: data.customer, price: "ตามตกลง", property_type: "งานด่วน", room_details: "-" };
-                db.ref('personal_jobs/' + id).remove();
-                switchToWorkMode();
-            });
-        }
-    }
-
-    function switchToWorkMode() {
-        document.getElementById('mainUI').style.display = "none";
-        document.getElementById('maidSelect').disabled = true;
+    function startWorkMode() {
+        document.getElementById('mainDashboard').style.display = "none";
         document.getElementById('workMode').style.display = "block";
-        db.ref('maid_status/' + selectedMaid).set("traveling");
+        document.getElementById('workWith').innerText = "ลูกค้า: " + activeJob.title;
+        db.ref('maid_status/' + selectedMaid).set("working");
     }
 
-    function startWorking() {
-        db.ref('maid_status/' + selectedMaid).set("working");
+    function startWorkTimer() {
         document.getElementById('arriveBtn').style.display = "none";
         document.getElementById('finishBtn').style.display = "block";
-        
-        timerInterval = setInterval(() => {
+        timerInt = setInterval(() => {
             seconds++;
             let h = Math.floor(seconds / 3600).toString().padStart(2, '0');
             let m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
@@ -180,40 +188,25 @@
     }
 
     function finishJob() {
-        // ตรวจเช็คลิสต์
         const tasks = document.querySelectorAll('.task');
-        let allDone = true;
-        tasks.forEach(t => { if(!t.checked) allDone = false; });
-
-        if(!allDone) return alert("❌ กรุณาติ๊กเช็คลิสต์งานให้ครบทุกข้อก่อนส่งงาน!");
-        if(!confirm("ยืนยันการจบงานและส่งรายงาน?")) return;
+        let done = true;
+        tasks.forEach(t => { if(!t.checked) done = false; });
+        if(!done) return alert("❌ โปรดเช็คงานให้ครบทุกข้อก่อนส่ง!");
 
         const duration = document.getElementById('timer').innerText;
-        const endTime = new Date().toLocaleTimeString('th-TH');
-
         const report = {
             maid_name: selectedMaid,
-            customer: currentActiveJob.title,
-            price: currentActiveJob.price,
-            work_detail: currentActiveJob.property_type + " (" + currentActiveJob.room_details + ")",
+            customer: activeJob.title,
+            price: activeJob.price,
             duration: duration,
-            finished_at: endTime
+            finished_at: new Date().toLocaleTimeString('th-TH')
         };
 
-        db.ref('maid_status/' + selectedMaid).set("available");
-        
-        fetch(webhook, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(report)
-        }).then(() => {
-            alert("🏁 ส่งรายงานสำเร็จ! ขอบคุณที่ตั้งใจทำงานครับ");
+        fetch(webhook, { method: 'POST', body: JSON.stringify(report) }).then(() => {
+            alert("🏁 ส่งรายงานสำเร็จ!");
             location.reload();
         });
     }
-
-    // เรียกโหลดงานทันทีเมื่อเปิดหน้า
-    loadJobsImmediately();
 </script>
 
 </body>
